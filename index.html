@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Mandaluyong City Map</title>
+
+    <style>
+      path {
+        fill: #ccc;
+        stroke: #fff;
+        stroke-width: 0.5px;
+      }
+
+      path:hover {
+        fill: red;
+      }
+    </style>
+    <!-- <script src="//d3js.org/d3.v3.min.js"></script> -->
+    <!-- <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script> -->
+    <!-- <script src="https://d3js.org/topojson.v2.min.js"></script> -->
+  </head>
+
+  <body>
+    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="https://d3js.org/topojson.v1.min.js"></script>
+    <script>
+      var width = 960,
+        height = 500;
+
+      var path = d3.geo.path();
+
+      var svg = d3
+        .select("body")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+      var url = "./NCR/Mandaluyong/output.json";
+      d3.json(url, function(error, topology) {
+        if (error) throw error;
+
+        console.log("topojson", topology);
+        var geojson = topojson.feature(topology, topology.objects.Mandaluyong);
+        console.log("geojson", geojson);
+
+        svg
+          .selectAll("path")
+          .data(geojson.features)
+          .enter()
+          .append("path")
+          .attr("d", path);
+      });
+    </script>
+  </body>
+</html>
