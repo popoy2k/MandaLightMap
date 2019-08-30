@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Manda</title>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
     <script src="https://d3js.org/topojson.v2.min.js"></script>
     <style>
-      .states :hover {
-        fill: red;
+      svg {
+        background: rgb(201, 197, 197);
       }
 
-      .state-borders {
-        fill: none;
+      .brgy {
+        fill: #005daa;
         stroke: #fff;
         stroke-width: 0.5px;
         stroke-linejoin: round;
@@ -21,39 +21,58 @@
         pointer-events: none;
       }
 
-      svg {
-        background: rgb(201, 197, 197);
+      .brgy:hover {
+        fill: #f03838;
       }
     </style>
   </head>
   <body>
-    <svg width="960" height="600"></svg>
+    <h1>Mandaluyong City</h1>
   </body>
   <script>
-    var svg = d3.select("svg");
+    var w = 480,
+      h = 360;
+    // Add only when using
+    // var zoom = d3
+    //   .zoom()
+    //   .scaleExtent([1, 40])
+    //   .translateExtent([[0, 0], [w, h]])
+    //   .extent([[0, 0], [w, h]])
+    //   .on("zoom", zoomed);
+
+    var svg = d3
+      .select("body")
+      .append("svg")
+      .attr("width", w)
+      .attr("height", h);
+
     var projection = d3
       .geoMercator()
+      .center([121.039, 14.585])
+      .translate([w / 2, h / 2])
+      .scale(500000);
 
-      .scale(100);
     var path = d3.geoPath().projection(projection);
 
-    d3.queue()
-      .defer(d3.json, "NCR/Mandaluyong/MandaTopo.json")
-      .await(ready);
+    const g = svg.append("g");
 
-    function ready(err, data) {
+    d3.json("NCR/Mandaluyong/MandaTopo.json", function(err, data) {
       if (err) return console.log(err);
 
-      var brgys = topojson.feature(data, data.objects.Mandaluyong).features;
-
-      svg
-        .selectAll(".brgy")
-        .data(brgys)
+      g.selectAll("path")
+        .data(topojson.feature(data, data.objects.Mandaluyong).features)
         .enter()
         .append("path")
-        .attr("class", "brgy")
         .attr("d", path)
-        .attr("width", "200px");
-    }
+        .attr("class", "brgy")
+        .attr("cursor", "pointer")
+        .on("mouseover", function(d) {
+          console.log(d);
+        });
+    });
+
+    // function zoomed() {
+    //   g.attr("transform", d3.event.transform);
+    // }
   </script>
 </html>
