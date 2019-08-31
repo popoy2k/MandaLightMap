@@ -1,33 +1,98 @@
-.App {
-  text-align: center;
+@import url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Roboto", sans-serif;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-  pointer-events: none;
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  padding: 10px 100px;
+  box-sizing: border-box;
+  transition: 0.3s;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+nav.black {
+  background: rgba(231, 231, 231, 0.9);
+  height: 100px;
+  padding: 10px 100px;
+}
+
+nav .logo {
+  padding: 22px 20px;
+  height: 80px;
+  float: left;
+  font-size: 24px;
+  transition: 0.3s;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+nav.black .logo {
+  color: rgb(0, 0, 0);
+}
+
+nav ul {
+  list-style: none;
+  float: right;
+  margin: 0;
+  padding: 22px 20px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+nav ul li {
+  list-style: none;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+nav ul li a {
+  line-height: 80%;
+  padding: 12px 30px;
+  color: #151515;
+  text-transform: uppercase;
+  text-decoration: none !important;
+  transition: 0.3s;
+  color: #fff;
+}
+
+nav.black ul li a {
+  color: rgb(0, 0, 0);
+}
+
+nav ul li a:focus {
+  outline: none;
+}
+
+nav ul li a.active {
+  background: rgba(91, 52, 231, 0.8);
+  border-radius: 5px;
+  color: #fff;
+}
+
+section.bg-frst {
+  width: 100%;
+  height: 100vh;
+  background: url("./bg.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.content {
+  margin-top: 80px;
+}
+
+.content p {
+  width: 900px;
+  margin: 30px auto;
+  text-align: justify;
+  font-size: 20px;
+  line-height: 30px;
+}
+
+/* Don't bother this */
+.cLink {
+  text-decoration: none !important;
 }

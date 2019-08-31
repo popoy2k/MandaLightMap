@@ -1,26 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+// Boiler
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+// Redux Dependecies
+import { Provider } from "react-redux";
+import store from "./store";
+
+// Components
+
+import { login as Login } from "./components/main/login";
+import { register as Register } from "./components/main/register";
+
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+
+export class App extends Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <Router>
+          <Route exact path="/" component={Login} />
+          <Route path="/register" component={Register} />
+        </Router>
+      </Provider>
+    );
+  }
 }
 
 export default App;
