@@ -5,11 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Manda</title>
+    <link
+      href="http://fonts.googleapis.com/css?family=Montserrat"
+      rel="stylesheet"
+      type="text/css"
+    />
     <script src="https://d3js.org/d3.v4.js"></script>
     <script src="https://d3js.org/topojson.v2.min.js"></script>
     <style>
+      h1 {
+        font-family: "Proxima Nove", Montserrat, san-serif;
+        font-weight: 100;
+        font-size: 2em;
+        color: #f38080;
+      }
+
       svg {
-        background: rgb(201, 197, 197);
+        background: transparent;
+        border: solid black 1px;
       }
 
       .brgy {
@@ -18,11 +31,11 @@
         stroke-width: 0.5px;
         stroke-linejoin: round;
         stroke-linecap: round;
-        pointer-events: none;
       }
 
       .brgy:hover {
-        fill: #f03838;
+        opacity: 0.6;
+        stroke-width: 1px;
       }
     </style>
   </head>
@@ -33,18 +46,20 @@
     var w = 480,
       h = 360;
     // Add only when using
-    // var zoom = d3
-    //   .zoom()
-    //   .scaleExtent([1, 40])
-    //   .translateExtent([[0, 0], [w, h]])
-    //   .extent([[0, 0], [w, h]])
-    //   .on("zoom", zoomed);
+    var zoom = d3
+      .zoom()
+      .scaleExtent([1, 2])
+      .translateExtent([[0, 0], [w, h]])
+      .extent([[0, 0], [w, h]])
+      .on("zoom", zoomed);
 
     var svg = d3
       .select("body")
       .append("svg")
       .attr("width", w)
-      .attr("height", h);
+      .attr("height", h)
+      .call(zoom);
+    // .call(zoom.transform, d3.zoomIdentity.translate(100, 50).scale(0.5));
 
     var projection = d3
       .geoMercator()
@@ -54,7 +69,8 @@
 
     var path = d3.geoPath().projection(projection);
 
-    const g = svg.append("g");
+    const g = svg.append("g"),
+      h1 = d3.select("h1");
 
     d3.json("NCR/Mandaluyong/MandaTopo.json", function(err, data) {
       if (err) return console.log(err);
@@ -67,12 +83,15 @@
         .attr("class", "brgy")
         .attr("cursor", "pointer")
         .on("mouseover", function(d) {
-          console.log(d);
+          h1.text(`Brgy. ${d.properties.NAME_3}`);
+        })
+        .on("mouseout", function(d) {
+          h1.text("Mandaluyong City");
         });
     });
 
-    // function zoomed() {
-    //   g.attr("transform", d3.event.transform);
-    // }
+    function zoomed() {
+      g.attr("transform", d3.event.transform);
+    }
   </script>
 </html>
