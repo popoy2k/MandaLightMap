@@ -78,6 +78,11 @@ nav ul li a:focus {
   outline: none;
 }
 
+nav ul li a.active {
+  background: rgba(91, 52, 231, 0.8);
+  color: #fff;
+}
+
 nav ul li a:hover {
   background: rgba(91, 52, 231, 0.8);
   color: #fff;
@@ -109,6 +114,62 @@ section.bg-frst > h1 {
   text-align: justify;
   font-size: 20px;
   line-height: 30px;
+}
+
+.left-brand {
+  width: 55%;
+  padding: 12% 0 0 8%;
+}
+
+.left-brand h1 {
+  font-size: 5rem;
+  color: #fff;
+  margin-bottom: 0;
+}
+
+.left-brand > .left-brand-sub-contianer {
+  /* background: rgba(255, 255, 255, 0.85); */
+  padding: 10px;
+  border-radius: 5px;
+  color: #fff;
+  /* border-bottom: 5px solid rgba(91, 52, 231, 0.8); */
+
+  /* border-top-left-radius: 5px;
+  border-bottom-right-radius: 5px; */
+}
+
+.left-brand-sub-contianer > p {
+  line-height: 150%;
+  font-size: 18px;
+  text-align: justify;
+}
+
+hr {
+  margin-top: 0;
+  border: none;
+  height: 1px;
+  background-color: #fff;
+}
+
+.csp-btn {
+  padding: 5px 20px;
+  background: rgba(91, 52, 231, 0.8);
+  color: #fff;
+  border-radius: 50px;
+  border: 2px solid transparent;
+  transition: 0.3s;
+  min-width: 50px;
+}
+
+.csp-btn:hover {
+  /* border: 2px solid rgba(91, 52, 231, 0.8); */
+  border: 2px solid #fff;
+  opacity: 1;
+  color: #fff;
+}
+
+.csp-btn:focus {
+  outline: none;
 }
 
 .content-msg {
