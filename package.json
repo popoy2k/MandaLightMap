@@ -4,8 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server",
-    "client": "npm run start --prefix client"
+    "server": "nodemon server",
+    "client": "npm run start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run start --prefix client\"",
+    "heroku-postbuild": "NODE_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
   "repository": {
     "type": "git",
@@ -23,6 +25,7 @@
     "nodemon": "^1.19.1"
   },
   "dependencies": {
+    "concurrently": "^4.1.2",
     "express": "^4.17.1",
     "mongoose": "^5.6.11"
   }

@@ -19,7 +19,7 @@ export class NavBar extends Component {
       <Fragment>
         <header>
           <nav className="">
-            <div className="logo">Mandi Light</div>
+            <div className="logo">Skótos</div>
             <ul>
               <li>
                 <a href="#">Home</a>
