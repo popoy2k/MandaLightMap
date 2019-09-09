@@ -1,5 +1,16 @@
 @import url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
 
+/* 
+Colors
+
+White  - rgba(231, 231, 231, 0.9)
+Purple - rgba(91, 52, 231, 0.8)
+*/
+
+::selection {
+  background: rgba(91, 52, 231, 0.4);
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -18,13 +29,14 @@ nav {
 }
 
 nav.black {
-  background: rgba(231, 231, 231, 0.9);
-  height: 100px;
-  padding: 10px 100px;
+  background: rgba(231, 231, 231, 1);
+  height: 70px;
+  padding: 0 100px;
+  border-bottom: 2px solid rgba(91, 52, 231, 0.8);
 }
 
 nav .logo {
-  padding: 22px 20px;
+  padding: 18px 20px;
   height: 80px;
   float: left;
   font-size: 24px;
@@ -49,7 +61,7 @@ nav ul li {
 }
 
 nav ul li a {
-  line-height: 80%;
+  line-height: 100%;
   padding: 12px 30px;
   color: #151515;
   text-transform: uppercase;
@@ -66,9 +78,8 @@ nav ul li a:focus {
   outline: none;
 }
 
-nav ul li a.active {
+nav ul li a:hover {
   background: rgba(91, 52, 231, 0.8);
-  border-radius: 5px;
   color: #fff;
 }
 
@@ -78,6 +89,14 @@ section.bg-frst {
   background: url("./bg.jpg");
   background-size: cover;
   background-position: center;
+}
+
+section.bg-frst > h1 {
+  vertical-align: middle;
+  padding: 150px 10%;
+  padding-bottom: 0;
+  text-align: center;
+  color: white;
 }
 
 .content {
@@ -90,6 +109,25 @@ section.bg-frst {
   text-align: justify;
   font-size: 20px;
   line-height: 30px;
+}
+
+.content-msg {
+  text-align: center;
+  margin: 0 auto;
+  margin-top: 50px;
+  padding: 5px 10px;
+  min-height: 100px;
+  min-width: 10em;
+  max-width: 80em;
+  align-items: center;
+  border-radius: 5px;
+  background: #fff;
+  border-bottom: solid rgba(91, 52, 231, 0.8) 5px;
+}
+
+.content-msg p {
+  margin: auto 10px;
+  text-align: justify;
 }
 
 /* Don't bother this */
