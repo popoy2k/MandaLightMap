@@ -8,8 +8,9 @@ import store from "./store";
 
 // Components
 
-import { login as Login } from "./components/main/login";
+// import { login as Login } from "./components/main/login";
 import { register as Register } from "./components/main/register";
+import { landing as LandingPage } from "./components/main/landing";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
@@ -19,7 +20,7 @@ export class App extends Component {
     return (
       <Provider store={store}>
         <Router>
-          <Route exact path="/" component={Login} />
+          <Route exact path="/" component={LandingPage} />
           <Route path="/register" component={Register} />
         </Router>
       </Provider>

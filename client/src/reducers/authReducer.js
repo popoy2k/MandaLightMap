@@ -1,9 +1,9 @@
-import {
-  LOGIN_ERROR,
-  LOGIN_SUCCESS,
-  USER_LOADING,
-  USER_LOADED
-} from "../actions/types";
+// import {
+//   LOGIN_ERROR,
+//   LOGIN_SUCCESS,
+//   USER_LOADING,
+//   USER_LOADED
+// } from "../actions/types";
 
 const initialState = {
   token: localStorage.getItem("token"),

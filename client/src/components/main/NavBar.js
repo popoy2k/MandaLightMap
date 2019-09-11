@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from "react";
-
+import { Link } from "react-router-dom";
 export class NavBar extends Component {
   constructor(props) {
     super(props);
@@ -22,16 +22,16 @@ export class NavBar extends Component {
             <div className="logo">Skótos</div>
             <ul>
               <li>
-                <a href="#">Home</a>
+                <Link to="/">Home</Link>
               </li>
               <li>
-                <a href="#">Health Concern</a>
+                <Link to="/">Health Concern</Link>
               </li>
               <li>
-                <a href="#">Statistics</a>
+                <Link to="/">Statistics</Link>
               </li>
               <li>
-                <a href="#">About Us</a>
+                <Link to="/">About Us</Link>
               </li>
             </ul>
           </nav>

@@ -18,11 +18,16 @@
         font-weight: 100;
         font-size: 2em;
         color: #f38080;
+        transition: 0.5s;
       }
 
       svg {
         background: transparent;
-        border: solid black 1px;
+      }
+
+      .border-in {
+        border: 1px solid black;
+        transition: 0.3s;
       }
 
       .brgy {
@@ -59,7 +64,6 @@
       .attr("width", w)
       .attr("height", h)
       .call(zoom);
-    // .call(zoom.transform, d3.zoomIdentity.translate(100, 50).scale(0.5));
 
     var projection = d3
       .geoMercator()
@@ -82,15 +86,23 @@
         .attr("d", path)
         .attr("class", "brgy")
         .attr("cursor", "pointer")
-        .on("mouseover", function(d) {
+        .on("mouseover", d => {
           h1.text(`Brgy. ${d.properties.NAME_3}`);
+          console.log(dd);
         })
         .on("mouseout", function(d) {
           h1.text("Mandaluyong City");
         });
     });
 
-    function zoomed() {
+    function zoomed(d) {
+      let { k, x, y } = d3.event.transform;
+      console.log(k, x, y);
+      if (k === 1 && x <= 0 && y <= 0) {
+        svg.classed("border-in", false);
+      } else {
+        svg.classed("border-in", true);
+      }
       g.attr("transform", d3.event.transform);
     }
   </script>
