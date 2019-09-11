@@ -7,6 +7,8 @@ import NavBar from "./NavBar";
 import { feature as Feature } from "topojson-client";
 import * as d3 from "d3";
 
+// Font Awesome
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 export class landing extends Component {
   constructor(props) {
     super(props);
@@ -107,18 +109,49 @@ export class landing extends Component {
             </div>
             <div className="map">
               <svg className="map-svg"></svg>
-              <div>
-                <small>
-                  This Choropleth map is just partial, for more details{" "}
-                  <Link to="/" className="prpl-btn">
-                    Go here
-                  </Link>
-                </small>
-              </div>
+            </div>
+          </div>
+          <p className="footer">
+            This Choropleth map is just a partial, for more details{" "}
+            <Link to="/" className="prpl-btn">
+              Go here.
+            </Link>
+          </p>
+        </section>
+        <section className="third-content">
+          <h2>Related Studies</h2>
+          <p>
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quidem
+            voluptatibus unde quae itaque cumque totam vero esse recusandae
+            maxime consectetur!
+          </p>
+          <div className="cards">
+            <div className="card">
+              <h1>
+                <FontAwesomeIcon icon="paw" />
+              </h1>
+              <h4>Animal</h4>
+            </div>
+            <div className="card">
+              <h1>
+                <FontAwesomeIcon icon="child" />
+              </h1>
+              <h4>Human</h4>
+            </div>
+            <div className="card">
+              <h1>
+                <FontAwesomeIcon icon="industry" />
+              </h1>
+              <h4>Energy</h4>
+            </div>
+            <div className="card">
+              <h1>
+                <FontAwesomeIcon icon="user-injured" />
+              </h1>
+              <h4>Safety</h4>
             </div>
           </div>
         </section>
-        <section>Hala</section>
       </Fragment>
     );
   }

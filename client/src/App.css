@@ -133,6 +133,15 @@ section.bg-frst > h1 {
   line-height: 30px;
 }
 
+.content p.footer {
+  width: 90%;
+  margin: 10px auto;
+  text-align: center;
+  font-size: 16px;
+  line-height: 30px;
+  transition: 0.3s;
+}
+
 .map > svg {
   background: transparent;
 }
@@ -297,3 +306,69 @@ hr {
 .data ul li {
   font-size: 14px;
 }
+
+/* Third Content  */
+
+.third-content {
+  width: 100%;
+  height: 100vh;
+  background: rgba(91, 52, 231, 0.95);
+  margin: 0;
+  padding: 5% 2%;
+}
+
+.third-content h2 {
+  width: 90%;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px;
+  color: #fff;
+}
+
+.third-content p {
+  width: 90%;
+  text-align: center;
+  font-size: 18px;
+  margin: 0 auto;
+  padding: 10px;
+  color: #fff;
+}
+
+.third-content .cards {
+  display: flex;
+  flex-direction: column;
+  flex-flow: wrap;
+}
+
+.third-content .cards .card {
+  color: #fff;
+  height: 50vh;
+  width: 20%;
+  margin: auto;
+  margin-top: 50px;
+  padding: 5px;
+  border: 2px solid#fff;
+  background: transparent;
+}
+
+.third-content .cards .card h1 {
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+  transition: all 0.5s;
+  cursor: pointer;
+}
+
+.third-content .cards .card h4 {
+  width: 100%;
+  text-align: center;
+  transition: all 0.5s;
+  cursor: pointer;
+}
+
+.third-content .cards .card h1:hover::after {
+  content: attr(data-name);
+  transition: all 0.5s;
+}
+
+/* End of Third Content */
