@@ -19,13 +19,24 @@ import {
   faChild,
   faIndustry,
   faSkullCrossbones,
-  faUserInjured
+  faUserInjured,
+  faMoneyBillAlt,
+  faChartArea
 } from "@fortawesome/free-solid-svg-icons";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
-library.add(fab, faPaw, faChild, faIndustry, faSkullCrossbones, faUserInjured);
+library.add(
+  fab,
+  faPaw,
+  faChild,
+  faIndustry,
+  faSkullCrossbones,
+  faUserInjured,
+  faMoneyBillAlt,
+  faChartArea
+);
 export class App extends Component {
   render() {
     return (

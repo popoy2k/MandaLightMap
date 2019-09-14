@@ -26,6 +26,7 @@ nav {
   padding: 10px 100px;
   box-sizing: border-box;
   transition: 0.3s;
+  z-index: 1;
 }
 
 nav.black {
@@ -261,13 +262,15 @@ hr {
   stroke-width: 0.7px;
   stroke-linejoin: round;
   stroke-linecap: round;
-  transition: 0.5s;
+  transform: scale(1, 1);
+  transition: 1s;
 }
 
 .brgy:hover {
   fill: rgba(91, 52, 231, 0.8);
   stroke: #fff;
   stroke-width: 1px;
+  transform: scale(1.01, 1.01) translate(0, -10px);
 }
 
 .data {
@@ -309,6 +312,10 @@ hr {
 
 /* Third Content  */
 
+.third-content ::selection {
+  background: rgba(255, 255, 255, 0.4);
+}
+
 .third-content {
   width: 100%;
   height: 100vh;
@@ -349,21 +356,32 @@ hr {
   padding: 5px;
   border: 2px solid#fff;
   background: transparent;
+  align-items: center;
 }
 
-.third-content .cards .card h1 {
-  width: 100%;
-  text-align: center;
-  margin-top: 20px;
+.third-content .cards .card .rel-icons {
+  margin: 20px 0;
   transition: all 0.5s;
   cursor: pointer;
+  font-size: 50px;
+  transition: 0.3s;
+}
+
+.third-content .cards .card .rel-icons:hover {
+  transform: scale(1.2);
 }
 
 .third-content .cards .card h4 {
   width: 100%;
   text-align: center;
-  transition: all 0.5s;
-  cursor: pointer;
+  transition: 0.5s;
+}
+
+.third-content .cards .card p {
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+  margin-bottom: 20px;
 }
 
 .third-content .cards .card h1:hover::after {
@@ -371,4 +389,90 @@ hr {
   transition: all 0.5s;
 }
 
+.third-btn {
+  padding: 5px 10px;
+  background: transparent;
+  color: #fff;
+  text-align: center;
+  border: 1.5px solid #fff;
+  transition: 0.3s;
+  border-radius: 50px;
+  text-decoration: none !important;
+}
+
+.third-btn:focus {
+  outline: none;
+}
+
+.third-btn:hover {
+  color: rgba(91, 52, 231, 0.9);
+
+  background: #fff;
+}
+
 /* End of Third Content */
+
+/* Forth */
+
+.forth {
+  width: 100%;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.forth ::selection {
+  background: rgba(91, 52, 231, 0.4);
+}
+
+.forth h1 {
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 10%;
+  text-align: left;
+  color: rgba(91, 52, 231, 0.9);
+  font-size: 4em;
+}
+
+.forth p {
+  width: 90%;
+  margin: 0 auto;
+  font-size: 1.5em;
+  text-align: left;
+  line-height: 110%;
+}
+
+.forth .forth-btn {
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 2%;
+}
+
+.forth .forth-btn a {
+  text-decoration: none;
+  margin-right: 4%;
+  padding: 5px 25px;
+  color: rgba(91, 52, 231, 0.9);
+  border: 1.5px solid rgba(91, 52, 231, 0.9);
+  border-radius: 50px;
+  font-size: 25px;
+  transition: 0.3s;
+}
+
+.forth .forth-btn a:hover {
+  border: 1.5px solid transparent;
+  color: #fff;
+  background: rgba(91, 52, 231, 0.9);
+}
+
+.forth .forth-btn a svg {
+  width: 100px;
+  height: 100px;
+  transition: 0.3s;
+  transform: scale(1);
+}
+
+.forth .forth-btn a svg:hover {
+  transform: scale(1.5);
+}
+
+/*  End of Forth */

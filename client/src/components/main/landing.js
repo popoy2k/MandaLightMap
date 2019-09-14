@@ -127,29 +127,68 @@ export class landing extends Component {
           </p>
           <div className="cards">
             <div className="card">
-              <h1>
-                <FontAwesomeIcon icon="paw" />
-              </h1>
+              <FontAwesomeIcon icon="paw" className="rel-icons" />
               <h4>Animal</h4>
+              <p>
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eius,
+                quidem.
+              </p>
+              <Link className="third-btn" to="/">
+                Learn more.
+              </Link>
             </div>
             <div className="card">
-              <h1>
-                <FontAwesomeIcon icon="child" />
-              </h1>
+              <FontAwesomeIcon className="rel-icons" icon="child" />
               <h4>Human</h4>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Dolores, ullam?
+              </p>
+              <Link className="third-btn" to="/">
+                Learn more.
+              </Link>
             </div>
             <div className="card">
-              <h1>
-                <FontAwesomeIcon icon="industry" />
-              </h1>
+              <FontAwesomeIcon className="rel-icons" icon="industry" />
               <h4>Energy</h4>
+              <p>
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                Voluptates, voluptate.
+              </p>
+              <Link className="third-btn" to="/">
+                Learn more.
+              </Link>
             </div>
             <div className="card">
-              <h1>
-                <FontAwesomeIcon icon="user-injured" />
-              </h1>
+              <FontAwesomeIcon className="rel-icons" icon="user-injured" />
               <h4>Safety</h4>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque,
+                rerum!
+              </p>
+
+              <Link className="third-btn" to="/">
+                Learn more.
+              </Link>
             </div>
+          </div>
+        </section>
+        <section className="forth">
+          <h1>Help us, Contribute Data.</h1>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Et sunt
+            esse labore dolores assumenda dolorem officia obcaecati iure, cum
+            laborum.
+          </p>
+          <div className="forth-btn">
+            <Link>
+              Money
+              {/* <FontAwesomeIcon icon="money-bill-alt" title="Money" /> */}
+            </Link>
+            <Link>
+              Data Set
+              {/* <FontAwesomeIcon icon="chart-area" title="Data Sets" /> */}
+            </Link>
           </div>
         </section>
       </Fragment>
