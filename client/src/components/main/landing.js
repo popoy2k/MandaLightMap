@@ -30,6 +30,22 @@ export class landing extends Component {
         "https://raw.githubusercontent.com/popoy2k/MandaLightMap/master/Choropleth/NCR/Mandaluyong/MandaTopo.json"
       )
       .then(data => {
+        // let numOfCoordinates = [];
+        // numOfCoordinates[0] = Feature(
+        //   data.data,
+        //   data.data.objects.Mandaluyong
+        // ).features.map(val => val.geometry.coordinates[0]);
+
+        // console.log(
+        //   JSON.stringify(
+        //     numOfCoordinates[0].reduce((prev, curr) => prev.concat(curr))
+        //   )
+        // );
+
+        // // Feature(data.data, data.data.objects.Mandaluyong).features.map(val =>
+        // //   console.log(val.geometry.coordinates[0].length)
+        // // );
+
         d3.select(svgInst)
           .attr("width", svgW)
           .attr("height", svgH)
@@ -180,16 +196,6 @@ export class landing extends Component {
             esse labore dolores assumenda dolorem officia obcaecati iure, cum
             laborum.
           </p>
-          <div className="forth-btn">
-            <Link>
-              Money
-              {/* <FontAwesomeIcon icon="money-bill-alt" title="Money" /> */}
-            </Link>
-            <Link>
-              Data Set
-              {/* <FontAwesomeIcon icon="chart-area" title="Data Sets" /> */}
-            </Link>
-          </div>
         </section>
       </Fragment>
     );
