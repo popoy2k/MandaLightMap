@@ -1,14 +1,41 @@
 import React, { Component, Fragment } from "react";
 import { Link } from "react-router-dom";
 
+import { signinUser } from "../../actions/auth";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+
 import { ReactComponent as GLogo } from "./GoogleLogo.svg";
 import { ReactComponent as GitLogo } from "./Github.svg";
 export class login extends Component {
-  componentDidMount() {
+  constructor(props) {
+    super(props);
     document.title = "Skótos - Sign in";
+
+    this.state = {
+      email: "",
+      password: "",
+      disabled: ""
+    };
   }
 
+  static propTypes = {
+    signinUser: PropTypes.func.isRequired
+  };
+
+  onChange = e => this.setState({ [e.target.name]: e.target.value });
+
+  onSubmit = e => {
+    e.preventDefault();
+    const { email, password } = this.state;
+    if (email && password) {
+      this.props.signinUser({ email, password });
+      this.setState({ password: "", disabled: "disabled" });
+    }
+  };
+
   render() {
+    const { email, password, disabled } = this.state;
     return (
       <Fragment>
         <div className="d-flex align-items-center" style={{ height: "100vh" }}>
@@ -28,18 +55,26 @@ export class login extends Component {
                   </Link>
                 </div>
                 <div className="sk-manual">
-                  <form method="POST">
+                  <form method="POST" onSubmit={this.onSubmit}>
                     <input
                       type="email"
                       placeholder="Email"
-                      className="sk-form-control"
+                      className={`sk-form-control ${disabled}`}
+                      name="email"
+                      value={email}
+                      onChange={this.onChange}
                     />
                     <input
                       type="password"
                       placeholder="Password"
-                      className="sk-form-control"
+                      className={`sk-form-control ${disabled}`}
+                      name="password"
+                      value={password}
+                      onChange={this.onChange}
                     />
-                    <button className="sk-btn-main">Sign in</button>
+                    <button className={`sk-btn-main ${disabled}`}>
+                      Sign in
+                    </button>
                   </form>
                   <Link to="/register" className="muted-link">
                     {" "}
@@ -55,4 +90,7 @@ export class login extends Component {
   }
 }
 
-export default login;
+export default connect(
+  null,
+  { signinUser }
+)(login);

@@ -23,6 +23,9 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(passport.initialize());
 
+// Middleware
+require("./middleware/auth");
+
 // Routes
 app.use("/auth", require("./route/main"));
 

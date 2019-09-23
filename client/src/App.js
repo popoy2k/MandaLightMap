@@ -25,7 +25,7 @@ import "./App.css";
 
 // import { login as Login } from "./components/main/login";
 import register from "./components/main/register";
-import { login as Login } from "./components/main/login";
+import login from "./components/main/login";
 import { landing as LandingPage } from "./components/main/landing";
 // import { SignUp } from "./components/main/SignUp";
 
@@ -46,7 +46,7 @@ export class App extends Component {
         <Router>
           <Switch>
             <Route exact path="/" component={LandingPage} />
-            <Route path="/login" component={Login} />
+            <Route path="/login" component={login} />
             <Route path="/register" component={register} />
           </Switch>
         </Router>

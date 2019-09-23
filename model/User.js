@@ -49,7 +49,7 @@ const UserSchema = new Schema({
 });
 
 UserSchema.pre("save", function(next) {
-  if (!this.password) {
+  if (!this.acctInfo.password) {
     return next();
   }
 
@@ -57,18 +57,18 @@ UserSchema.pre("save", function(next) {
     if (err) {
       return next(err);
     }
-    bcrypt.hash(this.password, hashed, (error, resHash) => {
+    bcrypt.hash(this.acctInfo.password, hashed, (error, resHash) => {
       if (error) {
         return next(error);
       }
-      this.password = resHash;
+      this.acctInfo.password = resHash;
       next();
     });
   });
 });
 
 UserSchema.methods.comparePass = function(rawPass) {
-  return bcrypt.compare(rawPass, this.password);
+  return bcrypt.compare(rawPass, this.acctInfo.password);
 };
 
 module.exports = User = mongoose.model("usersColl", UserSchema);
