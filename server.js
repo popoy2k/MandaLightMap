@@ -1,12 +1,30 @@
 const express = require("express");
 const app = express();
 const path = require("path");
-
+const mongoose = require("mongoose");
+const passport = require("passport");
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 
 const PORT = process.env.PORT;
+
+mongoose
+  .connect(process.env.MongoURI, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false
+  })
+  .then(() => console.log("Connected to MongoDB"))
+  .catch(err => console.log(err));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+app.use(passport.initialize());
+
+// Routes
+app.use("/auth", require("./route/main"));
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));

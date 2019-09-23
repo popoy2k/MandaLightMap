@@ -1,16 +1,10 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 // Boiler
 
 // Redux Dependecies
 import { Provider } from "react-redux";
 import store from "./store";
-
-// Components
-
-// import { login as Login } from "./components/main/login";
-import { register as Register } from "./components/main/register";
-import { landing as LandingPage } from "./components/main/landing";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fab } from "@fortawesome/free-brands-svg-icons";
@@ -27,6 +21,14 @@ import {
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
+// Components
+
+// import { login as Login } from "./components/main/login";
+import register from "./components/main/register";
+import { login as Login } from "./components/main/login";
+import { landing as LandingPage } from "./components/main/landing";
+// import { SignUp } from "./components/main/SignUp";
+
 library.add(
   fab,
   faPaw,
@@ -42,8 +44,11 @@ export class App extends Component {
     return (
       <Provider store={store}>
         <Router>
-          <Route exact path="/" component={LandingPage} />
-          <Route path="/register" component={Register} />
+          <Switch>
+            <Route exact path="/" component={LandingPage} />
+            <Route path="/login" component={Login} />
+            <Route path="/register" component={register} />
+          </Switch>
         </Router>
       </Provider>
     );

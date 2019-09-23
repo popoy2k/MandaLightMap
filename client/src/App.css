@@ -30,7 +30,7 @@ nav {
 }
 
 nav.black {
-  background: rgb(255, 255, 255, 0.95);
+  background: rgb(255, 255, 255, 1);
   height: 70px;
   padding: 0 100px;
   border-bottom: 2px solid rgba(91, 52, 231, 0.8);
@@ -190,6 +190,7 @@ hr {
   border-radius: 50px;
   border: 2px solid transparent;
   transition: 0.3s;
+  text-decoration: none !important;
   min-width: 50px;
 }
 
@@ -476,3 +477,163 @@ hr {
 }
 
 /* End of Fifth */
+
+/* Registration */
+
+.sk-container {
+  width: 35%;
+  height: 70vh;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 5px;
+  border-bottom: 3px solid rgba(91, 52, 231, 0.9);
+  box-shadow: 0 5px 15px #b8b6b6;
+  text-align: center;
+}
+
+.sk-container h1 {
+  padding: 10px 20px;
+  padding-bottom: 0;
+  font-size: 2.5em;
+  color: rgba(91, 52, 231, 0.8);
+}
+
+.sk-container .sk-flex {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.sk-container .sk-flex div {
+  width: 100%;
+  height: 35%;
+}
+
+.login-container {
+  height: 80vh !important;
+}
+
+.sk-form-control:focus {
+  outline: none;
+}
+.sk-form-control:hover {
+  border: 1px solid rgba(91, 52, 231, 0.9);
+}
+.sk-form-control:focus {
+  border: 1px solid rgba(91, 52, 231, 0.9);
+}
+
+.sk-form-control {
+  margin: 5px auto;
+  padding: 5px 10px;
+  width: 90%;
+  height: 6vh;
+  border: 1px solid rgba(193, 188, 212, 0.8);
+  border-radius: 5px;
+  transition: 0.3s ease-in;
+}
+
+.sk-btn-main {
+  width: 50%;
+  height: 5vh;
+  margin: 20px 0;
+  border-radius: 50px;
+  border: 1.5px solid transparent;
+  background: rgba(91, 52, 231, 0.9);
+  color: #fff;
+  transition: 0.3s;
+}
+
+.sk-btn-main:hover {
+  background: transparent;
+  border: 1.5px solid rgba(91, 52, 231, 0.9);
+  width: 90%;
+  color: rgba(91, 52, 231, 0.9);
+}
+
+.sk-btn-main:focus {
+  outline: none;
+}
+
+.sk-btn-main:disabled {
+  cursor: not-allowed;
+  width: 90%;
+  background: #555 !important;
+}
+
+.disabled {
+  cursor: not-allowed !important;
+  width: 90%;
+  background: rgb(219, 212, 212) !important;
+}
+
+.disabled:hover {
+  border: 1.5px solid transparent !important;
+  color: rgb(161, 161, 161) !important;
+}
+
+.sk-third-party {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.custom-sign-in svg {
+  width: 40px;
+  height: 40px;
+  padding-right: 10px;
+}
+
+.custom-sign-in {
+  width: 70%;
+  height: 8vh;
+  margin: 5px auto;
+  padding: 5px 15px;
+  background: transparent;
+  border: 2px solid white;
+  color: black;
+  text-decoration: none !important;
+  font-size: 15px;
+  text-align: center;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 2px 5px 15px rgb(160, 158, 158);
+  transform: scale(1, 1);
+  transition: 0.3s;
+}
+
+.GLink {
+  border: 2px solid transparent !important;
+  color: #666666 !important;
+  font-size: 20px !important;
+  transform: scale(1, 1) !important;
+  transition: 0.3s ease-in-out !important;
+}
+.GLink:hover {
+  box-shadow: 1px 5px 5px #b3b3b3 !important;
+  transform: scale(1.1, 1.1) !important;
+}
+
+.GitLink {
+  background: #333 !important;
+  color: #fff !important;
+  font-size: 20px !important;
+  border: 2px solid transparent !important;
+  transform: scale(1, 1) !important;
+  transition: 0.3s ease-in-out !important;
+}
+
+.GitLink:hover {
+  box-shadow: 1px 5px 5px #333 !important;
+  transform: scale(1.1, 1.1) !important;
+}
+
+.muted-link {
+  /* text-decoration: none !important; */
+  color: rgb(116, 113, 113) !important;
+  margin-top: 10px !important;
+}
+
+/* End of Registration */
