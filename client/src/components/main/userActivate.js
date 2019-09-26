@@ -17,13 +17,9 @@ export class userActivate extends Component {
   componentDidMount() {
     const { token } = this.props.match.params;
     axios
-      .post(
-        `/auth/user/activation`,
-        { token },
-        {
-          headers: { "Content-Type": "application/json" }
-        }
-      )
+      .get(`/auth/user/activation/${token}`, null, {
+        headers: { "Content-Type": "application/json" }
+      })
       .then(resData => {
         console.log(resData);
         const { email, firstName } = resData.data.data;

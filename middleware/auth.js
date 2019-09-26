@@ -2,7 +2,6 @@ const passport = require("passport");
 const LocalStrat = require("passport-local").Strategy;
 const User = require("../model/User");
 const Mailer = require("../utility/Mailer");
-const Activator = require("../utility/Activator");
 const crypto = require("crypto");
 
 passport.use(
@@ -79,7 +78,7 @@ passport.use(
 
                   newUser.save(lastErroNa => {
                     if (lastErroNa) {
-                      return cb(null, {
+                      cb(null, {
                         status: "error",
                         msg: "Something went wrong."
                       });
@@ -121,22 +120,26 @@ passport.use(
       passReqToCallback: true
     },
     (req, email, password, done) => {
-      console.log(req.body, email, password);
       if (!email || !password) {
-        return done(true, { status: "error", msg: "Please fill all fields." });
+        done(null, { status: "error", msg: "Please fill all fields." });
       }
 
       User.findOne(
         { "acctInfo.email": email, "acctInfo.creationType": "Local" },
         (err, resData) => {
           if (err) {
-            return done(true, err);
+            return done(null, {
+              status: "error",
+              msg: "Something went wrong."
+            });
           }
+
           resData
             .comparePass(password)
             .then(isMatch => {
-              if (!isMatch) {
-                return done(true, {
+              console.log("this shit => ", isMatch);
+              if (isMatch instanceof Error) {
+                return done(null, {
                   status: "error",
                   msg: "Email/Password is incorrect."
                 });
@@ -148,7 +151,8 @@ passport.use(
                 creationType,
                 creationId
               } = resData.acctInfo;
-              done(false, {
+
+              return done(null, {
                 status: "success",
                 data: {
                   firstName,
@@ -159,111 +163,14 @@ passport.use(
                 }
               });
             })
-            .catch(error => {
-              return done(true, error);
+            .catch(isError => {
+              return done(null, {
+                status: "error",
+                msg: "Something went wrong."
+              });
             });
         }
       );
-    }
-  )
-);
-
-passport.use(
-  "Local.activated",
-  new LocalStrat(
-    {
-      usernameField: "token",
-      passwordField: "token",
-      passReqToCallback: true
-    },
-    (req, token1, token2, cb) => {
-      const { token } = req.body;
-      console.log(token, token1, token2);
-      if (!token) {
-        return cb(null, { status: "error", msg: "Something went wrong." });
-      }
-
-      User.findOne({
-        "acctInfo.creationType": "Local",
-        "acctInfo.activationInfo.activationToken": token
-      })
-        .select("-acctInfo.password")
-        .then(resData => {
-          const { email, firstName } = resData.acctInfo;
-          const { activationExpiry } = resData.acctInfo.activationInfo;
-
-          if (activationExpiry < Date.now()) {
-            return cb(null, { status: "error", msg: "Something went wrong." });
-          }
-
-          Activator.sender(resData)
-            .then(dataUlit => {
-              return cb(true, {
-                status: "success",
-                data: { email, firstName }
-              });
-            })
-            .catch(errorUlit => {
-              return cb(null, {
-                status: "error",
-                msg: "Something went wrong;"
-              });
-            });
-        })
-        .catch(error => {
-          return cb(null, { status: "error", msg: "Something went wrong." });
-        });
-    }
-  )
-);
-
-passport.use(
-  "Local.activate",
-  new LocalStrat(
-    {
-      usernameField: "token",
-      passwordField: "token",
-      passReqToCallback: true
-    },
-    (req, user, password, done) => {
-      const { token } = req.body;
-
-      User.findOne({
-        "acctInfo.creationType": "Local",
-        "acctInfo.activationInfo.activationToken": token
-      })
-        .select("-acctInfo.password")
-        .exec((err, retData) => {
-          if (err) {
-            return done(null, { status: "error", msg: "Something went wrong" });
-          }
-
-          if (!retData) {
-            return done(null, {
-              status: "error",
-              msg: "Something went wrong."
-            });
-          }
-          const { activationExpiry } = retData.acctInfo.activationInfo;
-
-          if (activationExpiry < Date.now()) {
-            return done(null, {
-              status: "error",
-              msg: "Your link has expired."
-            });
-          }
-
-          Activator.sender(retData._id)
-            .then(res => console.log(res))
-            .catch();
-
-          const { email, firstName } = retData.acctInfo;
-
-          done(true, {
-            status: "success",
-            data: { firstName, email }
-          });
-        });
     }
   )
 );

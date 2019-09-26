@@ -66,12 +66,12 @@ UserSchema.pre("save", function(next) {
   if (!this.acctInfo.password) {
     return next();
   }
-
+  let { password } = this.acctInfo;
   bcrypt.genSalt(10, (err, hashed) => {
     if (err) {
       return next(err);
     }
-    bcrypt.hash(this.acctInfo.password, hashed, (error, resHash) => {
+    bcrypt.hash(password, hashed, (error, resHash) => {
       if (error) {
         return next(error);
       }
@@ -81,8 +81,10 @@ UserSchema.pre("save", function(next) {
   });
 });
 
-UserSchema.methods.comparePass = function(rawPass) {
-  return bcrypt.compare(rawPass, this.acctInfo.password);
+UserSchema.methods.comparePass = async function(rawPass) {
+  await bcrypt.compare(rawPass, this.acctInfo.password, (err, isMatch) => {
+    return err ? err : isMatch;
+  });
 };
 
 module.exports = User = mongoose.model("usersColl", UserSchema);

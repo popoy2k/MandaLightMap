@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const passport = require("passport");
+const customActivate = require("../middleware/custom");
 
 router.route("/signup").post(
   function(req, res, next) {
@@ -27,8 +28,8 @@ router.route("/signin").post(
       "Local.signin",
       { session: false },
       (err, msg, info) => {
-        console.log(err, msg);
-        if (err) {
+        console.log(err, msg, info);
+        if (msg.status === "error") {
           res.status(400).json(msg);
           return next();
         }
@@ -42,17 +43,8 @@ router.route("/signin").post(
   }
 );
 
-router.route("/user/activation").post(function(req, res, next) {
-  passport.authenticate(
-    "Local.activated",
-    { session: false },
-    (err, msg, info) => {
-      console.log(err, msg, info);
-      next();
-    }
-  ),
-    (req, res) => {
-      console.log("tangina");
-    };
+router.route("/user/activation/:token").get(customActivate, (req, res) => {
+  // to be handled
 });
+
 module.exports = router;
