@@ -254,9 +254,6 @@ hr {
   width: 50%;
 }
 
-.map-svg {
-  /* border: 1px solid black; */
-}
 .brgy {
   fill: transparent;
   stroke: rgba(91, 52, 231, 1);
