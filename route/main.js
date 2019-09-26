@@ -17,7 +17,7 @@ router.route("/signup").post(
     )(req, res, next);
   },
   (req, res) => {
-    // console.l
+    // to be handled
   }
 );
 
@@ -27,6 +27,7 @@ router.route("/signin").post(
       "Local.signin",
       { session: false },
       (err, msg, info) => {
+        console.log(err, msg);
         if (err) {
           res.status(400).json(msg);
           return next();
@@ -37,8 +38,21 @@ router.route("/signin").post(
     )(req, res, next);
   },
   (req, res) => {
-    // console.log(req.body);
+    // to be handled
   }
 );
 
+router.route("/user/activation").post(function(req, res, next) {
+  passport.authenticate(
+    "Local.activated",
+    { session: false },
+    (err, msg, info) => {
+      console.log(err, msg, info);
+      next();
+    }
+  ),
+    (req, res) => {
+      console.log("tangina");
+    };
+});
 module.exports = router;

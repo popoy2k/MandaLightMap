@@ -486,6 +486,17 @@ hr {
   color: rgb(116, 113, 113) !important;
 }
 
+.sk-badge {
+  width: 90%;
+  height: 10%;
+  margin: 0 auto;
+  padding: 5px 15px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(91, 52, 231, 0.9);
+  border-radius: 50px;
+}
+
 .sk-container {
   width: 35%;
   height: 70vh;
@@ -502,6 +513,33 @@ hr {
   padding-bottom: 0;
   font-size: 2.5em;
   color: rgba(91, 52, 231, 0.8);
+}
+
+.sk-container p {
+  width: 90%;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 16px;
+  padding: 10% 0;
+}
+
+.sk-custom-btn {
+  width: 90%;
+  margin: 50px auto;
+  text-decoration: none !important;
+  padding: 5px 20px;
+  font-size: 20px;
+  background: rgba(91, 52, 231, 0.9);
+  color: #fff;
+  border-radius: 50px;
+  border: 1.5px solid transparent;
+  transition: 0.3s;
+}
+
+.sk-custom-btn:hover {
+  background: transparent;
+  color: rgba(91, 52, 231, 0.9);
+  border: 1.5px solid rgba(91, 52, 231, 0.9);
 }
 
 .sk-container .sk-flex {

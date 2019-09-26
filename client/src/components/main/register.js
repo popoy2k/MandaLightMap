@@ -112,7 +112,7 @@ export class register extends Component {
                       Sign up
                     </button>
                   </form>
-                  <Link to="/login" className="muted-link">
+                  <Link to="/auth/login" className="muted-link">
                     Have an account?
                   </Link>
                 </div>

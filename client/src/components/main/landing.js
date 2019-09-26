@@ -87,7 +87,7 @@ export class landing extends Component {
                 pollution that can help their projects.
               </p>
             </div>
-            <Link to="/register" className="csp-btn">
+            <Link to="/auth/register" className="csp-btn">
               Read more
             </Link>
           </div>

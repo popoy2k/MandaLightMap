@@ -85,7 +85,7 @@ export class login extends Component {
                       Sign in
                     </button>
                   </form>
-                  <Link to="/register" className="muted-link">
+                  <Link to="/auth/register" className="muted-link">
                     {" "}
                     Don't have an account yet?{" "}
                   </Link>

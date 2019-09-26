@@ -37,7 +37,7 @@ const UserSchema = new Schema({
         type: Boolean,
         default: false
       },
-      activationURL: {
+      activationToken: {
         type: String,
         default: ""
       },

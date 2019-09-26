@@ -55,3 +55,7 @@ export const signinUser = oldUser => (dispatch, getState) => {
       });
     });
 };
+
+// export const activateUser = token => (dispatch, getState) => {
+
+// }
