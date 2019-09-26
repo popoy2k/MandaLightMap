@@ -32,6 +32,20 @@ const UserSchema = new Schema({
         default: Date.now
       }
     },
+    activationInfo: {
+      isActivated: {
+        type: Boolean,
+        default: false
+      },
+      activationURL: {
+        type: String,
+        default: ""
+      },
+      activationExpiry: {
+        type: Date,
+        default: Date.now
+      }
+    },
     dateCreated: {
       type: Date,
       default: Date.now

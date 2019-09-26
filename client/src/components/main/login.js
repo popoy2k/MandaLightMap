@@ -63,6 +63,7 @@ export class login extends Component {
                       name="email"
                       value={email}
                       onChange={this.onChange}
+                      disabled={disabled ? true : false}
                     />
                     <input
                       type="password"
@@ -71,8 +72,16 @@ export class login extends Component {
                       name="password"
                       value={password}
                       onChange={this.onChange}
+                      disabled={disabled ? true : false}
                     />
-                    <button className={`sk-btn-main ${disabled}`}>
+                    <div className="forget-pass">
+                      <Link to="/">Forget password?</Link>
+                    </div>
+
+                    <button
+                      className={`sk-btn-main ${disabled}`}
+                      disabled={disabled ? true : false}
+                    >
                       Sign in
                     </button>
                   </form>

@@ -1,6 +1,9 @@
 const passport = require("passport");
 const LocalStrat = require("passport-local").Strategy;
 const User = require("../model/User");
+const Mailer = require("../utility/Mailer");
+const crypto = require("crypto");
+
 passport.use(
   "Local.signup",
   new LocalStrat(
@@ -17,7 +20,11 @@ passport.use(
 
         User.findOne({ "acctInfo.email": email }, (err, resData) => {
           if (err) {
-            return cb(null, err);
+            console.log(err);
+            return cb(null, {
+              status: "error",
+              msg: "Something went wrong 1."
+            });
           }
 
           if (resData) {
@@ -30,13 +37,72 @@ passport.use(
             acctInfo: { firstName, lastName, email, password }
           });
           newUser.save(err => {
-            if (err) return cb(null, err);
+            if (err) {
+              console.log(err);
+              return cb(null, {
+                status: "error",
+                msg: "Something went wrong."
+              });
+            }
 
-            cb(null, { status: "success", msg: email });
+            crypto.randomBytes(128, (randErro, randBuff) => {
+              if (randErro) {
+                console.log(randErro);
+                return cb(null, {
+                  status: "error",
+                  msg: "Something went wrong."
+                });
+              }
+
+              Mailer.sender({
+                from: `Skótos Authentication <${process.env.G_USER}>`,
+                to: email,
+                subject: "Account Verification",
+                html: `Hi ${firstName} ${lastName}, 
+                <br /> 
+                You have successfully registered to our system, 
+                and to fully activate your account please click the link. 
+                You have <strong><i> 2 hours </i></strong> to activate your account.<br />
+                <a href="http://localhost:3000/auth/uact/${randBuff.toString(
+                  "hex"
+                )}">http://localhost:3000/auth/uact/${randBuff.toString(
+                  "hex"
+                )}</a>`
+              })
+                .then(reas => {
+                  newUser.acctInfo.activationInfo.activationURL = randBuff.toString(
+                    "hex"
+                  );
+                  newUser.acctInfo.activationInfo.activationExpiry =
+                    Date.now() + 2 * 60 * 60 * 1000;
+
+                  newUser.save(lastErroNa => {
+                    if (lastErroNa) {
+                      return cb(null, {
+                        status: "error",
+                        msg: "Something went wrong."
+                      });
+                    }
+
+                    return cb(false, { status: "success", data: email });
+                  });
+                })
+                .catch(reas => {
+                  console.log("This shit", reas);
+                  return cb(null, {
+                    status: "error",
+                    msg: "Something went wrong."
+                  });
+                });
+            });
           });
         });
       } catch (error) {
-        cb(null, error);
+        console.log(error);
+        return cb(null, {
+          status: "error",
+          msg: "Something went wrong."
+        });
       }
     }
   )
@@ -70,8 +136,23 @@ passport.use(
                 msg: "Email/Password is incorrect."
               });
             }
-            console.log("pasok na pasok");
-            done(false, { status: "success", data: resData });
+            const {
+              firstName,
+              lastName,
+              email,
+              creationType,
+              creationId
+            } = resData.acctInfo;
+            done(false, {
+              status: "success",
+              data: {
+                firstName,
+                lastName,
+                email,
+                creationType,
+                creationId
+              }
+            });
           })
           .catch(error => {
             return done(true, error);

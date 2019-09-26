@@ -17,7 +17,7 @@ router.route("/signup").post(
     )(req, res, next);
   },
   (req, res) => {
-    // console.log(req.body);
+    // console.l
   }
 );
 
@@ -27,12 +27,11 @@ router.route("/signin").post(
       "Local.signin",
       { session: false },
       (err, msg, info) => {
-        console.log(err, msg);
         if (err) {
           res.status(400).json(msg);
           return next();
         }
-        console.log(`Login success => ${typeof msg}`);
+        res.status(200).json(msg);
         next();
       }
     )(req, res, next);

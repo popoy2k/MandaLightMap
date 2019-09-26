@@ -66,6 +66,7 @@ export class register extends Component {
                       onChange={this.onChange}
                       placeholder="First Name"
                       className={`sk-form-control ${disabled}`}
+                      disabled={disabled ? true : false}
                     />
                     <input
                       type="text"
@@ -74,6 +75,7 @@ export class register extends Component {
                       onChange={this.onChange}
                       placeholder="Last Name"
                       className={`sk-form-control ${disabled}`}
+                      disabled={disabled ? true : false}
                     />
                     <input
                       type="email"
@@ -82,6 +84,7 @@ export class register extends Component {
                       onChange={this.onChange}
                       placeholder="Email"
                       className={`sk-form-control ${disabled}`}
+                      disabled={disabled ? true : false}
                     />
                     <input
                       type="password"
@@ -90,6 +93,7 @@ export class register extends Component {
                       onChange={this.onChange}
                       placeholder="Password"
                       className={`sk-form-control ${disabled}`}
+                      disabled={disabled ? true : false}
                     />
                     <input
                       type="password"
@@ -98,8 +102,13 @@ export class register extends Component {
                       onChange={this.onChange}
                       placeholder="Re-type Password"
                       className={`sk-form-control ${disabled}`}
+                      disabled={disabled ? true : false}
                     />
-                    <button type="submit" className={`sk-btn-main ${disabled}`}>
+                    <button
+                      type="submit"
+                      className={`sk-btn-main ${disabled}`}
+                      disabled={disabled ? true : false}
+                    >
                       Sign up
                     </button>
                   </form>
