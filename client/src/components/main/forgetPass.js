@@ -1,5 +1,8 @@
 import React, { Component } from "react";
-import axios from "axios";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { requestReset } from "../../actions/auth";
+import { Link } from "react-router-dom";
 
 export class forgetPass extends Component {
   constructor(props) {
@@ -10,19 +13,24 @@ export class forgetPass extends Component {
     document.title = "Skótos - Forget Password";
   }
 
+  componentDidUpdate(prevProps) {
+    const { reset } = this.props;
+    if (prevProps.reset !== reset) {
+      console.log(reset);
+    }
+  }
+
+  static propTypes = {
+    requestReset: PropTypes.func.isRequired
+  };
+
   onChange = e => this.setState({ [e.target.name]: e.target.value });
 
   onSubmit = e => {
     e.preventDefault();
-
     const { email } = this.state;
     if (email) {
-      axios
-        .post("/auth/user/forget/request", JSON.stringify({ email }), {
-          headers: { "Content-Type": "application/json" }
-        })
-        .then(result => console.log(result))
-        .catch(console.error);
+      this.props.requestReset({ email });
       this.setState({ email: "" });
     }
   };
@@ -33,21 +41,25 @@ export class forgetPass extends Component {
         <div className="container">
           <div className="forget-pass-container sk-container">
             <p>
-              Forgotten your password? Please enter the email address that you
-              used to sign up, and a link will be sent.
+              Forgotten your password? <br /> Please enter the email address
+              that you used to sign up, and a link will be sent.
             </p>
             <form method="POST" onSubmit={this.onSubmit}>
               <input
                 type="email"
                 className="sk-form-control"
                 placeholder="Enter email here."
-                onChage={this.onChange}
+                onChange={this.onChange}
                 name="email"
                 value={email}
               />
               <button type="submit" className="sk-btn-main">
                 Reset Password
               </button>
+              <br />
+              <Link to="/auth/login" className="muted-link">
+                Cancel
+              </Link>
             </form>
           </div>
         </div>
@@ -56,4 +68,11 @@ export class forgetPass extends Component {
   }
 }
 
-export default forgetPass;
+const mapStateToProps = state => ({
+  reset: state.reset
+});
+
+export default connect(
+  mapStateToProps,
+  { requestReset }
+)(forgetPass);

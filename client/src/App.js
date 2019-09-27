@@ -27,6 +27,7 @@ import register from "./components/main/register";
 import login from "./components/main/login";
 import userActivate from "./components/main/userActivate";
 import forgetPass from "./components/main/forgetPass";
+import resetPass from "./components/main/resetPass";
 import { landing as LandingPage } from "./components/main/landing";
 
 library.add(
@@ -49,6 +50,7 @@ export class App extends Component {
             <Route path="/auth/login" component={login} />
             <Route path="/auth/register" component={register} />
             <Route path="/auth/uact/:token" component={userActivate} />
+            <Route path="/auth/ures/:token" component={resetPass} />
             <Route path="/auth/ufor/" component={forgetPass} />
           </Switch>
         </Router>

@@ -2,7 +2,8 @@ import {
   SIGNUP_SUCCESS,
   SIGNUP_ERROR,
   SIGNIN_SUCCESS,
-  SIGNIN_ERROR
+  SIGNIN_ERROR,
+  RESET_REQUEST
 } from "./types";
 import axios from "axios";
 
@@ -56,6 +57,23 @@ export const signinUser = oldUser => (dispatch, getState) => {
     });
 };
 
-// export const activateUser = token => (dispatch, getState) => {
-
-// }
+export const requestReset = email => (dispatch, getState) => {
+  axios
+    .post(
+      "/auth/user/forget/request",
+      JSON.stringify(email),
+      getConfig(getState)
+    )
+    .then(res => {
+      dispatch({
+        type: RESET_REQUEST,
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      dispatch({
+        type: RESET_REQUEST,
+        payload: err.response.data
+      });
+    });
+};

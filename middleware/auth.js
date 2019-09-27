@@ -2,6 +2,7 @@ const passport = require("passport");
 const LocalStrat = require("passport-local").Strategy;
 const User = require("../model/User");
 const Mailer = require("../utility/Mailer");
+const genRand = require("../utility/RandomBytes");
 const crypto = require("crypto");
 
 passport.use(
@@ -171,7 +172,7 @@ passport.use(
 );
 
 passport.use(
-  "Local.forget.request",
+  "Local.request_reset",
   new LocalStrat(
     {
       usernameField: "email",
@@ -200,12 +201,12 @@ passport.use(
           }
 
           const {
-            isValidated,
+            isActivated,
             activationExpiry
           } = result.acctInfo.activationInfo;
 
-          if (!isValidated) {
-            if (new Date(activationExpiry) < Date.now()) {
+          if (!isActivated) {
+            if (new Date(activationExpiry) > Date.now()) {
               return done(null, {
                 status: "error",
                 msg:
@@ -218,11 +219,45 @@ passport.use(
                 "This account hasn't activated by the given time allotted. Please re-signup"
             });
           }
-          Mailer.sender({
-            from: `Skótos Reset Password <${process.env.G_USER}>`,
-            to: email,
-            subject: "Account Reset Password",
-            html: `You've successfully requested for your password to be reset. Here's a link for you to be able to reset your password. Bare in mind that after 2 hours this link will expired.`
+
+          crypto.randomBytes(128, (randErr, randBuff) => {
+            if (randErr) {
+              return done(null, {
+                status: "error",
+                msg: "Something went wrong."
+              });
+            }
+            Mailer.sender({
+              from: `Skótos Reset Password <${process.env.G_USER}>`,
+              to: email,
+              subject: "Account Reset Password",
+              html: `You've successfully requested for your password to be reset. 
+              Here's a link for you to be able to reset your password. 
+              Bare in mind that after <strong><i>2 hours</i></strong> this link will expired. <br /> 
+              <a href="http://localhost:3000/auth/ures/${randBuff.toString(
+                "hex"
+              )}">Click me </a>`
+            })
+              .then(res => {
+                result.acctInfo.resetPass.resetToken = randBuff.toString("hex");
+                result.acctInfo.resetPass.resetReqDate = Date.now();
+                result.acctInfo.resetPass.resetExpiryDate =
+                  Date.now() + 2 * 60 * 60 * 1000;
+
+                result.save(err => {
+                  if (err) {
+                    return done(null, {
+                      status: "error",
+                      msg: "Something went wrong"
+                    });
+                  }
+
+                  return done(null, { status: "success", data: { email } });
+                });
+              })
+              .catch(err =>
+                done(null, { status: "error", msg: "Something went wrong" })
+              );
           });
         });
     }
