@@ -75,7 +75,7 @@ export class login extends Component {
                       disabled={disabled ? true : false}
                     />
                     <div className="forget-pass">
-                      <Link to="/">Forget password?</Link>
+                      <Link to="/auth/ufor">Forget password?</Link>
                     </div>
 
                     <button

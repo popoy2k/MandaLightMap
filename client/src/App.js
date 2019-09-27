@@ -23,12 +23,11 @@ import "./App.css";
 
 // Components
 
-// import { login as Login } from "./components/main/login";
 import register from "./components/main/register";
 import login from "./components/main/login";
 import userActivate from "./components/main/userActivate";
+import forgetPass from "./components/main/forgetPass";
 import { landing as LandingPage } from "./components/main/landing";
-// import { SignUp } from "./components/main/SignUp";
 
 library.add(
   fab,
@@ -50,6 +49,7 @@ export class App extends Component {
             <Route path="/auth/login" component={login} />
             <Route path="/auth/register" component={register} />
             <Route path="/auth/uact/:token" component={userActivate} />
+            <Route path="/auth/ufor/" component={forgetPass} />
           </Switch>
         </Router>
       </Provider>

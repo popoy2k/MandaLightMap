@@ -48,7 +48,7 @@ export const signinUser = oldUser => (dispatch, getState) => {
       });
     })
     .catch(errData => {
-      console.log(errData);
+      console.log(errData.response);
       dispatch({
         type: SIGNIN_ERROR,
         paylaod: errData.response.data

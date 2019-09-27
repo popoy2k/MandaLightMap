@@ -20,7 +20,6 @@ passport.use(
 
         User.findOne({ "acctInfo.email": email }, (err, resData) => {
           if (err) {
-            console.log(err);
             return cb(null, {
               status: "error",
               msg: "Something went wrong 1."
@@ -38,7 +37,6 @@ passport.use(
           });
           newUser.save(err => {
             if (err) {
-              console.log(err);
               return cb(null, {
                 status: "error",
                 msg: "Something went wrong."
@@ -47,7 +45,6 @@ passport.use(
 
             crypto.randomBytes(128, (randErro, randBuff) => {
               if (randErro) {
-                console.log(randErro);
                 return cb(null, {
                   status: "error",
                   msg: "Something went wrong."
@@ -91,7 +88,6 @@ passport.use(
                   });
                 })
                 .catch(reas => {
-                  console.log("This shit", reas);
                   return cb(null, {
                     status: "error",
                     msg: "Something went wrong."
@@ -101,7 +97,6 @@ passport.use(
           });
         });
       } catch (error) {
-        console.log(error);
         return cb(null, {
           status: "error",
           msg: "Something went wrong."
@@ -138,7 +133,7 @@ passport.use(
             .comparePass(password)
             .then(isMatch => {
               console.log("this shit => ", isMatch);
-              if (isMatch instanceof Error) {
+              if (!isMatch) {
                 return done(null, {
                   status: "error",
                   msg: "Email/Password is incorrect."
@@ -171,6 +166,65 @@ passport.use(
             });
         }
       );
+    }
+  )
+);
+
+passport.use(
+  "Local.forget.request",
+  new LocalStrat(
+    {
+      usernameField: "email",
+      passwordField: "email",
+      passReqToCallback: true
+    },
+    (req, email, pass, done) => {
+      if (!email) {
+        return done(null, { status: "error", msg: "Please enter email." });
+      }
+
+      User.findOne({ "acctInfo.email": email })
+        .select("-acctInfo.password")
+        .exec((error, result) => {
+          if (error) {
+            return done(null, {
+              status: "error",
+              msg: "Something went wrong."
+            });
+          }
+          if (!result) {
+            return done(null, {
+              status: "error",
+              msg: "Please enter a valid email."
+            });
+          }
+
+          const {
+            isValidated,
+            activationExpiry
+          } = result.acctInfo.activationInfo;
+
+          if (!isValidated) {
+            if (new Date(activationExpiry) < Date.now()) {
+              return done(null, {
+                status: "error",
+                msg:
+                  "Your account is not validated yet, Please activate it using the link provided sent in your email."
+              });
+            }
+            return done(null, {
+              status: "error",
+              msg:
+                "This account hasn't activated by the given time allotted. Please re-signup"
+            });
+          }
+          Mailer.sender({
+            from: `Skótos Reset Password <${process.env.G_USER}>`,
+            to: email,
+            subject: "Account Reset Password",
+            html: `You've successfully requested for your password to be reset. Here's a link for you to be able to reset your password. Bare in mind that after 2 hours this link will expired.`
+          });
+        });
     }
   )
 );

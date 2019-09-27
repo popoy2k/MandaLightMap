@@ -28,7 +28,6 @@ router.route("/signin").post(
       "Local.signin",
       { session: false },
       (err, msg, info) => {
-        console.log(err, msg, info);
         if (msg.status === "error") {
           res.status(400).json(msg);
           return next();
@@ -46,5 +45,7 @@ router.route("/signin").post(
 router.route("/user/activation/:token").get(customActivate, (req, res) => {
   // to be handled
 });
+
+router.route("/user/forget/request").post((req, res) => {});
 
 module.exports = router;

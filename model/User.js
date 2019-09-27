@@ -63,28 +63,27 @@ const UserSchema = new Schema({
 });
 
 UserSchema.pre("save", function(next) {
-  if (!this.acctInfo.password) {
+  if (!this.acctInfo.password || !this.isModified("acctInfo.password")) {
     return next();
   }
   let { password } = this.acctInfo;
-  bcrypt.genSalt(10, (err, hashed) => {
+
+  bcrypt.genSalt(10, (err, salted) => {
     if (err) {
       return next(err);
     }
-    bcrypt.hash(password, hashed, (error, resHash) => {
+    bcrypt.hash(password, salted, (error, resHash) => {
       if (error) {
         return next(error);
       }
       this.acctInfo.password = resHash;
-      next();
+      return next();
     });
   });
 });
 
-UserSchema.methods.comparePass = async function(rawPass) {
-  await bcrypt.compare(rawPass, this.acctInfo.password, (err, isMatch) => {
-    return err ? err : isMatch;
-  });
+UserSchema.methods.comparePass = function(rawPass) {
+  return bcrypt.compare(rawPass, this.acctInfo.password);
 };
 
 module.exports = User = mongoose.model("usersColl", UserSchema);

@@ -691,3 +691,11 @@ hr {
 }
 
 /* End of Registration */
+
+/* Forget pass */
+
+.forget-pass-container {
+  height: 50vh !important;
+}
+
+/* Enf of forget pass */

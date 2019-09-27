@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import { Link } from "react-router-dom";
 export class NavBar extends Component {
   constructor(props) {
@@ -16,27 +16,25 @@ export class NavBar extends Component {
 
   render() {
     return (
-      <Fragment>
-        <header>
-          <nav className="">
-            <div className="logo">Skótos</div>
-            <ul>
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-              <li>
-                <Link to="/">Health Concern</Link>
-              </li>
-              <li>
-                <Link to="/">Statistics</Link>
-              </li>
-              <li>
-                <Link to="/">About Us</Link>
-              </li>
-            </ul>
-          </nav>
-        </header>
-      </Fragment>
+      <header>
+        <nav className="">
+          <div className="logo">Skótos</div>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/">Health Concern</Link>
+            </li>
+            <li>
+              <Link to="/">Statistics</Link>
+            </li>
+            <li>
+              <Link to="/">About Us</Link>
+            </li>
+          </ul>
+        </nav>
+      </header>
     );
   }
 }
