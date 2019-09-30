@@ -32,6 +32,9 @@ export class NavBar extends Component {
             <li>
               <Link to="/">About Us</Link>
             </li>
+            <li>
+              <Link to="/auth/login">For Developer</Link>
+            </li>
           </ul>
         </nav>
       </header>

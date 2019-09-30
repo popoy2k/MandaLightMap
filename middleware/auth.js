@@ -263,3 +263,62 @@ passport.use(
     }
   )
 );
+
+passport.use(
+  "Local.pass_reset",
+  new LocalStrat(
+    {
+      usernameField: "password",
+      passwordField: "rePassword",
+      passReqToCallback: true
+    },
+    (req, pass, rePass, done) => {
+      const { token } = req.body;
+      if (!token || !pass || !rePass || pass !== rePass) {
+        return done(null, { status: "error", msg: "Please fill all fields." });
+      }
+
+      User.findOne({
+        "acctInfo.resetPass.resetToken": token,
+        "acctInfo.creationType": "Local"
+      })
+        .select("-acctInfo.password")
+        .exec((err, resData) => {
+          if (err) {
+            return done(null, { status: "error", msg: "Something went wrong" });
+          }
+
+          if (!resData) {
+            return done(null, {
+              status: "error",
+              msg: "Account can't be found"
+            });
+          }
+
+          const { resetExpiryDate } = resData.acctInfo.resetPass;
+
+          if (resetExpiryDate < Date.now()) {
+            return done(null, { status: "error", msg: "The link is expired" });
+          }
+
+          resData.acctInfo.resetPass.resetToken = "";
+          resData.acctInfo.resetPass.resetExpiryDate = Date.now();
+          resData.acctInfo.password = pass;
+
+          resData.save(err => {
+            if (err) {
+              return done(null, {
+                status: "error",
+                msg: "Something went wrong"
+              });
+            }
+
+            return done(null, {
+              status: "success",
+              msg: "You've change your password successfully."
+            });
+          });
+        });
+    }
+  )
+);

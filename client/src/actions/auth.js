@@ -3,7 +3,8 @@ import {
   SIGNUP_ERROR,
   SIGNIN_SUCCESS,
   SIGNIN_ERROR,
-  RESET_REQUEST
+  RESET_REQUEST,
+  RESET_PASS
 } from "./types";
 import axios from "axios";
 
@@ -74,6 +75,23 @@ export const requestReset = email => (dispatch, getState) => {
       dispatch({
         type: RESET_REQUEST,
         payload: err.response.data
+      });
+    });
+};
+
+export const resetPassFinal = newPass => (dispatch, getState) => {
+  axios
+    .post("/auth/user/reset", JSON.stringify(newPass), getConfig(getState))
+    .then(resData => {
+      dispatch({
+        type: RESET_PASS,
+        payload: resData.data
+      });
+    })
+    .catch(resErr => {
+      dispatch({
+        type: RESET_PASS,
+        payload: resErr.response.data
       });
     });
 };
