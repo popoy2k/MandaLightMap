@@ -30,6 +30,9 @@ export class landing extends Component {
         "https://raw.githubusercontent.com/popoy2k/MandaLightMap/master/Choropleth/NCR/Mandaluyong/MandaTopo.json"
       )
       .then(data => {
+        let testing = Feature(data.data, data.data.objects.Mandaluyong)
+          .features[1].geometry.coordinates[0];
+
         d3.select(svgInst)
           .attr("width", svgW)
           .attr("height", svgH)
@@ -48,6 +51,28 @@ export class landing extends Component {
           .on("mouseout", () => {
             this.setState({ currBrgy: "Mandaluyong City" });
           });
+
+        d3.select(`${svgInst}`)
+          .selectAll("circle")
+          .data(testing)
+          .enter()
+          .append("circle")
+          .attr("cx", function(d) {
+            return d3
+              .geoMercator()
+              .center([121.03, 14.5758])
+              .translate([svgH / 2, svgW / 2])
+              .scale(750000)(d)[0];
+          })
+          .attr("cy", function(d) {
+            return d3
+              .geoMercator()
+              .center([121.03, 14.5758])
+              .translate([svgH / 2, svgW / 2])
+              .scale(750000)(d)[1];
+          })
+          .attr("r", "4px")
+          .attr("fill", "red");
       });
   }
 
@@ -61,6 +86,7 @@ export class landing extends Component {
         .scale(750000)
     );
   };
+
   render() {
     const { currBrgy } = this.state;
     return (
