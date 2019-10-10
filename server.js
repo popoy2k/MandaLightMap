@@ -31,6 +31,7 @@ require("./utility/Mailer");
 
 // Routes
 app.use("/auth", require("./route/main"));
+app.use("/data", require("./route/data"));
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));

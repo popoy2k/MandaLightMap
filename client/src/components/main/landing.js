@@ -2,6 +2,9 @@ import React, { Component, Fragment } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import NavBar from "./NavBar";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import { getLanding } from "../../actions/auth";
 
 // Map related imports
 import { feature as Feature } from "topojson-client";
@@ -17,64 +20,115 @@ export class landing extends Component {
       svgW: 720,
       svgH: 500,
       svgInst: ".map-svg",
-      currBrgy: "Mandaluyong City"
+      currBrgy: "Mandaluyong City",
+      mapData: d3.map()
     };
-
+    this.props.getLanding();
     document.title = "Welcome to Skótos!";
   }
 
-  componentDidMount() {
-    let { svgW, svgH, svgInst } = this.state;
-    axios
-      .get(
-        "https://raw.githubusercontent.com/popoy2k/MandaLightMap/master/Choropleth/NCR/Mandaluyong/MandaTopo.json"
-      )
-      .then(data => {
-        let testing = Feature(data.data, data.data.objects.Mandaluyong)
-          .features[1].geometry.coordinates[0];
+  static propTypes = {
+    getLanding: PropTypes.func.isRequired,
+    landing: PropTypes.object
+  };
 
-        d3.select(svgInst)
-          .attr("width", svgW)
-          .attr("height", svgH)
-          .append("g")
-          .selectAll("path")
-          .data(Feature(data.data, data.data.objects.Mandaluyong).features)
-          .enter()
-          .append("path")
-          .attr("d", this.path())
-          .attr("cursor", "pointer")
-          .attr("class", "brgy")
-          .on("mouseover", brgyData => {
-            const { NAME_3 } = brgyData.properties;
-            this.setState({ currBrgy: `Brgy. ${NAME_3}` });
-          })
-          .on("mouseout", () => {
-            this.setState({ currBrgy: "Mandaluyong City" });
-          });
+  componentDidUpdate(prevState) {
+    const { landing } = this.props;
+    let { svgW, svgH, svgInst, mapData } = this.state;
 
-        d3.select(`${svgInst}`)
-          .selectAll("circle")
-          .data(testing)
-          .enter()
-          .append("circle")
-          .attr("cx", function(d) {
-            return d3
-              .geoMercator()
-              .center([121.03, 14.5758])
-              .translate([svgH / 2, svgW / 2])
-              .scale(750000)(d)[0];
-          })
-          .attr("cy", function(d) {
-            return d3
-              .geoMercator()
-              .center([121.03, 14.5758])
-              .translate([svgH / 2, svgW / 2])
-              .scale(750000)(d)[1];
-          })
-          .attr("r", "4px")
-          .attr("fill", "red");
-      });
+    let colorScale = d3
+      .scaleThreshold()
+      .domain([20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 95, 100])
+      .range(d3.schemePurples[9]);
+
+    if (prevState.landing !== landing) {
+      landing.data.forEach(val => mapData.set(val.mapId, val.mean));
+      axios
+        .get(
+          "https://raw.githubusercontent.com/popoy2k/MandaLightMap/master/Choropleth/NCR/Mandaluyong/MandaTopo.json"
+        )
+        .then(data => {
+          d3.select(svgInst)
+            .attr("width", svgW)
+            .attr("height", svgH)
+            .append("g")
+            .selectAll("path")
+            .data(Feature(data.data, data.data.objects.Mandaluyong).features)
+            .enter()
+            .append("path")
+            .attr("d", this.path())
+            .attr("cursor", "pointer")
+            .attr("class", "brgy")
+            .attr("fill", function(d) {
+              d.total = mapData.get(d.properties.ID_3) || 0;
+
+              return colorScale(d.total);
+            })
+            .on("mouseover", brgyData => {
+              const { NAME_3 } = brgyData.properties;
+              this.setState({ currBrgy: `Brgy. ${NAME_3}` });
+            })
+            .on("mouseout", () => {
+              this.setState({ currBrgy: "Mandaluyong City" });
+            });
+        });
+    }
   }
+
+  // componentDidMount() {
+  //     d3.select(svgInst)
+  //       .selectAll("circle")
+  //       .data(Feature(data.data, data.data.objects.Mandaluyong).features)
+  //       .enter()
+  //       .append("circle")
+  //       .attr("cx", function(d) {
+  //         let long = d3.geoCentroid(d);
+  //         return d3
+  //           .geoMercator()
+  //           .center([121.03, 14.5758])
+  //           .translate([svgH / 2, svgW / 2])
+  //           .scale(750000)(long)[0];
+  //       })
+  //       .attr("cy", function(d) {
+  //         let lat = d3.geoCentroid(d);
+  //         return d3
+  //           .geoMercator()
+  //           .center([121.03, 14.5758])
+  //           .translate([svgH / 2, svgW / 2])
+  //           .scale(750000)(lat)[1];
+  //       })
+  //       .attr("r", "2px")
+  //       .attr("fill", "black");
+  //     d3.select(svgInst)
+  //       .selectAll("text")
+  //       .data(Feature(data.data, data.data.objects.Mandaluyong).features)
+  //       .enter()
+  //       .append("text")
+  //       .attr("x", function(d) {
+  //         let long = d3.geoCentroid(d);
+  //         return d3
+  //           .geoMercator()
+  //           .center([121.03, 14.5758])
+  //           .translate([svgH / 2, svgW / 2])
+  //           .scale(750000)(long)[0];
+  //       })
+  //       .attr("y", function(d) {
+  //         let lat = d3.geoCentroid(d);
+  //         return d3
+  //           .geoMercator()
+  //           .center([121.03, 14.5758])
+  //           .translate([svgH / 2, svgW / 2])
+  //           .scale(750000)(lat)[1];
+  //       })
+  //       .attr("dy", -7)
+  //       .style("fill", "rgba(91, 52, 231, 0.9)")
+  //       .attr("text-anchor", "middle")
+  //       .attr("font-size", "12px")
+  //       .text(function(d) {
+  //         return d.properties.NAME_3;
+  //       });
+  // });
+  // }
 
   path = () => {
     const { svgW, svgH } = this.state;
@@ -218,4 +272,11 @@ export class landing extends Component {
   }
 }
 
-export default landing;
+const mapStateToProps = state => ({
+  landing: state.data.landingData
+});
+
+export default connect(
+  mapStateToProps,
+  { getLanding }
+)(landing);

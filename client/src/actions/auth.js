@@ -4,7 +4,9 @@ import {
   SIGNIN_SUCCESS,
   SIGNIN_ERROR,
   RESET_REQUEST,
-  RESET_PASS
+  RESET_PASS,
+  LANDING_DATA_SUCCESS,
+  LANDING_DATA_ERROR
 } from "./types";
 import axios from "axios";
 
@@ -91,6 +93,23 @@ export const resetPassFinal = newPass => (dispatch, getState) => {
     .catch(resErr => {
       dispatch({
         type: RESET_PASS,
+        payload: resErr.response.data
+      });
+    });
+};
+
+export const getLanding = () => (dispatch, getState) => {
+  axios
+    .get("/data/landing", null, getConfig(getState))
+    .then(resData => {
+      dispatch({
+        type: LANDING_DATA_SUCCESS,
+        payload: resData.data
+      });
+    })
+    .catch(resErr => {
+      dispatch({
+        type: LANDING_DATA_ERROR,
         payload: resErr.response.data
       });
     });

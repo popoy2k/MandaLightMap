@@ -268,9 +268,9 @@ hr {
 }
 
 .brgy {
-  fill: transparent;
-  stroke: rgba(91, 52, 231, 1);
-  stroke-width: 0.7px;
+  /* fill: transparent; */
+  stroke: rgb(224, 216, 253);
+  stroke-width: 1px;
   stroke-linejoin: round;
   stroke-linecap: round;
   transform: scale(1, 1);
@@ -279,9 +279,8 @@ hr {
 
 .brgy:hover {
   fill: rgba(91, 52, 231, 0.8);
-  stroke: #fff;
-  stroke-width: 1px;
-  transform: scale(1.001, 1.001) translate(0, 5px);
+
+  /* transform: scale(1.005, 1.005); */
 }
 
 .data {

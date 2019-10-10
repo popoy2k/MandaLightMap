@@ -28,7 +28,7 @@ import login from "./components/main/login";
 import userActivate from "./components/main/userActivate";
 import forgetPass from "./components/main/forgetPass";
 import resetPass from "./components/main/resetPass";
-import { landing as LandingPage } from "./components/main/landing";
+import landing from "./components/main/landing";
 
 library.add(
   fab,
@@ -46,7 +46,7 @@ export class App extends Component {
       <Provider store={store}>
         <Router>
           <Switch>
-            <Route exact path="/" component={LandingPage} />
+            <Route exact path="/" component={landing} />
             <Route path="/auth/login" component={login} />
             <Route path="/auth/register" component={register} />
             <Route path="/auth/uact/:token" component={userActivate} />
