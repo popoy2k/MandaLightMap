@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+
 export class NavBar extends Component {
-  constructor(props) {
-    super(props);
+  componentDidMount() {
     window.addEventListener("scroll", () => {
       if (window.scrollY > 50) {
         document.querySelector("nav").classList.add("black");
@@ -11,8 +11,6 @@ export class NavBar extends Component {
       }
     });
   }
-
-  componentDidMount() {}
 
   render() {
     return (
@@ -30,7 +28,7 @@ export class NavBar extends Component {
               <Link to="/">Statistics</Link>
             </li>
             <li>
-              <Link to="/">About Us</Link>
+              <Link to="/map">About Us</Link>
             </li>
             <li>
               <Link to="/auth/login">For Developer</Link>

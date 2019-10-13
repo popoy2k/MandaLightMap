@@ -12,6 +12,7 @@ import * as d3 from "d3";
 
 // Font Awesome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 export class landing extends Component {
   constructor(props) {
     super(props);
@@ -21,6 +22,9 @@ export class landing extends Component {
       svgH: 500,
       svgInst: ".map-svg",
       currBrgy: "Mandaluyong City",
+      currPop: "386,276",
+      currLA: "1124.97",
+      currLiPo: "43.32",
       mapData: d3.map()
     };
     this.props.getLanding();
@@ -38,8 +42,10 @@ export class landing extends Component {
 
     let colorScale = d3
       .scaleThreshold()
-      .domain([20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 95, 100])
+      .domain(d3.range(20, 100, 5))
       .range(d3.schemePurples[9]);
+
+    let rateScale = d3.select(".map-svg");
 
     if (prevState.landing !== landing) {
       landing.data.forEach(val => mapData.set(val.mapId, val.mean));
@@ -61,88 +67,107 @@ export class landing extends Component {
             .attr("class", "brgy")
             .attr("fill", function(d) {
               d.total = mapData.get(d.properties.ID_3) || 0;
-
               return colorScale(d.total);
             })
             .on("mouseover", brgyData => {
-              const { NAME_3 } = brgyData.properties;
-              this.setState({ currBrgy: `Brgy. ${NAME_3}` });
+              const {
+                ID_3,
+                NAME_3,
+                area_3,
+                population_3
+              } = brgyData.properties;
+              let currLiPo = parseFloat(mapData.get(ID_3)).toFixed(2) || 0;
+
+              this.setState({
+                currBrgy: `Brgy. ${NAME_3}`,
+                currLA: area_3,
+                currPop: population_3,
+                currLiPo
+              });
             })
-            .on("mouseout", () => {
-              this.setState({ currBrgy: "Mandaluyong City" });
+            .on("mouseout", e => {
+              const { area_1, population_1 } = e.properties;
+              this.setState({
+                currBrgy: "Mandaluyong City",
+                currLiPo: "43.32",
+                currLA: area_1,
+                currPop: population_1
+              });
             });
+
+          let x = d3
+            .scaleLinear()
+            .domain([1, 10])
+            .rangeRound([50, 100]);
+          let gRS = rateScale
+            .append("g")
+            .attr("transform", "translate(-20,50)");
+
+          gRS
+            .selectAll("rect")
+            .data(
+              colorScale.range().map(function(d) {
+                d = colorScale.invertExtent(d);
+
+                if (d[0] == null) d[0] = x.domain()[0];
+                if (d[1] == null) d[1] = x.domain()[1];
+
+                if (d[0] <= 1) d[0] = 15;
+
+                return d;
+              })
+            )
+            .enter()
+            .append("rect")
+            .attr("height", 8)
+
+            .attr("x", function(d) {
+              return x(d[0]);
+            })
+            .attr("width", function(d) {
+              return x(d[1]) - x(d[0]);
+            })
+            .attr("fill", function(d) {
+              return colorScale(d[0]);
+            });
+          gRS
+            .append("text")
+            .attr("x", x.range()[0])
+            .attr("y", -6)
+            .attr("fill", "#000")
+            .attr("text-anchor", "start")
+            .attr("font-weight", "bold")
+            .attr("font-size", "12px")
+            .attr("transform", "translate(80,0)")
+            .text("Radiance Scale");
+
+          gRS
+            .call(
+              d3
+                .axisBottom(x)
+                .tickSize(13)
+                .tickValues(colorScale.domain().filter(val => val <= 60))
+            )
+            .select(".domain")
+            .remove();
         });
     }
   }
-
-  // componentDidMount() {
-  //     d3.select(svgInst)
-  //       .selectAll("circle")
-  //       .data(Feature(data.data, data.data.objects.Mandaluyong).features)
-  //       .enter()
-  //       .append("circle")
-  //       .attr("cx", function(d) {
-  //         let long = d3.geoCentroid(d);
-  //         return d3
-  //           .geoMercator()
-  //           .center([121.03, 14.5758])
-  //           .translate([svgH / 2, svgW / 2])
-  //           .scale(750000)(long)[0];
-  //       })
-  //       .attr("cy", function(d) {
-  //         let lat = d3.geoCentroid(d);
-  //         return d3
-  //           .geoMercator()
-  //           .center([121.03, 14.5758])
-  //           .translate([svgH / 2, svgW / 2])
-  //           .scale(750000)(lat)[1];
-  //       })
-  //       .attr("r", "2px")
-  //       .attr("fill", "black");
-  //     d3.select(svgInst)
-  //       .selectAll("text")
-  //       .data(Feature(data.data, data.data.objects.Mandaluyong).features)
-  //       .enter()
-  //       .append("text")
-  //       .attr("x", function(d) {
-  //         let long = d3.geoCentroid(d);
-  //         return d3
-  //           .geoMercator()
-  //           .center([121.03, 14.5758])
-  //           .translate([svgH / 2, svgW / 2])
-  //           .scale(750000)(long)[0];
-  //       })
-  //       .attr("y", function(d) {
-  //         let lat = d3.geoCentroid(d);
-  //         return d3
-  //           .geoMercator()
-  //           .center([121.03, 14.5758])
-  //           .translate([svgH / 2, svgW / 2])
-  //           .scale(750000)(lat)[1];
-  //       })
-  //       .attr("dy", -7)
-  //       .style("fill", "rgba(91, 52, 231, 0.9)")
-  //       .attr("text-anchor", "middle")
-  //       .attr("font-size", "12px")
-  //       .text(function(d) {
-  //         return d.properties.NAME_3;
-  //       });
-  // });
-  // }
 
   path = () => {
     const { svgW, svgH } = this.state;
     return d3.geoPath().projection(
       d3
         .geoMercator()
-        .center([121.03, 14.5758])
+        .center([121.03, 14.578])
         .translate([svgH / 2, svgW / 2])
         .scale(750000)
     );
   };
 
   render() {
-    const { currBrgy } = this.state;
+    const { currBrgy, currLA, currLiPo, currPop } = this.state;
+
     return (
       <Fragment>
         <NavBar />
@@ -183,11 +208,22 @@ export class landing extends Component {
           <div className="choropleth">
             <div className="data">
               <h2 className="currBrgy">{currBrgy}</h2>
-              <ul>
-                <li>Land area: </li>
-                <li>Population: </li>
-                <li>Light Intensity: </li>
-              </ul>
+              <table className="landingTable">
+                <tbody>
+                  <tr>
+                    <td>Land Area</td>
+                    <td>{currLA} ha</td>
+                  </tr>
+                  <tr>
+                    <td>Population</td>
+                    <td>{currPop}</td>
+                  </tr>
+                  <tr>
+                    <td>Radiance</td>
+                    <td>{currLiPo} W/cm2*sr</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <div className="map">
               <svg className="map-svg"></svg>
@@ -195,7 +231,7 @@ export class landing extends Component {
           </div>
           <p className="footer">
             This Choropleth map is just a partial, for more details{" "}
-            <Link to="/" className="prpl-btn">
+            <Link to="/map" className="prpl-btn">
               Go here.
             </Link>
           </p>

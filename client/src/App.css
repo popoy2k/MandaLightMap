@@ -264,7 +264,7 @@ hr {
 }
 
 .choropleth .data {
-  width: 50%;
+  width: 80%;
 }
 
 .brgy {
@@ -745,3 +745,47 @@ hr {
 }
 
 /* End of Notifications */
+
+/* sk-tbl */
+
+.landingTable {
+  margin: 5px 0 0 auto;
+
+  /* border: 1px solid black; */
+}
+
+.landingTable tr td {
+  text-align: left;
+  padding: 0;
+  min-width: 120px;
+  max-width: 120px;
+  border-bottom: 2px solid rgba(91, 52, 231, 0.9);
+}
+
+.landingTable tr td:nth-child(1) {
+  text-align: center !important;
+}
+
+/* end sk-tbl */
+
+/* Manda Map */
+
+.sec-map {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  padding: 10% 10px;
+  background: rgba(91, 52, 231, 0.9);
+}
+
+.sec-map h2 {
+  color: white;
+}
+
+.sec-map p {
+  color: white;
+  font-size: 20px;
+  line-height: 150%;
+}
+
+/* End of Manda Map */

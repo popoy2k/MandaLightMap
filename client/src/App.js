@@ -29,6 +29,7 @@ import userActivate from "./components/main/userActivate";
 import forgetPass from "./components/main/forgetPass";
 import resetPass from "./components/main/resetPass";
 import landing from "./components/main/landing";
+import MandaMap from "./components/map/MandaMap";
 
 library.add(
   fab,
@@ -52,6 +53,7 @@ export class App extends Component {
             <Route path="/auth/uact/:token" component={userActivate} />
             <Route path="/auth/ures/:token" component={resetPass} />
             <Route path="/auth/ufor/" component={forgetPass} />
+            <Route path="/map" component={MandaMap} />
           </Switch>
         </Router>
       </Provider>
