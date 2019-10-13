@@ -2,6 +2,9 @@ import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 // Boiler
 
+// Functions
+import { getMainMap } from "./actions/auth";
+
 // Redux Dependecies
 import { Provider } from "react-redux";
 import store from "./store";
@@ -17,7 +20,7 @@ import {
   faMoneyBillAlt,
   faChartArea
 } from "@fortawesome/free-solid-svg-icons";
-
+import "antd/dist/antd.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
@@ -42,6 +45,10 @@ library.add(
   faChartArea
 );
 export class App extends Component {
+  componentDidMount() {
+    store.dispatch(getMainMap());
+  }
+
   render() {
     return (
       <Provider store={store}>

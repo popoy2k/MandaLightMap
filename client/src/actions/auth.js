@@ -6,7 +6,9 @@ import {
   RESET_REQUEST,
   RESET_PASS,
   LANDING_DATA_SUCCESS,
-  LANDING_DATA_ERROR
+  LANDING_DATA_ERROR,
+  LOAD_MAIN_MAP_ERROR,
+  LOAD_MAIN_MAP_SUCCESS
 } from "./types";
 import axios from "axios";
 
@@ -112,5 +114,16 @@ export const getLanding = () => (dispatch, getState) => {
         type: LANDING_DATA_ERROR,
         payload: resErr.response.data
       });
+    });
+};
+
+export const getMainMap = () => (dispatch, getState) => {
+  axios
+    .get("/map/main", null, getConfig(getState))
+    .then(resData => {
+      dispatch({ type: LOAD_MAIN_MAP_SUCCESS, payload: resData.data });
+    })
+    .catch(resErr => {
+      dispatch({ type: LOAD_MAIN_MAP_ERROR, payload: resErr.response.data });
     });
 };
