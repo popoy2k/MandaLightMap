@@ -28,7 +28,6 @@ export class MandaMap extends Component {
   treeChange = value => this.setState({ treeValue: value });
 
   brgyChange = value => this.setState({ brgyValue: value });
-
   textureChange = value => this.setState({ textureValue: value });
 
   colorChange = value => this.setState({ colorValue: value });
