@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 // Boiler
 
 // Functions
-import { getMainMap } from "./actions/auth";
+// import { getMainMap } from "./actions/auth";
 
 // Redux Dependecies
 import { Provider } from "react-redux";
@@ -46,7 +46,8 @@ library.add(
 );
 export class App extends Component {
   componentDidMount() {
-    store.dispatch(getMainMap());
+    // store.dispatch(getMainMap());
+    // store.dispatch(getMapData({ mapObj: "2019-All" }));
   }
 
   render() {

@@ -3,11 +3,10 @@ import NavBar from "../main/NavBar";
 import { Icon, TreeSelect, Select } from "antd";
 import { brgyData, treeData } from "./treeData";
 import * as d3 from "d3";
-import { feature as Feature } from "topojson-client";
 
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { getMainMap } from "../../actions/auth";
+import { getMainMap, getMapData } from "../../actions/auth";
 
 const { SHOW_PARENT } = TreeSelect;
 const { Option, OptGroup } = Select;
@@ -17,43 +16,210 @@ export class MandaMap extends Component {
     treeValue: ["2019-All"],
     brgyValue: ["00-All"],
     textureValue: { key: "01-Choro" },
-    colorValue: { key: "02-Purple" }
+    colorValue: { key: "02-Purple" },
+    choroColorValue: d3.schemePurples[9],
+    mainMapData: null,
+    lipoMapData: d3.map()
   };
 
   static propTypes = {
     getMainMap: PropTypes.func.isRequired,
-    map: PropTypes.object
+    getMapData: PropTypes.func.isRequired,
+    map: PropTypes.object,
+    mainData: PropTypes.array
   };
 
-  treeChange = value => this.setState({ treeValue: value });
+  treeChange = value => {
+    this.setMainData(value);
+    this.setState({ treeValue: value });
+  };
+
+  setChoroColor = value => {
+    let finalColor = null;
+
+    switch (value.key) {
+      case "02-Purple":
+        finalColor = d3.schemePurples[9];
+        break;
+      case "02-Green":
+        finalColor = d3.schemeGreens[9];
+        break;
+      case "02-Blue":
+        finalColor = d3.schemeBlues[9];
+        break;
+      case "02-Grey":
+        finalColor = d3.schemeGreys[9];
+        break;
+      case "02-Orange":
+        finalColor = d3.schemeOranges[9];
+        break;
+      case "02-Dawn":
+        finalColor = d3.schemeRdBu[9];
+        break;
+      case "02-Midnight":
+        finalColor = d3.schemeRdGy[9];
+        break;
+      case "02-Spring":
+        finalColor = d3.schemeRdYlBu[9];
+        break;
+      case "02-Grass":
+        finalColor = d3.schemeRdYlGn[9];
+        break;
+      case "02-Ocean":
+        finalColor = d3.schemeSpectral[9];
+        break;
+      default:
+        finalColor = d3.schemePurples[9];
+    }
+
+    this.reRenderMap(finalColor);
+  };
+
+  setMainData = value => {
+    const { mainData } = this.props;
+    const { lipoMapData } = this.state;
+
+    let selectedData = [];
+    let tempData = [];
+    let finalData = [];
+
+    value.forEach(val => {
+      let iterData = val.split("-");
+      if (iterData[1] === "All") {
+        selectedData.push(...mainData.filter(val => val.year === iterData[0]));
+      } else {
+        selectedData.push(
+          ...mainData.filter(
+            val => val.year === iterData[0] && val.month === iterData[1]
+          )
+        );
+      }
+    });
+
+    let brgyKeys = selectedData[0].lipoData.map(val => val.mapId);
+
+    selectedData.forEach(val => tempData.push(...val.lipoData));
+
+    brgyKeys.forEach(val =>
+      finalData.push(tempData.filter(filVal => filVal.mapId === val))
+    );
+
+    finalData = finalData.map(val => ({
+      id: val[0].mapId,
+      mean: val.reduce((prev, curr) => prev.mean + curr.mean) / val.length
+    }));
+
+    finalData.forEach(val => {
+      lipoMapData.set(val.id, val.mean);
+    });
+
+    this.setState({ mainMapData: selectedData, lipoMapData });
+  };
 
   brgyChange = value => this.setState({ brgyValue: value });
+
   textureChange = value => this.setState({ textureValue: value });
 
-  colorChange = value => this.setState({ colorValue: value });
+  colorChange = value => {
+    this.setChoroColor(value);
+    this.setState({ colorValue: value });
+  };
+
+  componentDidUpdate(curr, prev) {
+    if (curr.map !== prev.map) {
+      if (!curr.map) {
+        this.renderMap(curr.map);
+      }
+    }
+    // Don't need this?
+    // if (curr.mainData !== prev.mainData) {
+    //   if (!prev.mainData) {
+    //     this.setState({ mainMapData: curr.mainData });
+    //   }
+    // }
+  }
 
   componentDidMount() {
     document.title = "Skótos - Light Pollution Map";
-    console.log(this.props);
-    let projection = d3.geoPath().projection();
+    const { map, mainData } = this.props;
 
-    let path = (svgH, svgW) =>
-      projection(
+    this.setMainData(["2019-All"]);
+    this.setChoroColor({ key: "02-Purple" });
+
+    if (!mainData) {
+      this.props.getMapData({ mapObj: "2019-All" });
+    }
+
+    if (!map) {
+      this.props.getMainMap();
+    }
+
+    if (map) {
+      this.renderMap(map);
+    }
+  }
+
+  reRenderMap = someColor => {
+    const { lipoMapData } = this.state;
+    let svg = d3.select("svg#main-mapped");
+    let reColorScale = d3
+      .scaleThreshold()
+      .domain(d3.range(20, 100, 5))
+      .range(someColor);
+    svg.selectAll("path").attr("fill", d => {
+      d.total = lipoMapData.get(d.properties.ID_3) || 0;
+      return reColorScale(d.total);
+    });
+  };
+
+  renderMap = map => {
+    map = JSON.parse(map.mainMap);
+
+    const { lipoMapData, choroColorValue } = this.state;
+
+    let svg = d3.select("svg#main-mapped");
+    // For adding stuff within the map
+    // let projection = d3.geoPath().projection();
+
+    // For scale presentation
+    // let x = d3
+    //   .scaleLinear()
+    //   .domain([1, 10])
+    //   .rangeRound([50, 100]);
+
+    // console.log("Shitting");
+    let colorScale = d3
+      .scaleThreshold()
+      .domain(d3.range(20, 100, 5))
+      .range(choroColorValue);
+
+    let path = () => {
+      let svgH = +svg.attr("height"),
+        svgW = +svg.attr("width");
+      return d3.geoPath().projection(
         d3
           .geoMercator()
-          .center(
-            [121.03, 14.578].translate([svgH / 2, svgW / 2]).scale(750000)
-          )
+          .center([121.012, 14.602])
+          .translate([svgH / 2, svgW / 2])
+          .scale(1100000)
       );
+    };
 
-    let svg = d3
-      .select("svg#main-mapped")
-      .attr("width", "100%")
-      .attr("height", "100%");
+    svg
+      .append("g")
+      .selectAll("path")
+      .data(map)
+      .enter()
+      .append("path")
+      .attr("d", path())
+      .attr("cursor", "pointer")
+      .attr("class", "brgy")
+      .attr("fill", d => {
+        d.total = lipoMapData.get(d.properties.ID_3) || 0;
 
-    let svgH = +svg.attr("height"),
-      svgW = +svg.attr("width");
-  }
+        return colorScale(d.total);
+      });
+  };
 
   render() {
     const { treeValue, brgyValue, textureValue, colorValue } = this.state;
@@ -230,7 +396,10 @@ export class MandaMap extends Component {
             </div>
           </div>
           <div className="main-map-svg">
-            <svg id="main-mapped"></svg>
+            <svg
+              id="main-mapped"
+              style={{ width: "100%", height: "100%" }}
+            ></svg>
           </div>
         </section>
       </Fragment>
@@ -239,10 +408,11 @@ export class MandaMap extends Component {
 }
 
 const mapStateToProps = state => ({
-  map: state.map
+  map: state.map,
+  mainData: state.data.mainMapData
 });
 
 export default connect(
   mapStateToProps,
-  { getMainMap }
+  { getMainMap, getMapData }
 )(MandaMap);

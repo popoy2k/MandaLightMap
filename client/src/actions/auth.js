@@ -8,7 +8,9 @@ import {
   LANDING_DATA_SUCCESS,
   LANDING_DATA_ERROR,
   LOAD_MAIN_MAP_ERROR,
-  LOAD_MAIN_MAP_SUCCESS
+  LOAD_MAIN_MAP_SUCCESS,
+  LOAD_MAIN_MAP_DATA_SUCCESS,
+  LOAD_MAIN_MAP_DATA_ERROR
 } from "./types";
 import axios from "axios";
 
@@ -28,14 +30,12 @@ export const signupUser = newUser => (dispatch, getState) => {
   axios
     .post("/auth/signup", JSON.stringify(newUser), getConfig(getState))
     .then(resData => {
-      console.log(resData);
       dispatch({
         type: SIGNUP_SUCCESS,
         payload: resData
       });
     })
     .catch(errData => {
-      console.log(errData.response);
       dispatch({
         type: SIGNUP_ERROR,
         paylaod: errData.response.data
@@ -47,14 +47,12 @@ export const signinUser = oldUser => (dispatch, getState) => {
   axios
     .post("/auth/signin", JSON.stringify(oldUser), getConfig(getState))
     .then(resData => {
-      console.log(resData);
       dispatch({
         type: SIGNIN_SUCCESS,
         payload: resData
       });
     })
     .catch(errData => {
-      console.log(errData.response);
       dispatch({
         type: SIGNIN_ERROR,
         paylaod: errData.response.data
@@ -125,5 +123,26 @@ export const getMainMap = () => (dispatch, getState) => {
     })
     .catch(resErr => {
       dispatch({ type: LOAD_MAIN_MAP_ERROR, payload: resErr.response.data });
+    });
+};
+
+export const getMapData = mapObj => (dispatch, getState) => {
+  if (Array.isArray(mapObj.mapObj)) {
+    mapObj = { mapObj: mapObj.mapObj.join(",") };
+  }
+
+  axios
+    .post("/data/custom", JSON.stringify(mapObj), getConfig(getState))
+    .then(resData => {
+      dispatch({
+        type: LOAD_MAIN_MAP_DATA_SUCCESS,
+        payload: resData.data
+      });
+    })
+    .catch(resErr => {
+      dispatch({
+        type: LOAD_MAIN_MAP_DATA_ERROR,
+        payload: resErr.response.data
+      });
     });
 };

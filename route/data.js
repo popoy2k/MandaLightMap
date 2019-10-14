@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const passport = require("passport");
 const MandaLipo = require("../model/MandaLipo");
 
 router.route("/landing").get((req, res) => {
@@ -17,5 +18,25 @@ router.route("/landing").get((req, res) => {
     res.status(200).json({ status: "success", data: finalData });
   });
 });
+
+router.route("/custom").post(
+  (req, res, next) => {
+    passport.authenticate(
+      "Local.custom_map_data",
+      { session: false },
+      (err, msg, info) => {
+        console.log(err, msg, info);
+        if (msg.status === "error") {
+          res.status(400).json(msg);
+          return next(err);
+        }
+
+        res.status(200).json(msg);
+        next();
+      }
+    )(req, res, next);
+  },
+  (req, res) => {}
+);
 
 module.exports = router;

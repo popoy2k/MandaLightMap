@@ -25,6 +25,7 @@ app.use(passport.initialize());
 
 // Middleware
 require("./middleware/auth");
+require("./middleware/map");
 
 // Utility
 require("./utility/Mailer");
