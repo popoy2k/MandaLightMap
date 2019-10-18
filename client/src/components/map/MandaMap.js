@@ -18,8 +18,17 @@ export class MandaMap extends Component {
     textureValue: { key: "01-Choro" },
     colorValue: { key: "02-Purple" },
     choroColorValue: d3.schemePurples[9],
-    mainMapData: null,
-    lipoMapData: d3.map()
+    mainMapData: {},
+    lipoMeanMapData: d3.map(),
+    lipoMinMapData: d3.map(),
+    lipoMaxMapData: d3.map(),
+    currMainData: {},
+    currLoc: "Mandaluyong City",
+    currLA: "1124.97 ha",
+    currPop: "386,276",
+    radMean: "",
+    radMax: "",
+    radMin: ""
   };
 
   static propTypes = {
@@ -71,13 +80,18 @@ export class MandaMap extends Component {
       default:
         finalColor = d3.schemePurples[9];
     }
-
+    console.log("This should work");
     this.reRenderMap(finalColor);
   };
 
   setMainData = value => {
     const { mainData } = this.props;
-    const { lipoMapData } = this.state;
+    const {
+      lipoMeanMapData,
+      lipoMaxMapData,
+      lipoMinMapData,
+      currMainData
+    } = this.state;
 
     let selectedData = [];
     let tempData = [];
@@ -104,16 +118,23 @@ export class MandaMap extends Component {
       finalData.push(tempData.filter(filVal => filVal.mapId === val))
     );
 
-    finalData = finalData.map(val => ({
+    let finalCurrMainData = finalData.map(val => ({
       id: val[0].mapId,
-      mean: val.reduce((prev, curr) => prev.mean + curr.mean) / val.length
+      mean: val.reduce((prev, curr) => prev.mean + curr.mean) / val.length,
+      min: val.map(minVal => minVal.min).sort((a, b) => a - b)[0],
+      max: val.map(maxVal => maxVal.max).sort((a, b) => b - a)[0]
     }));
 
-    finalData.forEach(val => {
-      lipoMapData.set(val.id, val.mean);
+    finalCurrMainData.forEach(val => {
+      lipoMeanMapData.set(val.id, val.mean);
+      lipoMaxMapData.set(val.id, val.max);
+      lipoMinMapData.set(val.id, val.min);
     });
 
-    this.setState({ mainMapData: selectedData, lipoMapData });
+    this.setState({
+      mainMapData: selectedData,
+      currMainData: finalCurrMainData
+    });
   };
 
   brgyChange = value => this.setState({ brgyValue: value });
@@ -126,11 +147,13 @@ export class MandaMap extends Component {
   };
 
   componentDidUpdate(curr, prev) {
+    console.log(prev);
     if (curr.map !== prev.map) {
       if (!curr.map) {
         this.renderMap(curr.map);
       }
     }
+
     // Don't need this?
     // if (curr.mainData !== prev.mainData) {
     //   if (!prev.mainData) {
@@ -160,23 +183,39 @@ export class MandaMap extends Component {
   }
 
   reRenderMap = someColor => {
-    const { lipoMapData } = this.state;
+    const { currMainData } = this.state;
     let svg = d3.select("svg#main-mapped");
     let reColorScale = d3
       .scaleThreshold()
       .domain(d3.range(20, 100, 5))
       .range(someColor);
-    svg.selectAll("path").attr("fill", d => {
-      d.total = lipoMapData.get(d.properties.ID_3) || 0;
-      return reColorScale(d.total);
-    });
+    svg
+      .selectAll("path")
+      .attr("fill", d => {
+        return reColorScale(
+          currMainData.filter(val => val.id === d.properties.ID_3)[0].mean
+        );
+      })
+      .on("click", d => {
+        let iterData = currMainData.filter(
+          val => val.id === d.properties.ID_3
+        )[0];
+        console.log(iterData);
+        this.setState({
+          currLoc: d.properties.NAME_3,
+          currLA: d.properties.area_3,
+          currPop: d.properties.population_3,
+          radMean: iterData.mean.toFixed(2),
+          radMax: iterData.max.toFixed(2),
+          radMin: iterData.min.toFixed(2)
+        });
+      });
   };
 
   renderMap = map => {
     map = JSON.parse(map.mainMap);
 
-    const { lipoMapData, choroColorValue } = this.state;
-
+    const { lipoMeanMapData, choroColorValue, currMainData } = this.state;
     let svg = d3.select("svg#main-mapped");
     // For adding stuff within the map
     // let projection = d3.geoPath().projection();
@@ -205,6 +244,8 @@ export class MandaMap extends Component {
       );
     };
 
+    svg.on("click", d => console.log("Something", d));
+
     svg
       .append("g")
       .selectAll("path")
@@ -215,14 +256,25 @@ export class MandaMap extends Component {
       .attr("cursor", "pointer")
       .attr("class", "brgy")
       .attr("fill", d => {
-        d.total = lipoMapData.get(d.properties.ID_3) || 0;
-
+        d.total = lipoMeanMapData.get(d.properties.ID_3) || 0;
         return colorScale(d.total);
-      });
+      })
+      .on("click", d => console.log(currMainData));
   };
 
   render() {
-    const { treeValue, brgyValue, textureValue, colorValue } = this.state;
+    const {
+      treeValue,
+      brgyValue,
+      textureValue,
+      colorValue,
+      currLoc,
+      currLA,
+      currPop,
+      radMean,
+      radMax,
+      radMin
+    } = this.state;
 
     const tProps = {
       treeData,
@@ -235,7 +287,7 @@ export class MandaMap extends Component {
         maxHeight: "40vh"
       },
       style: {
-        width: 300
+        width: "100%"
       },
       maxTagCount: 3,
       maxTagPlaceholder: args => `Too many to show.. (${args.length} items)`
@@ -251,7 +303,7 @@ export class MandaMap extends Component {
         maxHeight: "40vh"
       },
       style: {
-        width: 300
+        width: "100%"
       },
       maxTagCount: 3,
       maxTagPlaceholder: args => `Too many to show.. (${args.length} items)`
@@ -260,7 +312,7 @@ export class MandaMap extends Component {
       <div className="form-group">
         <h4>Color</h4>
         <Select
-          style={{ width: 300 }}
+          style={{ width: "100%" }}
           defaultValue={colorValue}
           onChange={this.colorChange}
           labelInValue
@@ -328,14 +380,14 @@ export class MandaMap extends Component {
                 <ul>
                   <li title="Area Location">
                     <Icon type="environment" className="sk-icon-color" />{" "}
-                    Mandaluyong City
+                    {currLoc}
                   </li>
                   <li title="Land Area">
-                    <Icon type="area-chart" className="sk-icon-color" /> 1124.97
-                    ha
+                    <Icon type="area-chart" className="sk-icon-color" />{" "}
+                    {currLA} ha
                   </li>
                   <li title="Population">
-                    <Icon type="team" className="sk-icon-color" /> 386,276
+                    <Icon type="team" className="sk-icon-color" /> {currPop}
                   </li>
                   <li title="Light Intensity">
                     <Icon type="heat-map" className="sk-icon-color" /> Radiance
@@ -343,13 +395,13 @@ export class MandaMap extends Component {
                     <ul>
                       <li></li>
                       <li>
-                        51.23 <small className="secondary">Mean</small>
+                        {radMean} <small className="secondary">Mean</small>
                       </li>
                       <li>
-                        32.44 <small className="secondary">Max</small>
+                        {radMax} <small className="secondary">Max</small>
                       </li>
                       <li>
-                        61.21 <small className="secondary">Min</small>
+                        {radMin} <small className="secondary">Min</small>
                       </li>
                     </ul>
                   </li>
@@ -371,7 +423,7 @@ export class MandaMap extends Component {
                 <div className="form-group">
                   <h4>Area Texture</h4>
                   <Select
-                    style={{ width: 300 }}
+                    style={{ width: "100%" }}
                     defaultValue={{ key: "01-Choro" }}
                     onChange={this.textureChange}
                     dropdownStyle={{ maxHeight: "40vh" }}

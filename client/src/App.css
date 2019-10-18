@@ -278,7 +278,8 @@ hr {
 }
 
 .brgy:hover {
-  fill: rgba(91, 52, 231, 0.8);
+  opacity: 0.3;
+  /* fill: rgba(91, 52, 231, 0.8); */
 
   /* transform: scale(1.005, 1.005); */
 }
@@ -907,7 +908,7 @@ svg {
 
 .main-map-div {
   position: absolute;
-  width: 100%;
+  width: 90%;
 }
 
 .main-map-svg {
