@@ -207,6 +207,8 @@ export class MandaMap extends Component {
     document.title = "Skótos - Light Pollution Map";
     const { map, mainData } = this.props;
 
+    this.props.getMainMap();
+
     if (!mainData) {
       this.props.getMapData({ mapObj: "2019-All" });
     }
@@ -214,10 +216,6 @@ export class MandaMap extends Component {
     if (mainData) {
       this.setMainData(["2019-All"]);
       this.setChoroColor({ key: "02-Purple" });
-    }
-
-    if (!map) {
-      this.props.getMainMap();
     }
 
     if (map) {
