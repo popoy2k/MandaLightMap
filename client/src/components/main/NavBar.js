@@ -28,7 +28,7 @@ export class NavBar extends Component {
               <Link to="/">Statistics</Link>
             </li>
             <li>
-              <Link to="/map">About Us</Link>
+              <Link to="/map">Light Pollution Map</Link>
             </li>
             <li>
               <Link to="/auth/login">For Developer</Link>

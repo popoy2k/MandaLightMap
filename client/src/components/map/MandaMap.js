@@ -3,6 +3,7 @@ import NavBar from "../main/NavBar";
 import { Icon, TreeSelect, Select } from "antd";
 import { brgyData, treeData } from "./treeData";
 import * as d3 from "d3";
+import { Redirect } from "react-router-dom";
 
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
@@ -19,16 +20,16 @@ export class MandaMap extends Component {
     colorValue: { key: "02-Purple" },
     choroColorValue: d3.schemePurples[9],
     mainMapData: {},
+    currMainData: {},
     lipoMeanMapData: d3.map(),
     lipoMinMapData: d3.map(),
     lipoMaxMapData: d3.map(),
-    currMainData: {},
     currLoc: "Mandaluyong City",
-    currLA: "1124.97 ha",
+    currLA: "1124.97",
     currPop: "386,276",
-    radMean: "",
-    radMax: "",
-    radMin: ""
+    radMean: "44.94",
+    radMax: "75.14",
+    radMin: "31.19"
   };
 
   static propTypes = {
@@ -80,18 +81,13 @@ export class MandaMap extends Component {
       default:
         finalColor = d3.schemePurples[9];
     }
-    console.log("This should work");
+    this.setState({ choroColorValue: finalColor });
     this.reRenderMap(finalColor);
   };
 
   setMainData = value => {
     const { mainData } = this.props;
-    const {
-      lipoMeanMapData,
-      lipoMaxMapData,
-      lipoMinMapData,
-      currMainData
-    } = this.state;
+    const { lipoMeanMapData, lipoMaxMapData, lipoMinMapData } = this.state;
 
     let selectedData = [];
     let tempData = [];
@@ -120,7 +116,9 @@ export class MandaMap extends Component {
 
     let finalCurrMainData = finalData.map(val => ({
       id: val[0].mapId,
-      mean: val.reduce((prev, curr) => prev.mean + curr.mean) / val.length,
+      mean:
+        val.map(meanVal => meanVal.mean).reduce((prev, curr) => prev + curr) /
+        val.length,
       min: val.map(minVal => minVal.min).sort((a, b) => a - b)[0],
       max: val.map(maxVal => maxVal.max).sort((a, b) => b - a)[0]
     }));
@@ -131,13 +129,63 @@ export class MandaMap extends Component {
       lipoMinMapData.set(val.id, val.min);
     });
 
+    let currMean =
+      finalCurrMainData
+        .map(val => val.mean)
+        .reduce((prev, curr) => prev + curr) / finalCurrMainData.length;
+
+    let currMax = finalCurrMainData
+      .map(val => val.max)
+      .sort((a, b) => b - a)[0];
+    let currMin = finalCurrMainData
+      .map(val => val.min)
+      .sort((a, b) => a - b)[0];
+
     this.setState({
       mainMapData: selectedData,
-      currMainData: finalCurrMainData
+      currMainData: finalCurrMainData,
+      currLoc: "Mandaluyong City",
+      currLA: "1124.97",
+      currPop: "386,276",
+      radMean: currMean.toFixed(2),
+      radMax: currMax.toFixed(2),
+      radMin: currMin.toFixed(2)
     });
+
+    this.reFill();
   };
 
-  brgyChange = value => this.setState({ brgyValue: value });
+  brgyChange = value => {
+    this.setNewBrgy(value);
+    this.setState({ brgyValue: value });
+  };
+
+  setNewBrgy = value => {
+    let svg = d3.select("svg#main-mapped");
+    let currBrgy = value.map(val => val.split("-")[1]);
+
+    svg.selectAll("path").attr("display", d => {
+      if (currBrgy[0] === "All") {
+        return "block";
+      }
+      if (!currBrgy.includes(`${d.properties.ID_3}`)) {
+        console.log(d.properties.NAME_3, d.properties.ID_3);
+        return "none";
+      }
+      return "block";
+    });
+
+    svg.selectAll("image").attr("display", d => {
+      if (currBrgy[0] === "All") {
+        return "block";
+      }
+      if (!currBrgy.includes(`${d.properties.ID_3}`)) {
+        console.log(d.properties.NAME_3, d.properties.ID_3);
+        return "none";
+      }
+      return "block";
+    });
+  };
 
   textureChange = value => this.setState({ textureValue: value });
 
@@ -147,30 +195,25 @@ export class MandaMap extends Component {
   };
 
   componentDidUpdate(curr, prev) {
-    console.log(prev);
+    // console.log(prev);
     if (curr.map !== prev.map) {
       if (!curr.map) {
         this.renderMap(curr.map);
       }
     }
-
-    // Don't need this?
-    // if (curr.mainData !== prev.mainData) {
-    //   if (!prev.mainData) {
-    //     this.setState({ mainMapData: curr.mainData });
-    //   }
-    // }
   }
 
   componentDidMount() {
     document.title = "Skótos - Light Pollution Map";
     const { map, mainData } = this.props;
 
-    this.setMainData(["2019-All"]);
-    this.setChoroColor({ key: "02-Purple" });
-
     if (!mainData) {
       this.props.getMapData({ mapObj: "2019-All" });
+    }
+
+    if (mainData) {
+      this.setMainData(["2019-All"]);
+      this.setChoroColor({ key: "02-Purple" });
     }
 
     if (!map) {
@@ -180,15 +223,62 @@ export class MandaMap extends Component {
     if (map) {
       this.renderMap(map);
     }
+
+    this.addLocationName();
   }
+
+  addLocationName = () => {
+    const { map } = this.props;
+    let newMap = JSON.parse(map.mainMap);
+    let svg = d3.select("svg#main-mapped");
+    let svgH = svg.attr("height"),
+      svgW = svg.attr("width");
+    let geo = d3
+      .geoMercator()
+      .center([121.012, 14.602])
+      .translate([svgH / 2, svgW / 2])
+      .scale(1100000);
+
+    svg
+      .selectAll("image")
+      .data(newMap)
+      .enter()
+      .append("image")
+      .attr("x", d => geo(d3.geoCentroid(d))[0] - 15)
+      .attr("y", d => geo(d3.geoCentroid(d))[1] - 15)
+      .attr("width", 20)
+      .attr("height", 24)
+      .attr(
+        "xlink:href",
+        "https://image.flaticon.com/icons/svg/252/252025.svg"
+      );
+  };
+
+  reFill = () => {
+    const { choroColorValue, lipoMeanMapData } = this.state;
+    let svg = d3.select("svg#main-mapped");
+
+    let reFillCS = d3
+      .scaleThreshold()
+      .domain(d3.range(20, 100, 5))
+      .range(choroColorValue);
+
+    svg.selectAll("path").attr("fill", d => {
+      return reFillCS(lipoMeanMapData.get(d.properties.ID_3));
+    });
+  };
 
   reRenderMap = someColor => {
     const { currMainData } = this.state;
     let svg = d3.select("svg#main-mapped");
+    let scale = d3.select("svg#main-mapped>g#map-scale");
     let reColorScale = d3
       .scaleThreshold()
       .domain(d3.range(20, 100, 5))
       .range(someColor);
+
+    scale.selectAll("rect").attr("fill", d => reColorScale(d[0]));
+
     svg
       .selectAll("path")
       .attr("fill", d => {
@@ -200,7 +290,6 @@ export class MandaMap extends Component {
         let iterData = currMainData.filter(
           val => val.id === d.properties.ID_3
         )[0];
-        console.log(iterData);
         this.setState({
           currLoc: d.properties.NAME_3,
           currLA: d.properties.area_3,
@@ -215,18 +304,21 @@ export class MandaMap extends Component {
   renderMap = map => {
     map = JSON.parse(map.mainMap);
 
-    const { lipoMeanMapData, choroColorValue, currMainData } = this.state;
+    const {
+      lipoMeanMapData,
+      lipoMaxMapData,
+      lipoMinMapData,
+      choroColorValue
+    } = this.state;
     let svg = d3.select("svg#main-mapped");
-    // For adding stuff within the map
-    // let projection = d3.geoPath().projection();
+    let scale = d3.select("svg#main-mapped>g#map-scale");
 
     // For scale presentation
-    // let x = d3
-    //   .scaleLinear()
-    //   .domain([1, 10])
-    //   .rangeRound([50, 100]);
+    let x = d3
+      .scaleLinear()
+      .domain([1, 10])
+      .rangeRound([50, 100]);
 
-    // console.log("Shitting");
     let colorScale = d3
       .scaleThreshold()
       .domain(d3.range(20, 100, 5))
@@ -244,7 +336,48 @@ export class MandaMap extends Component {
       );
     };
 
-    svg.on("click", d => console.log("Something", d));
+    scale
+      .attr("transform", "translate(-20,50)")
+      .selectAll("rect")
+      .data(
+        colorScale.range().map(d => {
+          d = colorScale.invertExtent(d);
+
+          if (d[0] == null) d[0] = x.domain()[0];
+          if (d[1] == null) d[1] = x.domain()[1];
+
+          if (d[0] <= 1) d[0] = 15;
+
+          return d;
+        })
+      )
+      .enter()
+      .append("rect")
+      .attr("height", 15)
+      .attr("x", d => x(d[0]))
+      .attr("width", d => x(d[1]) - x(d[0]))
+      .attr("fill", d => colorScale(d[0]));
+
+    scale
+      .append("text")
+      .attr("x", x.range()[0])
+      .attr("y", -6)
+      .attr("fill", "#000")
+      .attr("text-anchor", "start")
+      .attr("font-weight", "bold")
+      .attr("font-size", "12px")
+      .attr("transform", "translate(80,0)")
+      .text("Radiance Scale");
+
+    scale
+      .call(
+        d3
+          .axisBottom(x)
+          .tickSize(20)
+          .tickValues(colorScale.domain().filter(val => val <= 60))
+      )
+      .select(".domain")
+      .remove();
 
     svg
       .append("g")
@@ -256,10 +389,22 @@ export class MandaMap extends Component {
       .attr("cursor", "pointer")
       .attr("class", "brgy")
       .attr("fill", d => {
-        d.total = lipoMeanMapData.get(d.properties.ID_3) || 0;
-        return colorScale(d.total);
+        d.mean = lipoMeanMapData.get(d.properties.ID_3) || 0;
+        return colorScale(d.mean);
       })
-      .on("click", d => console.log(currMainData));
+      .on("click", d => {
+        d.mean = lipoMeanMapData.get(d.properties.ID_3);
+        d.min = lipoMinMapData.get(d.properties.ID_3);
+        d.max = lipoMaxMapData.get(d.properties.ID_3);
+        this.setState({
+          currLoc: d.properties.NAME_3,
+          currLA: d.properties.area_3,
+          currPop: d.properties.population_3,
+          radMean: d.mean.toFixed(2),
+          radMax: d.max.toFixed(2),
+          radMin: d.min.toFixed(2)
+        });
+      });
   };
 
   render() {
@@ -358,6 +503,11 @@ export class MandaMap extends Component {
     if (textureValue.key !== "01-Choro") {
       isColored = "";
     }
+
+    const { mainData } = this.props;
+    if (!mainData) {
+      return <Redirect to="/map" />;
+    }
     return (
       <Fragment>
         <NavBar />
@@ -448,10 +598,9 @@ export class MandaMap extends Component {
             </div>
           </div>
           <div className="main-map-svg">
-            <svg
-              id="main-mapped"
-              style={{ width: "100%", height: "100%" }}
-            ></svg>
+            <svg id="main-mapped" style={{ width: "100%", height: "100%" }}>
+              <g id="map-scale"></g>
+            </svg>
           </div>
         </section>
       </Fragment>

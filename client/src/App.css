@@ -912,7 +912,7 @@ svg {
 }
 
 .main-map-svg {
-  border: 1px solid black;
+  /* border: 1px solid black; */
   width: 70%;
   height: 100vh;
   display: flex;
@@ -920,4 +920,5 @@ svg {
   right: 1%;
   position: absolute;
 }
+
 /* End of Manda Map */
