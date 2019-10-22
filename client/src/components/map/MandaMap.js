@@ -169,7 +169,6 @@ export class MandaMap extends Component {
         return "block";
       }
       if (!currBrgy.includes(`${d.properties.ID_3}`)) {
-        console.log(d.properties.NAME_3, d.properties.ID_3);
         return "none";
       }
       return "block";
@@ -180,7 +179,6 @@ export class MandaMap extends Component {
         return "block";
       }
       if (!currBrgy.includes(`${d.properties.ID_3}`)) {
-        console.log(d.properties.NAME_3, d.properties.ID_3);
         return "none";
       }
       return "block";
@@ -194,11 +192,22 @@ export class MandaMap extends Component {
     this.setState({ colorValue: value });
   };
 
-  componentDidUpdate(curr, prev) {
-    // console.log(prev);
-    if (curr.map !== prev.map) {
-      if (!curr.map) {
-        this.renderMap(curr.map);
+  componentDidUpdate(prevProps) {
+    const { map, mainData } = this.props;
+
+    if (prevProps.map.mainMap !== map.mainMap) {
+      if (mainData) {
+        this.setMainData(["2019-All"]);
+        this.renderMap(map);
+        this.addLocationName();
+      }
+    }
+
+    if (prevProps.mainData !== mainData) {
+      this.setMainData(["2019-All"]);
+      if (map.mainMap) {
+        this.renderMap(map);
+        this.addLocationName();
       }
     }
   }
@@ -207,27 +216,25 @@ export class MandaMap extends Component {
     document.title = "Skótos - Light Pollution Map";
     const { map, mainData } = this.props;
 
-    this.props.getMainMap();
+    if (map.mainMap === null) {
+      this.props.getMainMap();
+    }
 
     if (!mainData) {
       this.props.getMapData({ mapObj: "2019-All" });
     }
 
-    if (mainData) {
+    if (map.mainMap && mainData) {
       this.setMainData(["2019-All"]);
       this.setChoroColor({ key: "02-Purple" });
-    }
-
-    if (map) {
       this.renderMap(map);
+      this.addLocationName();
     }
-
-    this.addLocationName();
   }
 
   addLocationName = () => {
     const { map } = this.props;
-    let newMap = JSON.parse(map.mainMap);
+    let newMap = map.mainMap;
     let svg = d3.select("svg#main-mapped");
     let svgH = svg.attr("height"),
       svgW = svg.attr("width");
@@ -300,7 +307,7 @@ export class MandaMap extends Component {
   };
 
   renderMap = map => {
-    map = JSON.parse(map.mainMap);
+    let newMap = map.mainMap;
 
     const {
       lipoMeanMapData,
@@ -380,7 +387,7 @@ export class MandaMap extends Component {
     svg
       .append("g")
       .selectAll("path")
-      .data(map)
+      .data(newMap)
       .enter()
       .append("path")
       .attr("d", path())

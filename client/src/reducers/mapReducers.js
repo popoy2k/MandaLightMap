@@ -1,7 +1,7 @@
 import { LOAD_MAIN_MAP_SUCCESS, LOAD_MAIN_MAP_ERROR } from "../actions/types";
 
 const initialState = {
-  mainMap: localStorage.getItem("mainMap")
+  mainMap: JSON.parse(localStorage.getItem("mainMap")) || null
 };
 
 export default (state = initialState, action) => {
