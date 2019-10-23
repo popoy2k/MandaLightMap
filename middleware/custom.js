@@ -35,7 +35,6 @@ const customActivate = (req, res, next) => {
 
       Activator.sender(responseData._id)
         .then(returnData => {
-          console.log(returnData);
           res
             .status(200)
             .json({ status: "success", data: { email, firstName } });

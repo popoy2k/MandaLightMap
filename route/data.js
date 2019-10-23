@@ -25,7 +25,6 @@ router.route("/custom").post(
       "Local.custom_map_data",
       { session: false },
       (err, msg, info) => {
-        console.log(err, msg, info);
         if (msg.status === "error") {
           res.status(400).json(msg);
           return next(err);

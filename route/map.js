@@ -6,7 +6,6 @@ const path = require("path");
 router.route("/main").get((req, res) => {
   fs.readFile(path.join(__dirname, "MandaTopo.json"), (err, resData) => {
     if (err) {
-      console.log(err);
       return res
         .status(400)
         .json({ status: "error", msg: "Something went wrong" });

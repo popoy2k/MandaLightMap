@@ -133,7 +133,6 @@ passport.use(
           resData
             .comparePass(password)
             .then(isMatch => {
-              console.log("this shit => ", isMatch);
               if (!isMatch) {
                 return done(null, {
                   status: "error",

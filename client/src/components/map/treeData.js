@@ -481,39 +481,57 @@ const brgyData = [
   {
     title: "Mandaluyong City",
     value: "00-All",
-    kay: "00-All",
+    key: "00-All",
     children: [
-      { title: "Brgy. Plainview", key: "00-24424", value: "00-24424" },
-      { title: "Brgy. Pleasant Hills", key: "00-24425", value: "00-24425" },
-      { title: "Brgy. Poblacion", key: "00-24426", value: "00-24426" },
-      { title: "Brgy. San Jose", key: "00-24427", value: "00-24427" },
-      { title: "Brgy. Vergara", key: "00-24428", value: "00-24428" },
       {
-        title: "Brgy. Wack-Wack Greenhills",
-        key: "00-24429",
-        value: "00-24429"
+        title: "District 1",
+        value: "001-All",
+        key: "001-All",
+        children: [
+          {
+            title: "Addition Hills",
+            key: "001-24403",
+            value: "001-24403"
+          },
+          { title: "Bagong Silang", key: "001-24404", value: "001-24404" },
+          { title: "Burol", key: "001-24410", value: "001-24410" },
+          { title: "Daang Bakal", key: "001-24411", value: "001-24411" },
+          { title: "Hagdang Bato Itaas", key: "001-24412", value: "001-24412" },
+          { title: "Hagdang Bato Libis", key: "001-24413", value: "001-24413" },
+          { title: "Harapin Ang Bukas", key: "001-24414", value: "001-24414" },
+          { title: "Highway Hills", key: "001-24415", value: "001-24415" },
+          { title: "Mauway", key: "001-24419", value: "001-24419" },
+          { title: "New Zañiga", key: "001-24421", value: "001-24421" },
+          { title: "Pag-Asa", key: "001-24423", value: "001-24423" },
+          { title: "Pleasant Hills", key: "001-24425", value: "001-24425" },
+          { title: "Poblacion", key: "001-24426", value: "001-24426" },
+          {
+            title: "Wack-Wack Greenhills",
+            key: "001-24429",
+            value: "001-24429"
+          }
+        ]
       },
-      { title: "Brgy. Addition Hills", key: "00-24403", value: "00-24403" },
-      { title: "Brgy. Bagong Silang", key: "00-24404", value: "00-24404" },
-      { title: "Brgy. Barangka Drive", key: "00-24405", value: "00-24405" },
-      { title: "Brgy. Barangka Ibaba", key: "00-24406", value: "00-24406" },
-      { title: "Brgy. Barangka Ilaya", key: "00-24407", value: "00-24407" },
-      { title: "Brgy. Barangka Itaas", key: "00-24408", value: "00-24408" },
-      { title: "Brgy. Buayang Bato", key: "00-24409", value: "00-24409" },
-      { title: "Brgy. Burol", key: "00-24410", value: "00-24410" },
-      { title: "Brgy. Daang Bakal", key: "00-24411", value: "00-24411" },
-      { title: "Brgy. Hagdang Bato Itaas", key: "00-24412", value: "00-24412" },
-      { title: "Brgy. Hagdang Bato Libis", key: "00-24413", value: "00-24413" },
-      { title: "Brgy. Harapin Ang Bukas", key: "00-24414", value: "00-24414" },
-      { title: "Brgy. Highway Hills", key: "00-24415", value: "00-24415" },
-      { title: "Brgy. Hulo", key: "00-24416", value: "00-24416" },
-      { title: "Brgy. Mabini-J. Rizal", key: "00-24417", value: "00-24417" },
-      { title: "Brgy. Malamig", key: "00-24418", value: "00-24418" },
-      { title: "Brgy. Mauway", key: "00-24419", value: "00-24419" },
-      { title: "Brgy. Namayan", key: "00-24420", value: "00-24420" },
-      { title: "Brgy. New Zañiga", key: "00-24421", value: "00-24421" },
-      { title: "Brgy. Old Zañiga", key: "00-24422", value: "00-24422" },
-      { title: "Brgy. Pag-Asa", key: "00-24423", value: "00-24423" }
+      {
+        title: "District 2",
+        value: "002-All",
+        key: "002-All",
+        children: [
+          { title: "Plainview", key: "002-24424", value: "002-24424" },
+          { title: "San Jose", key: "002-24427", value: "002-24427" },
+          { title: "Vergara", key: "002-24428", value: "002-24428" },
+          { title: "Barangka Drive", key: "002-24405", value: "002-24405" },
+          { title: "Barangka Ibaba", key: "002-24406", value: "002-24406" },
+          { title: "Barangka Ilaya", key: "002-24407", value: "002-24407" },
+          { title: "Barangka Itaas", key: "002-24408", value: "002-24408" },
+          { title: "Buayang Bato", key: "002-24409", value: "002-24409" },
+          { title: "Hulo", key: "002-24416", value: "002-24416" },
+          { title: "Mabini-J. Rizal", key: "002-24417", value: "002-24417" },
+          { title: "Malamig", key: "002-24418", value: "002-24418" },
+          { title: "Namayan", key: "002-24420", value: "002-24420" },
+          { title: "Old Zañiga", key: "002-24422", value: "002-24422" }
+        ]
+      }
     ]
   }
 ];

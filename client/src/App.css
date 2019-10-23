@@ -921,4 +921,56 @@ svg {
   position: absolute;
 }
 
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: rgba(91, 52, 231, 0.9);
+  border-color: rgba(91, 52, 231, 0.9);
+}
 /* End of Manda Map */
+
+/* Pulse effect */
+
+.high-pulse {
+  animation: highPulse 3s linear infinite;
+}
+
+@keyframes highPulse {
+  0% {
+    fill: rgba(201, 33, 0, 0.918);
+  }
+
+  40% {
+    fill: rgba(248, 47, 7, 0.849);
+  }
+
+  70% {
+    fill: rgba(248, 47, 7, 0.568);
+  }
+
+  100% {
+    fill: rgba(248, 47, 7, 0.123);
+  }
+}
+
+.low-pulse {
+  animation: lowPulse 3s linear infinite;
+}
+
+@keyframes lowPulse {
+  0% {
+    fill: rgb(20, 240, 75);
+  }
+
+  40% {
+    fill: rgba(20, 240, 75, 0.849);
+  }
+
+  70% {
+    fill: rgba(20, 240, 75, 0.568);
+  }
+
+  100% {
+    fill: rgba(20, 240, 75, 0.322);
+  }
+}
+
+/* End of pulse effect */

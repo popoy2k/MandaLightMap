@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from "react";
 import NavBar from "../main/NavBar";
-import { Icon, TreeSelect, Select } from "antd";
+import { Icon, TreeSelect, Select, Checkbox, Row } from "antd";
 import { brgyData, treeData } from "./treeData";
 import * as d3 from "d3";
 import { Redirect } from "react-router-dom";
@@ -29,7 +29,9 @@ export class MandaMap extends Component {
     currPop: "386,276",
     radMean: "44.94",
     radMax: "75.14",
-    radMin: "31.19"
+    radMin: "31.19",
+    showIcon: true,
+    showIntensity: false
   };
 
   static propTypes = {
@@ -37,6 +39,110 @@ export class MandaMap extends Component {
     getMapData: PropTypes.func.isRequired,
     map: PropTypes.object,
     mainData: PropTypes.array
+  };
+
+  intensityChange = value => {
+    const { showIntensity } = this.state;
+    this.addHighlight(showIntensity);
+    this.setState({ showIntensity: !showIntensity });
+  };
+
+  addHighlight = value => {
+    const { currMainData, lipoMeanMapData, brgyValue } = this.state;
+    let svg = d3.select("svg#main-mapped");
+    let initData = [];
+    let finalSet = [];
+    let finalData = [];
+
+    if (brgyValue.length === 1 && brgyValue[0].indexOf("00-All") > -1) {
+      finalSet = brgyData[0].children
+        .map(val => val.children)
+        .flat(Infinity)
+        .map(val => parseInt(val.key.split("-")[1]));
+    } else if (brgyValue.length === 1 && brgyValue[0].indexOf("00-All") <= -1) {
+      finalSet = brgyData[0].children
+        .filter(val => val.key === brgyValue[0])[0]
+        .children.map(mVal => parseInt(mVal.key.split("-")[1]));
+    } else if (brgyValue.length > 1 && brgyValue[0].indexOf("All") > -1) {
+      finalSet = [
+        ...brgyValue
+          .map(val => val.split("-")[1])
+          .filter(fVal => parseInt(fVal))
+          .map(nVal => parseInt(nVal)),
+        ...brgyData[0].children
+          .find(val => val.key.indexOf(brgyValue[0].split("-")[0]) > -1)
+          .children.map(val => parseInt(val.key.split("-")[1]))
+      ];
+    } else {
+      finalSet = brgyValue.map(val => parseInt(val.split("-")[1]));
+    }
+
+    if (!currMainData) {
+      initData = lipoMeanMapData
+        .entries()
+        .map(val => ({ id: parseInt(val.key), mean: val.value }));
+    } else {
+      initData = currMainData.map(val => ({ id: val.id, mean: val.mean }));
+    }
+
+    finalData = initData
+      .filter(val => finalSet.includes(val.id))
+      .sort((a, b) => a.mean - b.mean);
+
+    if (!value) {
+      if (finalData.length > 1) {
+        svg
+          .selectAll("path")
+          .transition()
+          .duration(300)
+          .ease(d3.easeLinear)
+          .attr("class", d => {
+            if (finalData.slice(-1)[0].id === d.properties.ID_3) {
+              return "high-pulse";
+            }
+
+            if (finalData[0].id === d.properties.ID_3) {
+              return "low-pulse";
+            }
+            return "";
+          });
+      }
+    } else {
+      svg
+        .selectAll("path")
+        .classed("low-pulse", false)
+        .classed("high-pulse", false);
+    }
+  };
+
+  iconChange = value => {
+    const { showIcon } = this.state;
+    this.iconMethod(showIcon ? "none" : "block");
+    this.setState({ showIcon: !showIcon });
+  };
+
+  iconMethod = value => {
+    let svg = d3.select("svg#main-mapped");
+    if (value === "block") {
+      svg
+        .selectAll("image")
+        .style("opacity", 0)
+        .attr("display", d => value)
+        .transition()
+        .duration(500)
+        .ease(d3.easeLinear)
+        .style("opacity", 1);
+    } else {
+      svg
+        .selectAll("image")
+        .transition()
+        .duration(500)
+        .ease(d3.easeLinear)
+        .style("opacity", 0)
+        .on("end", d => {
+          svg.selectAll("image").attr("display", d => value);
+        });
+    }
   };
 
   treeChange = value => {
@@ -88,6 +194,10 @@ export class MandaMap extends Component {
   setMainData = value => {
     const { mainData } = this.props;
     const { lipoMeanMapData, lipoMaxMapData, lipoMinMapData } = this.state;
+    if (value.length < 1) {
+      this.setState({ currMainData: [] });
+      return this.reRenderMap(d3.schemePurples[9]);
+    }
 
     let selectedData = [];
     let tempData = [];
@@ -162,26 +272,49 @@ export class MandaMap extends Component {
 
   setNewBrgy = value => {
     let svg = d3.select("svg#main-mapped");
-    let currBrgy = value.map(val => val.split("-")[1]);
+    let currBrgy = value.map(val => val.split("-"));
+    let brgySets = currBrgy.map(val => val[1]).filter(fVal => parseInt(fVal));
 
     svg.selectAll("path").attr("display", d => {
-      if (currBrgy[0] === "All") {
-        return "block";
-      }
-      if (!currBrgy.includes(`${d.properties.ID_3}`)) {
+      if (value.length < 1) {
         return "none";
       }
-      return "block";
+      if (brgySets.includes(`${d.properties.ID_3}`)) {
+        return "block";
+      } else if (currBrgy[0][1] === "All") {
+        if (currBrgy[0][0] === "001" && d.properties.DISTRICT === 1) {
+          return "block";
+        } else if (currBrgy[0][0] === "002" && d.properties.DISTRICT === 2) {
+          return "block";
+        } else if (currBrgy[0][0] === "00") {
+          return "block";
+        } else {
+          return "none";
+        }
+      } else {
+        return "none";
+      }
     });
 
     svg.selectAll("image").attr("display", d => {
-      if (currBrgy[0] === "All") {
-        return "block";
-      }
-      if (!currBrgy.includes(`${d.properties.ID_3}`)) {
+      if (value.length < 1) {
         return "none";
       }
-      return "block";
+      if (brgySets.includes(`${d.properties.ID_3}`)) {
+        return "block";
+      } else if (currBrgy[0][1] === "All") {
+        if (currBrgy[0][0] === "001" && d.properties.DISTRICT === 1) {
+          return "block";
+        } else if (currBrgy[0][0] === "002" && d.properties.DISTRICT === 2) {
+          return "block";
+        } else if (currBrgy[0][0] === "00") {
+          return "block";
+        } else {
+          return "none";
+        }
+      } else {
+        return "none";
+      }
     });
   };
 
@@ -282,7 +415,12 @@ export class MandaMap extends Component {
       .domain(d3.range(20, 100, 5))
       .range(someColor);
 
-    scale.selectAll("rect").attr("fill", d => reColorScale(d[0]));
+    scale
+      .selectAll("rect")
+      .transition()
+      .duration(300)
+      .ease(d3.easeLinear)
+      .attr("fill", d => reColorScale(d[0]));
 
     svg
       .selectAll("path")
@@ -423,7 +561,9 @@ export class MandaMap extends Component {
       currPop,
       radMean,
       radMax,
-      radMin
+      radMin,
+      showIcon,
+      showIntensity
     } = this.state;
 
     const tProps = {
@@ -433,6 +573,8 @@ export class MandaMap extends Component {
       treeCheckable: true,
       showCheckedStrategy: SHOW_PARENT,
       searchPlaceholder: "Please select",
+      allowClear: true,
+      showSearch: true,
       dropdownStyle: {
         maxHeight: "40vh"
       },
@@ -446,6 +588,8 @@ export class MandaMap extends Component {
       treeData: brgyData,
       value: brgyValue,
       onChange: this.brgyChange,
+      allowClear: true,
+      showSearch: true,
       treeCheckable: true,
       showCheckedStrategy: SHOW_PARENT,
       searchPlaceholder: "Please select",
@@ -459,49 +603,61 @@ export class MandaMap extends Component {
       maxTagPlaceholder: args => `Too many to show.. (${args.length} items)`
     };
     let isColored = (
-      <div className="form-group">
-        <h4>Color</h4>
-        <Select
-          style={{ width: "100%" }}
-          defaultValue={colorValue}
-          onChange={this.colorChange}
-          labelInValue
-        >
-          <OptGroup label="Sequential">
-            <Option key="02-Purple" value="02-Purple">
-              Purple
-            </Option>
-            <Option key="02-Green" value="02-Green">
-              Green
-            </Option>
-            <Option key="02-Blue" value="02-Blue">
-              Blue
-            </Option>
-            <Option key="02-Grey" value="02-Grey">
-              Grey
-            </Option>
-            <Option key="02-Orange" value="02-Orange">
-              Orange
-            </Option>
-          </OptGroup>
-          <OptGroup label="Diverging">
-            <Option key="02-Dawn" value="02-Dawn">
-              Dawn
-            </Option>
-            <Option key="02-Midnight" value="02-Midnight">
-              Midnight
-            </Option>
-            <Option key="02-Spring" value="02-Spring">
-              Spring
-            </Option>
-            <Option key="02-Grass" value="02-Grass">
-              Grass
-            </Option>
-            <Option key="02-Ocean" value="02-Ocean">
-              Ocean
-            </Option>
-          </OptGroup>
-        </Select>
+      <div>
+        <div className="form-group">
+          <h4>Color</h4>
+          <Select
+            style={{ width: "100%" }}
+            defaultValue={colorValue}
+            onChange={this.colorChange}
+            labelInValue
+          >
+            <OptGroup label="Sequential">
+              <Option key="02-Purple" value="02-Purple">
+                Purple
+              </Option>
+              <Option key="02-Green" value="02-Green">
+                Green
+              </Option>
+              <Option key="02-Blue" value="02-Blue">
+                Blue
+              </Option>
+              <Option key="02-Grey" value="02-Grey">
+                Grey
+              </Option>
+              <Option key="02-Orange" value="02-Orange">
+                Orange
+              </Option>
+            </OptGroup>
+            <OptGroup label="Diverging">
+              <Option key="02-Dawn" value="02-Dawn">
+                Dawn
+              </Option>
+              <Option key="02-Midnight" value="02-Midnight">
+                Midnight
+              </Option>
+              <Option key="02-Spring" value="02-Spring">
+                Spring
+              </Option>
+              <Option key="02-Grass" value="02-Grass">
+                Grass
+              </Option>
+              <Option key="02-Ocean" value="02-Ocean">
+                Ocean
+              </Option>
+            </OptGroup>
+          </Select>
+        </div>
+        <Row>
+          <Checkbox onChange={this.iconChange} checked={showIcon}>
+            Show Location Icon
+          </Checkbox>
+        </Row>
+        <Row>
+          <Checkbox onChange={this.intensityChange} checked={showIntensity}>
+            Highlight Radiance Intensity
+          </Checkbox>
+        </Row>
       </div>
     );
 
@@ -568,12 +724,12 @@ export class MandaMap extends Component {
               <div className="main">
                 <div className="form-group">
                   <h4>VIIRS Layers</h4>
-                  <TreeSelect {...tProps} allowClear showSearch />
+                  <TreeSelect {...tProps} />
                 </div>
 
                 <div className="form-group">
                   <h4>Area Coverage</h4>
-                  <TreeSelect {...bProps} allowClear showSearch />
+                  <TreeSelect {...bProps} />
                 </div>
                 <div className="form-group">
                   <h4>Area Texture</h4>
