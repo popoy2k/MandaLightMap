@@ -368,8 +368,6 @@ export class MandaMap extends Component {
         { loc_area: "0", loc_pop: "0" }
       );
 
-    console.log(tempStats);
-
     this.setState({
       currMainData: finalData,
       currLoc: finalLoc,
@@ -388,7 +386,9 @@ export class MandaMap extends Component {
         .sort((a, b) => b - a)[0]
         .toFixed(2)
     });
-
+    lipoMeanMapData.clear();
+    lipoMaxMapData.clear();
+    lipoMinMapData.clear();
     finalData.forEach(feVal => {
       lipoMeanMapData.set(feVal.id, feVal.mean);
       lipoMinMapData.set(feVal.id, feVal.min);
@@ -524,14 +524,6 @@ export class MandaMap extends Component {
 
   componentDidUpdate(prevProps) {
     const { map, mainData } = this.props;
-
-    // const {
-    //   currMainData,
-    //   lipoMaxMapData,
-    //   lipoMinMapData,
-    //   lipoMeanMapData
-    // } = this.state;
-    // console.log(currMainData, lipoMaxMapData, lipoMinMapData, lipoMeanMapData);
 
     if (prevProps.map.mainMap !== map.mainMap) {
       if (mainData) {
