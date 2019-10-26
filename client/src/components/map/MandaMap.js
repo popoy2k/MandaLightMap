@@ -32,7 +32,8 @@ export class MandaMap extends Component {
     radMin: "31.19",
     showIcon: true,
     showIntensity: false,
-    iconDisable: false
+    iconDisable: false,
+    intensityDisable: false
   };
 
   static propTypes = {
@@ -49,71 +50,45 @@ export class MandaMap extends Component {
   };
 
   addHighlight = value => {
-    const { currMainData, lipoMeanMapData, brgyValue } = this.state;
+    const { lipoMeanMapData } = this.state;
     let svg = d3.select("svg#main-mapped");
-    let initData = [];
-    let finalSet = [];
-    let finalData = [];
 
-    if (brgyValue.length === 1 && brgyValue[0].indexOf("00-All") > -1) {
-      finalSet = brgyData[0].children
-        .map(val => val.children)
-        .flat(Infinity)
-        .map(val => parseInt(val.key.split("-")[1]));
-    } else if (brgyValue.length === 1 && brgyValue[0].indexOf("00-All") <= -1) {
-      finalSet = brgyData[0].children
-        .filter(val => val.key === brgyValue[0])[0]
-        .children.map(mVal => parseInt(mVal.key.split("-")[1]));
-    } else if (brgyValue.length > 1 && brgyValue[0].indexOf("All") > -1) {
-      finalSet = [
-        ...brgyValue
-          .map(val => val.split("-")[1])
-          .filter(fVal => parseInt(fVal))
-          .map(nVal => parseInt(nVal)),
-        ...brgyData[0].children
-          .find(val => val.key.indexOf(brgyValue[0].split("-")[0]) > -1)
-          .children.map(val => parseInt(val.key.split("-")[1]))
-      ];
-    } else {
-      finalSet = brgyValue.map(val => parseInt(val.split("-")[1]));
-    }
-
-    if (!currMainData) {
-      initData = lipoMeanMapData
-        .entries()
-        .map(val => ({ id: parseInt(val.key), mean: val.value }));
-    } else {
-      initData = currMainData.map(val => ({ id: val.id, mean: val.mean }));
-    }
-
-    finalData = initData
-      .filter(val => finalSet.includes(val.id))
-      .sort((a, b) => a.mean - b.mean);
-
-    if (!value) {
-      if (finalData.length > 1) {
-        svg
-          .selectAll("path")
-          .transition()
-          .duration(300)
-          .ease(d3.easeLinear)
-          .attr("class", function(d) {
-            if (finalData.slice(-1)[0].id === d.properties.ID_3) {
-              return "brgy high-pulse";
-            }
-
-            if (finalData[0].id === d.properties.ID_3) {
-              return "brgy low-pulse";
-            }
-            return "brgy";
-          });
+    let temp = lipoMeanMapData.entries().sort((a, b) => b.value - a.value);
+    console.log(temp.slice(-1)[0], temp[0], value);
+    // Refactoring in process
+    svg.selectAll("path").each(function(d) {
+      if (!value) {
+        if (temp[0].key === `${d.properties.ID_3}`) {
+          d3.select(this)
+            .transition()
+            .duration(300)
+            .ease(d3.easeLinear)
+            .attr("class", "brgy high-pulse");
+        }
+        if (temp.slice(-1)[0].key === `${d.properties.ID_3}`) {
+          d3.select(this)
+            .transition()
+            .duration(300)
+            .ease(d3.easeLinear)
+            .attr("class", "brgy low-pulse");
+        }
+      } else {
+        if (temp[0].key === `${d.properties.ID_3}`) {
+          d3.select(this)
+            .transition()
+            .duration(300)
+            .ease(d3.easeLinear)
+            .attr("class", "brgy");
+        }
+        if (temp.slice(-1)[0].key === `${d.properties.ID_3}`) {
+          d3.select(this)
+            .transition()
+            .duration(300)
+            .ease(d3.easeLinear)
+            .attr("class", "brgy");
+        }
       }
-    } else {
-      svg
-        .selectAll("path")
-        .classed("low-pulse", false)
-        .classed("high-pulse", false);
-    }
+    });
   };
 
   iconChange = value => {
@@ -124,11 +99,18 @@ export class MandaMap extends Component {
 
   iconMethod = value => {
     let svg = d3.select("svg#main-mapped");
+    let { currMainData } = this.state;
+
     if (value === "block") {
       svg
         .selectAll("image")
         .style("opacity", 0)
-        .attr("display", d => value)
+        .attr("display", d => {
+          if (currMainData.find(fVal => fVal.id === d.properties.ID_3)) {
+            return value;
+          }
+          return "none";
+        })
         .transition()
         .duration(500)
         .ease(d3.easeLinear)
@@ -269,7 +251,19 @@ export class MandaMap extends Component {
   brgyChange = value => {
     this.setNewData(value);
     this.setNewBrgy(value);
-    this.setState({ brgyValue: value });
+    if (!value.length || (value[0].indexOf("All") < 0 && value.length === 1)) {
+      this.setState({
+        brgyValue: value,
+        showIntensity: false,
+        intensityDisable: true
+      });
+      return;
+    }
+    this.setState({
+      brgyValue: value,
+      showIntensity: false,
+      intensityDisable: false
+    });
   };
 
   setNewData = value => {
@@ -324,6 +318,8 @@ export class MandaMap extends Component {
           finalSet = areaData
             .filter(fVal => fVal.district === 2)
             .map(mVal => mVal.id);
+          break;
+        default:
           break;
       }
     }
@@ -407,111 +403,50 @@ export class MandaMap extends Component {
 
   setNewBrgy = value => {
     let svg = d3.select("svg#main-mapped");
-    let currBrgy = value.map(val => val.split("-"));
-    let brgySets = currBrgy.map(val => val[1]).filter(fVal => parseInt(fVal));
     let self = this;
+    const { lipoMeanMapData } = this.state;
+
+    if (value.length < 1) {
+      self.iconMethod("none");
+      self.setState({
+        iconDisable: true,
+        intensityDisable: true,
+        showIcon: false
+      });
+    } else {
+      self.setState({
+        iconDisable: false,
+        intensityDisable: false,
+        showIcon: true
+      });
+    }
 
     svg.selectAll("path").each(function(d) {
-      if (value.length < 1) {
-        self
-          .fadeElement(this, 0)
-          .attr("cursor", "default")
-          .attr("class", "brgy-disabled");
-
-        self.iconMethod("none");
-        self.setState({ iconDisable: true, showIcon: false });
-        return 0;
-      }
-
-      self.setState({ iconDisable: false, showIcon: true });
-      if (brgySets.includes(`${d.properties.ID_3}`)) {
+      if (lipoMeanMapData.has(d.properties.ID_3)) {
         self
           .fadeElement(this, 1)
-          .attr("cursor", "pointer")
-          .attr("class", "brgy");
-        return 0;
-      } else if (currBrgy[0][1] === "All") {
-        if (currBrgy[0][0] === "001" && d.properties.DISTRICT === 1) {
-          self
-            .fadeElement(this, 1)
-            .attr("cursor", "pointer")
-            .attr("class", "brgy");
-          return 0;
-        } else if (currBrgy[0][0] === "002" && d.properties.DISTRICT === 2) {
-          self
-            .fadeElement(this, 1)
-            .attr("cursor", "pointer")
-            .attr("class", "brgy");
-          return 0;
-        } else if (currBrgy[0][0] === "00") {
-          self
-            .fadeElement(this, 1)
-            .attr("cursor", "pointer")
-            .attr("class", "brgy");
-          return 0;
-        } else {
-          self
-            .fadeElement(this, 0)
-            .attr("cursor", "default")
-            .attr("class", "brgy-disabled");
-          return 0;
-        }
-      } else {
-        self
-          .fadeElement(this, 0)
           .attr("cursor", "default")
-          .attr("class", "brgy-disabled");
-        return 0;
+          .attr("class", "brgy");
+        return;
       }
+      self
+        .fadeElement(this, 0)
+        .attr("cursor", "default")
+        .attr("class", "brgy-disabled");
     });
 
     svg.selectAll("image").each(function(d) {
-      if (value.length < 1) {
+      if (lipoMeanMapData.has(d.properties.ID_3)) {
         self
-          .fadeElement(this, 0)
+          .fadeElement(this, 1)
           .attr("cursor", "default")
-          .attr("class", "brgy-disabled");
-        return 0;
-      }
-      if (brgySets.includes(`${d.properties.ID_3}`)) {
-        self
-          .fadeElement(this, 1, 500)
-          .attr("cursor", "pointer")
           .attr("class", "brgy");
-        return 0;
-      } else if (currBrgy[0][1] === "All") {
-        if (currBrgy[0][0] === "001" && d.properties.DISTRICT === 1) {
-          self
-            .fadeElement(this, 1, 500)
-            .attr("cursor", "pointer")
-            .attr("class", "brgy");
-          return 0;
-        } else if (currBrgy[0][0] === "002" && d.properties.DISTRICT === 2) {
-          self
-            .fadeElement(this, 1, 500)
-            .attr("cursor", "pointer")
-            .attr("class", "brgy");
-          return 0;
-        } else if (currBrgy[0][0] === "00") {
-          self
-            .fadeElement(this, 1, 500)
-            .attr("cursor", "pointer")
-            .attr("class", "brgy");
-          return 0;
-        } else {
-          self
-            .fadeElement(this, 0)
-            .attr("cursor", "default")
-            .attr("class", "brgy-disabled");
-          return 0;
-        }
-      } else {
-        self
-          .fadeElement(this, 0)
-          .attr("cursor", "default")
-          .attr("class", "brgy-disabled");
-        return 0;
+        return;
       }
+      self
+        .fadeElement(this, 0)
+        .attr("cursor", "default")
+        .attr("class", "brgy-disabled");
     });
   };
 
@@ -605,6 +540,10 @@ export class MandaMap extends Component {
 
   reRenderMap = someColor => {
     const { currMainData } = this.state;
+
+    if (!currMainData.length) {
+      return;
+    }
     let svg = d3.select("svg#main-mapped");
     let scale = d3.select("svg#main-mapped>g#map-scale");
     let reColorScale = d3
@@ -761,7 +700,8 @@ export class MandaMap extends Component {
       radMin,
       showIcon,
       showIntensity,
-      iconDisable
+      iconDisable,
+      intensityDisable
     } = this.state;
 
     const tProps = {
@@ -856,7 +796,11 @@ export class MandaMap extends Component {
           </Checkbox>
         </Row>
         <Row>
-          <Checkbox onChange={this.intensityChange} checked={showIntensity}>
+          <Checkbox
+            onChange={this.intensityChange}
+            checked={showIntensity}
+            disabled={intensityDisable}
+          >
             Highlight Radiance Intensity
           </Checkbox>
         </Row>
