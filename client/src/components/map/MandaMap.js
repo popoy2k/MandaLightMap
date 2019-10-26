@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from "react";
 import NavBar from "../main/NavBar";
 import { Icon, TreeSelect, Select, Checkbox, Row } from "antd";
-import { brgyData, treeData } from "./treeData";
+import { brgyData, treeData, areaData } from "./treeData";
 import * as d3 from "d3";
 import { Redirect } from "react-router-dom";
 
@@ -31,7 +31,8 @@ export class MandaMap extends Component {
     radMax: "75.14",
     radMin: "31.19",
     showIcon: true,
-    showIntensity: false
+    showIntensity: false,
+    iconDisable: false
   };
 
   static propTypes = {
@@ -96,15 +97,15 @@ export class MandaMap extends Component {
           .transition()
           .duration(300)
           .ease(d3.easeLinear)
-          .attr("class", d => {
+          .attr("class", function(d) {
             if (finalData.slice(-1)[0].id === d.properties.ID_3) {
-              return "high-pulse";
+              return "brgy high-pulse";
             }
 
             if (finalData[0].id === d.properties.ID_3) {
-              return "low-pulse";
+              return "brgy low-pulse";
             }
-            return "";
+            return "brgy";
           });
       }
     } else {
@@ -266,54 +267,250 @@ export class MandaMap extends Component {
   };
 
   brgyChange = value => {
+    this.setNewData(value);
     this.setNewBrgy(value);
     this.setState({ brgyValue: value });
+  };
+
+  setNewData = value => {
+    const {
+      currMainData,
+      lipoMeanMapData,
+      lipoMinMapData,
+      lipoMaxMapData,
+      mainMapData
+    } = this.state;
+
+    let initValue = value.map(val => val.split("-"));
+    let finalSet = [];
+    let finalData = [];
+    let allContainer = "";
+    let finalLoc = "";
+
+    if (!value.length) {
+      if (currMainData.length || currMainData) {
+        this.setState({
+          currMainData: {},
+          currLoc: "",
+          currLA: "",
+          currPop: "",
+          radMax: "",
+          radMin: "",
+          radMean: ""
+        });
+      }
+      lipoMeanMapData.clear();
+      lipoMinMapData.clear();
+      lipoMaxMapData.clear();
+      return;
+    }
+
+    allContainer = initValue.filter(val => isNaN(parseInt(val[1])))[0] || "";
+
+    if (allContainer) {
+      switch (allContainer[0]) {
+        case "00":
+          finalLoc = "Mandaluyong City";
+          finalSet = areaData.map(val => val.id);
+          break;
+        case "001":
+          finalLoc = "District 1 Mandaluyong City";
+          finalSet = areaData
+            .filter(fVal => fVal.district === 1)
+            .map(mVal => mVal.id);
+          break;
+        case "002":
+          finalLoc = "District 2 Mandaluyong City";
+          finalSet = areaData
+            .filter(fVal => fVal.district === 2)
+            .map(mVal => mVal.id);
+          break;
+      }
+    }
+
+    initValue
+      .filter(fVal => parseInt(fVal[1]))
+      .forEach(feVal => {
+        finalSet.push(parseInt(feVal.slice(-1)[0]));
+      });
+
+    if (initValue.filter(fVal => parseInt(fVal[1])).length) {
+      finalLoc = "Custom Area";
+    }
+    if (finalSet.length === 1) {
+      finalLoc = areaData.filter(fVal => fVal.id === finalSet[0])[0].loc_name;
+    }
+
+    let tempFinalData = mainMapData
+      .map(mVal => mVal.lipoData.filter(fVal => finalSet.includes(fVal.mapId)))
+      .flat(Infinity);
+    finalSet.forEach(val =>
+      finalData.push(tempFinalData.filter(fVal => fVal.mapId === val))
+    );
+
+    finalData = finalData.map(mVal => ({
+      id: mVal[0].mapId,
+      mean:
+        mVal.map(meanVal => meanVal.mean).reduce((prev, curr) => prev + curr) /
+        mVal.length,
+      max: mVal.map(maxVal => maxVal.max).sort((a, b) => b - a)[0],
+      min: mVal.map(minVal => minVal.min).sort((a, b) => a - b)[0]
+    }));
+
+    let tempStats = areaData
+      .filter(fVal => finalSet.includes(fVal.id))
+      .reduce(
+        (prev, curr) => ({
+          loc_area: parseFloat(prev.loc_area) + parseFloat(curr.loc_area),
+          loc_pop: `${parseInt(prev.loc_pop.replace(",", "")) +
+            parseInt(curr.loc_pop.replace(",", ""))}`
+        }),
+        { loc_area: "0", loc_pop: "0" }
+      );
+
+    console.log(tempStats);
+
+    this.setState({
+      currMainData: finalData,
+      currLoc: finalLoc,
+      currLA: parseFloat(tempStats.loc_area).toFixed(2),
+      currPop: parseInt(tempStats.loc_pop).toLocaleString(),
+      radMean: (
+        finalData.reduce((prev, curr) => ({ mean: prev.mean + curr.mean }))
+          .mean / finalData.length
+      ).toFixed(2),
+      radMin: finalData
+        .map(mVal => mVal.min)
+        .sort((a, b) => a - b)[0]
+        .toFixed(2),
+      radMax: finalData
+        .map(mVal => mVal.min)
+        .sort((a, b) => b - a)[0]
+        .toFixed(2)
+    });
+
+    finalData.forEach(feVal => {
+      lipoMeanMapData.set(feVal.id, feVal.mean);
+      lipoMinMapData.set(feVal.id, feVal.min);
+      lipoMaxMapData.set(feVal.id, feVal.max);
+    });
+  };
+
+  fadeElement = (self, opacity, interval = 300) => {
+    return d3
+      .select(self)
+      .transition()
+      .duration(interval)
+      .ease(d3.easeLinear)
+      .style("opacity", opacity);
   };
 
   setNewBrgy = value => {
     let svg = d3.select("svg#main-mapped");
     let currBrgy = value.map(val => val.split("-"));
     let brgySets = currBrgy.map(val => val[1]).filter(fVal => parseInt(fVal));
+    let self = this;
 
-    svg.selectAll("path").attr("display", d => {
+    svg.selectAll("path").each(function(d) {
       if (value.length < 1) {
-        return "none";
+        self
+          .fadeElement(this, 0)
+          .attr("cursor", "default")
+          .attr("class", "brgy-disabled");
+
+        self.iconMethod("none");
+        self.setState({ iconDisable: true, showIcon: false });
+        return 0;
       }
+
+      self.setState({ iconDisable: false, showIcon: true });
       if (brgySets.includes(`${d.properties.ID_3}`)) {
-        return "block";
+        self
+          .fadeElement(this, 1)
+          .attr("cursor", "pointer")
+          .attr("class", "brgy");
+        return 0;
       } else if (currBrgy[0][1] === "All") {
         if (currBrgy[0][0] === "001" && d.properties.DISTRICT === 1) {
-          return "block";
+          self
+            .fadeElement(this, 1)
+            .attr("cursor", "pointer")
+            .attr("class", "brgy");
+          return 0;
         } else if (currBrgy[0][0] === "002" && d.properties.DISTRICT === 2) {
-          return "block";
+          self
+            .fadeElement(this, 1)
+            .attr("cursor", "pointer")
+            .attr("class", "brgy");
+          return 0;
         } else if (currBrgy[0][0] === "00") {
-          return "block";
+          self
+            .fadeElement(this, 1)
+            .attr("cursor", "pointer")
+            .attr("class", "brgy");
+          return 0;
         } else {
-          return "none";
+          self
+            .fadeElement(this, 0)
+            .attr("cursor", "default")
+            .attr("class", "brgy-disabled");
+          return 0;
         }
       } else {
-        return "none";
+        self
+          .fadeElement(this, 0)
+          .attr("cursor", "default")
+          .attr("class", "brgy-disabled");
+        return 0;
       }
     });
 
-    svg.selectAll("image").attr("display", d => {
+    svg.selectAll("image").each(function(d) {
       if (value.length < 1) {
-        return "none";
+        self
+          .fadeElement(this, 0)
+          .attr("cursor", "default")
+          .attr("class", "brgy-disabled");
+        return 0;
       }
       if (brgySets.includes(`${d.properties.ID_3}`)) {
-        return "block";
+        self
+          .fadeElement(this, 1, 500)
+          .attr("cursor", "pointer")
+          .attr("class", "brgy");
+        return 0;
       } else if (currBrgy[0][1] === "All") {
         if (currBrgy[0][0] === "001" && d.properties.DISTRICT === 1) {
-          return "block";
+          self
+            .fadeElement(this, 1, 500)
+            .attr("cursor", "pointer")
+            .attr("class", "brgy");
+          return 0;
         } else if (currBrgy[0][0] === "002" && d.properties.DISTRICT === 2) {
-          return "block";
+          self
+            .fadeElement(this, 1, 500)
+            .attr("cursor", "pointer")
+            .attr("class", "brgy");
+          return 0;
         } else if (currBrgy[0][0] === "00") {
-          return "block";
+          self
+            .fadeElement(this, 1, 500)
+            .attr("cursor", "pointer")
+            .attr("class", "brgy");
+          return 0;
         } else {
-          return "none";
+          self
+            .fadeElement(this, 0)
+            .attr("cursor", "default")
+            .attr("class", "brgy-disabled");
+          return 0;
         }
       } else {
-        return "none";
+        self
+          .fadeElement(this, 0)
+          .attr("cursor", "default")
+          .attr("class", "brgy-disabled");
+        return 0;
       }
     });
   };
@@ -327,6 +524,14 @@ export class MandaMap extends Component {
 
   componentDidUpdate(prevProps) {
     const { map, mainData } = this.props;
+
+    // const {
+    //   currMainData,
+    //   lipoMaxMapData,
+    //   lipoMinMapData,
+    //   lipoMeanMapData
+    // } = this.state;
+    // console.log(currMainData, lipoMaxMapData, lipoMinMapData, lipoMeanMapData);
 
     if (prevProps.map.mainMap !== map.mainMap) {
       if (mainData) {
@@ -382,10 +587,10 @@ export class MandaMap extends Component {
       .data(newMap)
       .enter()
       .append("image")
-      .attr("x", d => geo(d3.geoCentroid(d))[0] - 15)
+      .attr("x", d => geo(d3.geoCentroid(d))[0] - 10)
       .attr("y", d => geo(d3.geoCentroid(d))[1] - 15)
-      .attr("width", 20)
-      .attr("height", 24)
+      .attr("width", 15)
+      .attr("height", 20)
       .attr(
         "xlink:href",
         "https://image.flaticon.com/icons/svg/252/252025.svg"
@@ -563,7 +768,8 @@ export class MandaMap extends Component {
       radMax,
       radMin,
       showIcon,
-      showIntensity
+      showIntensity,
+      iconDisable
     } = this.state;
 
     const tProps = {
@@ -581,7 +787,7 @@ export class MandaMap extends Component {
       style: {
         width: "100%"
       },
-      maxTagCount: 3,
+      maxTagCount: 2,
       maxTagPlaceholder: args => `Too many to show.. (${args.length} items)`
     };
     const bProps = {
@@ -599,7 +805,7 @@ export class MandaMap extends Component {
       style: {
         width: "100%"
       },
-      maxTagCount: 3,
+      maxTagCount: 2,
       maxTagPlaceholder: args => `Too many to show.. (${args.length} items)`
     };
     let isColored = (
@@ -649,7 +855,11 @@ export class MandaMap extends Component {
           </Select>
         </div>
         <Row>
-          <Checkbox onChange={this.iconChange} checked={showIcon}>
+          <Checkbox
+            onChange={this.iconChange}
+            checked={showIcon}
+            disabled={iconDisable}
+          >
             Show Location Icon
           </Checkbox>
         </Row>

@@ -278,10 +278,14 @@ hr {
 }
 
 .brgy:hover {
-  opacity: 0.3;
+  opacity: 0.3 !important;
   /* fill: rgba(91, 52, 231, 0.8); */
 
   /* transform: scale(1.005, 1.005); */
+}
+
+.brgy-disabled {
+  pointer-events: none;
 }
 
 .data {
@@ -796,7 +800,7 @@ hr {
 }
 
 .main-map .scoreboard-panel {
-  height: 35vh;
+  height: auto;
   width: 25%;
   padding: 10px 20px;
   box-shadow: 0 7px 11px 2px rgba(63, 63, 63, 0.4);
@@ -825,9 +829,9 @@ hr {
 }
 
 .main-map .map-setting-panel {
-  height: 65vh;
+  height: auto;
   width: 25%;
-  padding: 10px 15px;
+  padding: 1% 20px;
   margin-top: 1%;
   box-shadow: 0 7px 11px 2px rgba(63, 63, 63, 0.4);
   border-radius: 5px;
@@ -915,6 +919,7 @@ svg {
   /* border: 1px solid black; */
   width: 70%;
   height: 100vh;
+  min-height: 100vh;
   display: flex;
   margin-top: 1%;
   right: 1%;
@@ -947,7 +952,7 @@ svg {
   }
 
   100% {
-    fill: rgba(248, 47, 7, 0.123);
+    fill: rgba(248, 47, 7, 0.322);
   }
 }
 
