@@ -3,6 +3,7 @@ import NavBar from "../main/NavBar";
 import { Icon, TreeSelect, Select, Checkbox, Row } from "antd";
 import { brgyData, treeData, areaData } from "./treeData";
 import * as d3 from "d3";
+import * as d3Arr from "d3-array";
 import { Redirect } from "react-router-dom";
 
 import { connect } from "react-redux";
@@ -18,6 +19,7 @@ export class MandaMap extends Component {
     brgyValue: ["00-All"],
     textureValue: { key: "01-Choro" },
     colorValue: { key: "02-Purple" },
+    colorDisabled: false,
     choroColorValue: d3.schemePurples[9],
     mainMapData: {},
     currMainData: {},
@@ -30,7 +32,7 @@ export class MandaMap extends Component {
     radMean: "44.94",
     radMax: "75.14",
     radMin: "31.19",
-    showIcon: true,
+    showIcon: false,
     showIntensity: false,
     iconDisable: false,
     intensityDisable: false
@@ -54,8 +56,6 @@ export class MandaMap extends Component {
     let svg = d3.select("svg#main-mapped");
 
     let temp = lipoMeanMapData.entries().sort((a, b) => b.value - a.value);
-    console.log(temp.slice(-1)[0], temp[0], value);
-    // Refactoring in process
     svg.selectAll("path").each(function(d) {
       if (!value) {
         if (temp[0].key === `${d.properties.ID_3}`) {
@@ -89,12 +89,54 @@ export class MandaMap extends Component {
         }
       }
     });
+
+    let highlight = svg
+      .append("g")
+      .attr("transform", "translate(10, 100)")
+      .attr("id", "highlight");
+
+    if (!value) {
+      highlight
+        .selectAll("rect")
+        .data([{ no: 1, name: "Lowest LiPo" }, { no: 2, name: "Highest LiPo" }])
+        .enter()
+        .append("rect")
+        .attr("height", 15)
+        .attr("x", d => 15)
+        .attr("y", d => d.no * 20)
+        .attr("width", d => 15)
+        .attr("fill", d =>
+          d.no % 2 === 0 ? "rgba(248, 47, 7)" : "rgb(20, 240, 75)"
+        );
+
+      highlight
+        .selectAll("text")
+        .data([
+          { no: 30, name: "Lowest LiPo" },
+          { no: 50, name: "Highest LiPo" }
+        ])
+        .enter()
+        .append("text")
+        .attr("x", 35)
+        .attr("y", d => d.no)
+        .attr("font-size", "12px")
+        .text(d => d.name);
+    } else {
+      d3.selectAll("g#highlight").remove();
+    }
   };
 
   iconChange = value => {
     const { showIcon } = this.state;
     this.iconMethod(showIcon ? "none" : "block");
     this.setState({ showIcon: !showIcon });
+    if (!showIcon === true) {
+      this.addLocationName();
+    } else {
+      d3.select("div.main-map-svg")
+        .selectAll("div")
+        .style("opacity", 0);
+    }
   };
 
   iconMethod = value => {
@@ -176,7 +218,12 @@ export class MandaMap extends Component {
 
   setMainData = value => {
     const { mainData } = this.props;
-    const { lipoMeanMapData, lipoMaxMapData, lipoMinMapData } = this.state;
+    const {
+      lipoMeanMapData,
+      lipoMaxMapData,
+      lipoMinMapData,
+      showIcon
+    } = this.state;
     if (value.length < 1) {
       this.setState({ currMainData: [] });
       return this.reRenderMap(d3.schemePurples[9]);
@@ -246,6 +293,10 @@ export class MandaMap extends Component {
     });
 
     this.reFill();
+
+    if (showIcon) {
+      this.addLocationName(selectedData);
+    }
   };
 
   brgyChange = value => {
@@ -255,14 +306,16 @@ export class MandaMap extends Component {
       this.setState({
         brgyValue: value,
         showIntensity: false,
-        intensityDisable: true
+        intensityDisable: true,
+        colorDisabled: true
       });
       return;
     }
     this.setState({
       brgyValue: value,
       showIntensity: false,
-      intensityDisable: false
+      intensityDisable: false,
+      colorDisabled: false
     });
   };
 
@@ -378,7 +431,7 @@ export class MandaMap extends Component {
         .sort((a, b) => a - b)[0]
         .toFixed(2),
       radMax: finalData
-        .map(mVal => mVal.min)
+        .map(mVal => mVal.max)
         .sort((a, b) => b - a)[0]
         .toFixed(2)
     });
@@ -425,7 +478,7 @@ export class MandaMap extends Component {
       if (lipoMeanMapData.has(d.properties.ID_3)) {
         self
           .fadeElement(this, 1)
-          .attr("cursor", "default")
+          .attr("cursor", "pointer")
           .attr("class", "brgy");
         return;
       }
@@ -437,10 +490,7 @@ export class MandaMap extends Component {
 
     svg.selectAll("image").each(function(d) {
       if (lipoMeanMapData.has(d.properties.ID_3)) {
-        self
-          .fadeElement(this, 1)
-          .attr("cursor", "default")
-          .attr("class", "brgy");
+        self.fadeElement(this, 1, 1000).attr("cursor", "default");
         return;
       }
       self
@@ -464,7 +514,6 @@ export class MandaMap extends Component {
       if (mainData) {
         this.setMainData(["2019-All"]);
         this.renderMap(map);
-        this.addLocationName();
       }
     }
 
@@ -472,7 +521,6 @@ export class MandaMap extends Component {
       this.setMainData(["2019-All"]);
       if (map.mainMap) {
         this.renderMap(map);
-        this.addLocationName();
       }
     }
   }
@@ -493,13 +541,78 @@ export class MandaMap extends Component {
       this.setMainData(["2019-All"]);
       this.setChoroColor({ key: "02-Purple" });
       this.renderMap(map);
-      this.addLocationName();
     }
   }
 
-  addLocationName = () => {
+  setCurrentSelected = data => {
+    const {
+      ID_3: ID,
+      area_3: LA,
+      population_3: Pop,
+      NAME_3: Loc
+    } = data.properties;
+    const { currMainData } = this.state;
+    const finalData = currMainData.filter(val => val.id === ID)[0];
+
+    this.setState({
+      currLoc: Loc,
+      currLA: LA,
+      currPop: Pop,
+      radMean: finalData.mean.toFixed(2),
+      radMin: finalData.min.toFixed(2),
+      radMax: finalData.max.toFixed(2)
+    });
+  };
+
+  addLocationName = (newSet = null) => {
     const { map } = this.props;
+    const { mainMapData, choroColorValue } = this.state;
+    let initData = newSet || mainMapData;
+    const numOfYears = [...new Set(initData.map(mVal => mVal.year))];
+    let temp = [];
+
+    if (!numOfYears.length) {
+      return;
+    }
+
+    initData = initData.map(mVal => ({
+      month: mVal.month,
+      year: mVal.year,
+      data: mVal.lipoData.map(mmVal => ({
+        id: mmVal.mapId,
+        mean: mmVal.mean
+      }))
+    }));
+
+    if (numOfYears.length > 1) {
+      temp = [...d3Arr.group(initData, d => d.year)]
+        .map(mVal => ({
+          year: mVal[0],
+          data: mVal[1]
+            .map(mmVal => mmVal.data.map(mmmVal => mmmVal))
+            .flat(Infinity)
+        }))
+        .map(m2Val => ({
+          year: m2Val.year,
+          data: [...d3Arr.group(m2Val.data, d2 => d2.id)].map(mm2Val => ({
+            id: mm2Val[0],
+            mean:
+              mm2Val[1]
+                .map(mmm2Val => mmm2Val.mean)
+                .reduce((prev, curr) => prev + curr) / mm2Val[1].length
+          }))
+        }));
+      initData = temp;
+    }
+
     let newMap = map.mainMap;
+    d3.select("div.main-map-svg")
+      .append("div")
+      .attr("class", "sk-tooltip")
+      .append("svg")
+      .append("g")
+      .attr("transform", "translate(30,10)");
+
     let svg = d3.select("svg#main-mapped");
     let svgH = svg.attr("height"),
       svgW = svg.attr("width");
@@ -508,6 +621,7 @@ export class MandaMap extends Component {
       .center([121.012, 14.602])
       .translate([svgH / 2, svgW / 2])
       .scale(1100000);
+    let self = this;
 
     svg
       .selectAll("image")
@@ -516,12 +630,95 @@ export class MandaMap extends Component {
       .append("image")
       .attr("x", d => geo(d3.geoCentroid(d))[0] - 10)
       .attr("y", d => geo(d3.geoCentroid(d))[1] - 15)
+      .style("cursor", "pointer")
       .attr("width", 15)
       .attr("height", 20)
-      .attr(
-        "xlink:href",
-        "https://image.flaticon.com/icons/svg/252/252025.svg"
-      );
+      .attr("xlink:href", "https://image.flaticon.com/icons/svg/252/252025.svg")
+      .on("click", function(d) {
+        let pos = geo(d3.geoCentroid(d));
+        let finalData = initData.map(mVal => ({
+          ...mVal,
+          data: mVal.data.filter(fVal => fVal.id === d.properties.ID_3)[0]
+        }));
+
+        console.log(finalData, initData);
+
+        let h = 115,
+          w = 250;
+        self.setCurrentSelected(d);
+        d3.select("div.main-map-svg")
+          .selectAll("div")
+          .transition()
+          .style("left", pos[0] + "px")
+          .style("top", pos[1] - 65 + "px")
+          .style("opacity", 1)
+          .duration(300);
+
+        // let miniSvg = addToolTip.append("svg");
+        let miniG = d3
+          .select("div.main-map-svg")
+          .selectAll("div")
+          .select("g");
+
+        let y = d3
+          .scaleLinear()
+          .domain([0, 70])
+          .range([h, 0])
+          .nice();
+
+        let yAxis = d3
+          .axisLeft()
+          .ticks(6)
+          .scale(y);
+
+        if (miniG.selectAll("g").node()) {
+          miniG.selectAll("g").remove();
+        }
+
+        miniG.append("g").call(yAxis);
+
+        let x = d3
+          .scaleBand()
+          .domain(d3.range(0, finalData.length))
+          .range([2, w]);
+        let xAxis = d3
+          .axisBottom()
+          .scale(x)
+          .tickFormat(d => {
+            let name = finalData.map(m => m.month || m.year)[d];
+            if (name < 13) {
+              return new Date(name).toDateString().split(" ")[1];
+            }
+            return name;
+          });
+
+        miniG
+          .append("g")
+          .attr("transform", `translate(0,${h})`)
+          .call(xAxis)
+          .selectAll("text")
+          .attr("text-anchor", "end")
+          .attr("transform", "rotate(-35)translate(0,0)");
+
+        if (miniG.selectAll("rect").node) {
+          miniG.selectAll("rect").remove();
+        }
+
+        miniG
+          .selectAll("rect")
+          .data(finalData)
+          .enter()
+          .append("rect")
+          .attr("y", h)
+          .attr("height", 0)
+          .attr("width", x.bandwidth() - 2)
+          .attr("x", (d, i) => x(i))
+          .attr("fill", choroColorValue[6])
+          .transition()
+          .attr("height", d => h - y(d.data.mean))
+          .attr("y", d => y(d.data.mean))
+          .duration(1000);
+      });
   };
 
   reFill = () => {
@@ -701,7 +898,8 @@ export class MandaMap extends Component {
       showIcon,
       showIntensity,
       iconDisable,
-      intensityDisable
+      intensityDisable,
+      colorDisabled
     } = this.state;
 
     const tProps = {
@@ -748,6 +946,7 @@ export class MandaMap extends Component {
             style={{ width: "100%" }}
             defaultValue={colorValue}
             onChange={this.colorChange}
+            disabled={colorDisabled}
             labelInValue
           >
             <OptGroup label="Sequential">
