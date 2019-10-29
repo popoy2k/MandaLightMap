@@ -575,14 +575,16 @@ export class MandaMap extends Component {
       return;
     }
 
-    initData = initData.map(mVal => ({
-      month: mVal.month,
-      year: mVal.year,
-      data: mVal.lipoData.map(mmVal => ({
-        id: mmVal.mapId,
-        mean: mmVal.mean
+    initData = initData
+      .map(mVal => ({
+        month: mVal.month,
+        year: parseInt(mVal.year),
+        data: mVal.lipoData.map(mmVal => ({
+          id: mmVal.mapId,
+          mean: mmVal.mean
+        }))
       }))
-    }));
+      .sort((a, b) => a.year - b.year);
 
     if (numOfYears.length > 1) {
       temp = [...d3Arr.group(initData, d => d.year)]
@@ -606,12 +608,21 @@ export class MandaMap extends Component {
     }
 
     let newMap = map.mainMap;
-    d3.select("div.main-map-svg")
-      .append("div")
-      .attr("class", "sk-tooltip")
-      .append("svg")
-      .append("g")
-      .attr("transform", "translate(30,10)");
+
+    if (
+      !d3
+        .select("div.main-map-svg")
+        .selectAll("div")
+        .node()
+    ) {
+      d3.select("div.main-map-svg")
+        .append("div")
+        .attr("class", "sk-tooltip")
+        .append("svg")
+        .attr("height", 180)
+        .append("g")
+        .attr("transform", "translate(30,30)");
+    }
 
     let svg = d3.select("svg#main-mapped");
     let svgH = svg.attr("height"),
@@ -622,6 +633,10 @@ export class MandaMap extends Component {
       .translate([svgH / 2, svgW / 2])
       .scale(1100000);
     let self = this;
+
+    if (svg.selectAll("image").node()) {
+      svg.selectAll("image").remove();
+    }
 
     svg
       .selectAll("image")
@@ -641,8 +656,6 @@ export class MandaMap extends Component {
           data: mVal.data.filter(fVal => fVal.id === d.properties.ID_3)[0]
         }));
 
-        console.log(finalData, initData);
-
         let h = 115,
           w = 250;
         self.setCurrentSelected(d);
@@ -654,7 +667,6 @@ export class MandaMap extends Component {
           .style("opacity", 1)
           .duration(300);
 
-        // let miniSvg = addToolTip.append("svg");
         let miniG = d3
           .select("div.main-map-svg")
           .selectAll("div")
@@ -714,10 +726,64 @@ export class MandaMap extends Component {
           .attr("width", x.bandwidth() - 2)
           .attr("x", (d, i) => x(i))
           .attr("fill", choroColorValue[6])
+          .attr("cursor", "pointer")
           .transition()
           .attr("height", d => h - y(d.data.mean))
           .attr("y", d => y(d.data.mean))
           .duration(1000);
+
+        if (miniG.selectAll("g.barText").node()) {
+          miniG.selectAll("g.barText").remove();
+        }
+
+        miniG
+          .append("g")
+          .attr("class", "barText")
+          .selectAll("text")
+          .data(finalData)
+          .enter()
+          .append("text")
+          .style("opacity", 0)
+          .attr("height", d => h - y(d.data.mean))
+          .attr("y", d => y(d.data.mean) - 5)
+          .attr("x", (d, i) => x(i) + (x.bandwidth() - 2) / 2)
+          .attr("text-anchor", "middle")
+          .style("font-size", "10px")
+          .text(function(d) {
+            return d.data.mean.toFixed(1);
+          })
+          .transition()
+          .style("opacity", 1)
+          .delay(600)
+          .duration(300);
+
+        if (
+          d3
+            .select("div.sk-tooltip")
+            .select("svg")
+            .select("text.highText")
+            .node()
+        ) {
+          d3.select("div.sk-tooltip")
+            .select("svg")
+            .select("text.highText")
+            .remove();
+        }
+
+        d3.select("div.sk-tooltip")
+          .select("svg")
+          .append("text")
+          .attr("class", "highText")
+          .style("font-size", "18px")
+          .style("opacity", 0)
+          .text(d.properties.NAME_3)
+          .attr("x", w / 2 + 20)
+          .attr("y", 20)
+          .attr("text-anchor", "middle")
+          .transition()
+          .style("opacity", 1)
+          .duration(300)
+          .delay(300);
       });
   };
 
@@ -991,7 +1057,7 @@ export class MandaMap extends Component {
             checked={showIcon}
             disabled={iconDisable}
           >
-            Show Location Icon
+            Show Area Information
           </Checkbox>
         </Row>
         <Row>
