@@ -1,14 +1,17 @@
 import React, { Component, Fragment } from "react";
 import NavBar from "../main/NavBar";
-import { Icon, TreeSelect, Select, Checkbox, Row } from "antd";
+import { Icon, TreeSelect, Select, Checkbox, Row, Radio } from "antd";
 import { brgyData, treeData, areaData } from "./treeData";
 import * as d3 from "d3";
 import * as d3Arr from "d3-array";
 import { Redirect } from "react-router-dom";
+import ReactMapGL from "react-map-gl";
 
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { getMainMap, getMapData } from "../../actions/auth";
+
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 const { SHOW_PARENT } = TreeSelect;
 const { Option, OptGroup } = Select;
@@ -17,7 +20,6 @@ export class MandaMap extends Component {
   state = {
     treeValue: ["2019-All"],
     brgyValue: ["00-All"],
-    textureValue: { key: "01-Choro" },
     colorValue: { key: "02-Purple" },
     colorDisabled: false,
     choroColorValue: d3.schemePurples[9],
@@ -35,7 +37,15 @@ export class MandaMap extends Component {
     showIcon: false,
     showIntensity: false,
     iconDisable: false,
-    intensityDisable: false
+    intensityDisable: false,
+    textureVal: "choropleth",
+    viewport: {
+      width: "100%",
+      height: "100%",
+      latitude: 37.7577,
+      longitude: -122.4376,
+      zoom: 8
+    }
   };
 
   static propTypes = {
@@ -49,6 +59,43 @@ export class MandaMap extends Component {
     const { showIntensity } = this.state;
     this.addHighlight(showIntensity);
     this.setState({ showIntensity: !showIntensity });
+  };
+
+  textureRadioChange = value => {
+    this.shiftTexture(value.target.value);
+    this.setState({ textureVal: value.target.value });
+  };
+
+  shiftTexture = value => {
+    if (!value) {
+      return;
+    }
+
+    const { map } = this.props;
+    d3.select("div.main-map-svg")
+      .select("svg")
+      .selectAll("*")
+      .remove();
+
+    d3.select("div.main-map-svg")
+      .selectAll("div")
+      .remove();
+
+    this.setState({ showIcon: false, showIntensity: false });
+
+    switch (value) {
+      case "choropleth":
+        this.setMainData(["2019-All"]);
+        this.setChoroColor({ key: "02-Purple" });
+        this.renderMap(map);
+        break;
+      case "natural":
+        break;
+      case "roads":
+        break;
+      default:
+        return;
+    }
   };
 
   addHighlight = value => {
@@ -500,8 +547,6 @@ export class MandaMap extends Component {
     });
   };
 
-  textureChange = value => this.setState({ textureValue: value });
-
   colorChange = value => {
     this.setChoroColor(value);
     this.setState({ colorValue: value });
@@ -809,6 +854,7 @@ export class MandaMap extends Component {
     }
     let svg = d3.select("svg#main-mapped");
     let scale = d3.select("svg#main-mapped>g#map-scale");
+
     let reColorScale = d3
       .scaleThreshold()
       .domain(d3.range(20, 100, 5))
@@ -852,8 +898,11 @@ export class MandaMap extends Component {
       lipoMinMapData,
       choroColorValue
     } = this.state;
+
     let svg = d3.select("svg#main-mapped");
-    let scale = d3.select("svg#main-mapped>g#map-scale");
+    let scale = d3.select("svg#main-mapped>g#map-scale").node()
+      ? d3.select("svg#main-mapped>g#map-scale")
+      : svg.append("g").attr("id", "map-scale");
 
     // For scale presentation
     let x = d3
@@ -953,7 +1002,6 @@ export class MandaMap extends Component {
     const {
       treeValue,
       brgyValue,
-      textureValue,
       colorValue,
       currLoc,
       currLA,
@@ -965,7 +1013,9 @@ export class MandaMap extends Component {
       showIntensity,
       iconDisable,
       intensityDisable,
-      colorDisabled
+      colorDisabled,
+      textureVal,
+      viewport
     } = this.state;
 
     const tProps = {
@@ -1072,7 +1122,7 @@ export class MandaMap extends Component {
       </div>
     );
 
-    if (textureValue.key !== "01-Choro") {
+    if (textureVal !== "choropleth") {
       isColored = "";
     }
 
@@ -1080,6 +1130,23 @@ export class MandaMap extends Component {
     if (!mainData) {
       return <Redirect to="/map" />;
     }
+
+    let niceMap = "";
+
+    switch (textureVal) {
+      case "natural":
+        niceMap = (
+          <ReactMapGL
+            {...viewport}
+            mapboxApiAccessToken={"pk.eyJ1IjoiY2FybGRlbm5pcyIsImEiOiJjazIxZzl5Y3EwYzRjM2Nucm9tNHByMmxxIn0._MG8WyHvx4q4-ygT_o1SbA"}
+            onViewportChange={viewport => this.setState({ viewport })}
+          />
+        );
+        break;
+      default:
+        niceMap = "";
+    }
+
     return (
       <Fragment>
         <NavBar />
@@ -1144,26 +1211,19 @@ export class MandaMap extends Component {
                 </div>
                 <div className="form-group">
                   <h4>Area Texture</h4>
-                  <Select
-                    style={{ width: "100%" }}
-                    defaultValue={{ key: "01-Choro" }}
-                    onChange={this.textureChange}
-                    dropdownStyle={{ maxHeight: "40vh" }}
-                    labelInValue
-                  >
-                    <Option key="01-Choro" value="01-Choro">
-                      Choropleth
-                    </Option>
-                    <Option key="01-NE" value="01-NE">
-                      Natural Earth
-                    </Option>
-                    <Option key="01-Roads" value="01-Roads">
-                      Roads
-                    </Option>
-                    <Option key="01-Hybrid" value="01-Hybrid">
-                      Hybrid
-                    </Option>
-                  </Select>
+                  <div style={{ width: "100%", margin: "10px 0" }}>
+                    <Radio.Group
+                      onChange={this.textureRadioChange}
+                      size="small"
+                      defaultValue="choropleth"
+                      value={textureVal}
+                      style={{ width: "100%" }}
+                    >
+                      <Radio.Button value="choropleth">Choropleth</Radio.Button>
+                      <Radio.Button value="natural">Natural Earth</Radio.Button>
+                      <Radio.Button value="roads">Roads</Radio.Button>
+                    </Radio.Group>
+                  </div>
                 </div>
                 {isColored}
               </div>
@@ -1171,8 +1231,9 @@ export class MandaMap extends Component {
           </div>
           <div className="main-map-svg">
             <svg id="main-mapped" style={{ width: "100%", height: "100%" }}>
-              <g id="map-scale"></g>
+              <g id="map-scale" className="map-scale"></g>
             </svg>
+            {niceMap}
           </div>
         </section>
       </Fragment>
