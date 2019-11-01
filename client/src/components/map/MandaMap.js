@@ -12,6 +12,14 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { getMainMap, getMapData } from "../../actions/auth";
 
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+  iconUrl: require("leaflet/dist/images/marker-icon.png"),
+  shadowUrl: require("leaflet/dist/images/marker-shadow.png")
+});
+
 const { SHOW_PARENT } = TreeSelect;
 const { Option, OptGroup } = Select;
 
@@ -181,12 +189,32 @@ export class MandaMap extends Component {
       })
       .duration(1000);
 
+    g.append("g")
+      .attr("class", "barText")
+      .selectAll("text")
+      .data(finalData)
+      .enter()
+      .append("text")
+      .style("opacity", 0)
+      .attr("height", d => height - y(d.data.mean))
+      .attr("y", d => y(d.data.mean) - 5)
+      .attr("x", (d, i) => x(i) + (x.bandwidth() - 2) / 2)
+      .attr("text-anchor", "middle")
+      .style("font-size", "10px")
+      .text(function(d) {
+        return d.data.mean.toFixed(1);
+      })
+      .transition()
+      .style("opacity", 1)
+      .delay(600)
+      .duration(300);
+
     svg
       .append("text")
       .style("font-size", "20px")
       .text(currentData.NAME_3)
       .attr("x", width / 2 + margin.left)
-      .attr("y", 30)
+      .attr("y", 20)
       .attr("text-anchor", "middle");
 
     return div.node();
@@ -209,16 +237,20 @@ export class MandaMap extends Component {
       .selectAll("*")
       .remove();
 
+    /*
+      0.002508 & 0.001125 
+      Workaround to polygons to be aligned
+    */
+
     let sample = map.mainMap.map(mVal => ({
       ...mVal,
       geometry: {
         ...mVal.geometry,
         coordinates: mVal.geometry.coordinates.map(m2Val =>
-          m2Val.map(m3Val => [m3Val[0] + 0.002508, m3Val[1] - 0.001125])
+          m2Val.map(m3Val => [m3Val[0] + 0.002908, m3Val[1] - 0.0010525])
         )
       }
     }));
-    // let sample = map.mainMap.map(mVal => ({...mVal, geometry: mVal.geometry.map(m2Val => ({...m2Val, coordinates: m2Val.coordinates.map( m3Val => ([m3Val[0] - 0.000325, m3Val[1] - 0.000325]))}))}))
 
     this.setState({ showIcon: false, showIntensity: false });
 
@@ -244,16 +276,19 @@ export class MandaMap extends Component {
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
         }).addTo(thisMap);
 
-        L.marker([14.583474431870872, 121.02747792001996]).addTo(thisMap);
-
         L.geoJSON(geoData)
           .addTo(thisMap)
           .bindPopup(this.popupInteractive);
 
-        // thisMap.on("contextmenu", function(event) {
+        // let marker;
+
+        // thisMap.on("click", function(event) {
+        //   if (marker) {
+        //     thisMap.removeLayer(marker);
+        //   }
+
         //   const { lat, lng } = event.latlng;
-        //   console.log(lat, lng);
-        //   L.marker([lat, lng]).addTo(thisMap);
+        //   marker = new L.Marker([lat, lng]).addTo(thisMap);
         // });
 
         break;
