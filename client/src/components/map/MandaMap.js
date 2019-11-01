@@ -5,13 +5,12 @@ import { brgyData, treeData, areaData } from "./treeData";
 import * as d3 from "d3";
 import * as d3Arr from "d3-array";
 import { Redirect } from "react-router-dom";
-import ReactMapGL from "react-map-gl";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { getMainMap, getMapData } from "../../actions/auth";
-
-import 'mapbox-gl/dist/mapbox-gl.css';
 
 const { SHOW_PARENT } = TreeSelect;
 const { Option, OptGroup } = Select;
@@ -38,14 +37,7 @@ export class MandaMap extends Component {
     showIntensity: false,
     iconDisable: false,
     intensityDisable: false,
-    textureVal: "choropleth",
-    viewport: {
-      width: "100%",
-      height: "100%",
-      latitude: 37.7577,
-      longitude: -122.4376,
-      zoom: 8
-    }
+    textureVal: "choropleth"
   };
 
   static propTypes = {
@@ -61,6 +53,145 @@ export class MandaMap extends Component {
     this.setState({ showIntensity: !showIntensity });
   };
 
+  popupInteractive = data => {
+    const {
+      mainMapData,
+      lipoMaxMapData,
+      lipoMeanMapData,
+      lipoMinMapData
+    } = this.state;
+    const currentData = data.feature.properties;
+    const {
+      NAME_3: currLoc,
+      area_3: currLA,
+      population_3: currPop,
+      ID_3: mainID
+    } = currentData;
+    const radMean = lipoMeanMapData.get(mainID).toFixed(2),
+      radMax = lipoMaxMapData.get(mainID).toFixed(2),
+      radMin = lipoMinMapData.get(mainID).toFixed(2);
+
+    this.setState({ currLoc, currLA, currPop, radMean, radMin, radMax });
+    let initData = mainMapData;
+    const numOfYears = [...new Set(initData.map(mVal => mVal.year))];
+    let temp = [];
+    if (!numOfYears.length) {
+      return;
+    }
+    initData = initData
+      .map(mVal => ({
+        month: mVal.month,
+        year: parseInt(mVal.year),
+        data: mVal.lipoData.map(mmVal => ({
+          id: mmVal.mapId,
+          mean: mmVal.mean
+        }))
+      }))
+      .sort((a, b) => a.year - b.year);
+
+    if (numOfYears.length > 1) {
+      temp = [...d3Arr.group(initData, d => d.year)]
+        .map(mVal => ({
+          year: mVal[0],
+          data: mVal[1]
+            .map(mmVal => mmVal.data.map(mmmVal => mmmVal))
+            .flat(Infinity)
+        }))
+        .map(m2Val => ({
+          year: m2Val.year,
+          data: [...d3Arr.group(m2Val.data, d2 => d2.id)].map(mm2Val => ({
+            id: mm2Val[0],
+            mean:
+              mm2Val[1]
+                .map(mmm2Val => mmm2Val.mean)
+                .reduce((prev, curr) => prev + curr) / mm2Val[1].length
+          }))
+        }));
+      initData = temp;
+    }
+
+    let finalData = initData.map(mVal => ({
+      ...mVal,
+      data: mVal.data.filter(fVal => fVal.id === currentData.ID_3)[0]
+    }));
+
+    let width = 290;
+    let height = 80;
+    let margin = { left: 20, right: 10, top: 40, bottom: 40 };
+
+    let div = d3.create("div");
+    let svg = div
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom);
+    let g = svg
+      .append("g")
+      .attr("transform", "translate(" + [margin.left, margin.top] + ")");
+
+    let y = d3
+      .scaleLinear()
+      .domain([0, 70])
+      .range([height, 0]);
+
+    let yAxis = d3
+      .axisLeft()
+      .ticks(6)
+      .scale(y);
+    g.append("g").call(yAxis);
+    let x = d3
+      .scaleBand()
+      .domain(d3.range(initData.length))
+      .range([2, width]);
+
+    let xAxis = d3
+      .axisBottom()
+      .scale(x)
+      .tickFormat(function(d) {
+        let name = finalData.map(m => m.month || m.year)[d];
+        if (name < 13) {
+          return new Date(name).toDateString().split(" ")[1];
+        }
+        return name;
+      });
+
+    g.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .selectAll("text")
+      .attr("text-anchor", "end")
+      .attr("transform", "rotate(-90)translate(-12,-15)");
+
+    g.selectAll("rect")
+      .data(finalData)
+      .enter()
+      .append("rect")
+      .attr("y", height)
+      .attr("height", 0)
+      .attr("width", x.bandwidth() - 2)
+      .attr("x", function(d, i) {
+        return x(i);
+      })
+      .attr("fill", "steelblue")
+      .transition()
+      .attr("height", function(d) {
+        return height - y(d.data.mean);
+      })
+      .attr("y", function(d) {
+        return y(d.data.mean);
+      })
+      .duration(1000);
+
+    svg
+      .append("text")
+      .style("font-size", "20px")
+      .text(currentData.NAME_3)
+      .attr("x", width / 2 + margin.left)
+      .attr("y", 30)
+      .attr("text-anchor", "middle");
+
+    return div.node();
+  };
+
   textureRadioChange = value => {
     this.shiftTexture(value.target.value);
     this.setState({ textureVal: value.target.value });
@@ -73,15 +204,25 @@ export class MandaMap extends Component {
 
     const { map } = this.props;
     d3.select("div.main-map-svg")
-      .select("svg")
+      .attr("class", "main-map-svg")
+      .attr("id", "main-map-svg")
       .selectAll("*")
       .remove();
 
-    d3.select("div.main-map-svg")
-      .selectAll("div")
-      .remove();
+    let sample = map.mainMap.map(mVal => ({
+      ...mVal,
+      geometry: {
+        ...mVal.geometry,
+        coordinates: mVal.geometry.coordinates.map(m2Val =>
+          m2Val.map(m3Val => [m3Val[0] + 0.002508, m3Val[1] - 0.001125])
+        )
+      }
+    }));
+    // let sample = map.mainMap.map(mVal => ({...mVal, geometry: mVal.geometry.map(m2Val => ({...m2Val, coordinates: m2Val.coordinates.map( m3Val => ([m3Val[0] - 0.000325, m3Val[1] - 0.000325]))}))}))
 
     this.setState({ showIcon: false, showIntensity: false });
+
+    let geoData = { type: "featureCollection", features: [...sample] };
 
     switch (value) {
       case "choropleth":
@@ -90,6 +231,31 @@ export class MandaMap extends Component {
         this.renderMap(map);
         break;
       case "natural":
+        let thisMap = L.map("main-map-svg", {
+          center: [14.58108681, 121.03394965],
+          zoom: 14,
+          zoomControl: false
+        });
+
+        L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+          maxZoom: 20,
+          maxNativeZoom: 17,
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
+        }).addTo(thisMap);
+
+        L.marker([14.583474431870872, 121.02747792001996]).addTo(thisMap);
+
+        L.geoJSON(geoData)
+          .addTo(thisMap)
+          .bindPopup(this.popupInteractive);
+
+        // thisMap.on("contextmenu", function(event) {
+        //   const { lat, lng } = event.latlng;
+        //   console.log(lat, lng);
+        //   L.marker([lat, lng]).addTo(thisMap);
+        // });
+
         break;
       case "roads":
         break;
@@ -683,6 +849,11 @@ export class MandaMap extends Component {
       svg.selectAll("image").remove();
     }
 
+    let colorScale = d3
+      .scaleThreshold()
+      .domain(d3.range(20, 100, 5))
+      .range(choroColorValue);
+
     svg
       .selectAll("image")
       .data(newMap)
@@ -770,7 +941,7 @@ export class MandaMap extends Component {
           .attr("height", 0)
           .attr("width", x.bandwidth() - 2)
           .attr("x", (d, i) => x(i))
-          .attr("fill", choroColorValue[6])
+          .attr("fill", d => colorScale(d.data.mean))
           .attr("cursor", "pointer")
           .transition()
           .attr("height", d => h - y(d.data.mean))
@@ -899,7 +1070,14 @@ export class MandaMap extends Component {
       choroColorValue
     } = this.state;
 
-    let svg = d3.select("svg#main-mapped");
+    let svg = d3.select("svg#main-mapped").node()
+      ? d3.select("svg#main-mapped")
+      : d3
+          .select("div.main-map-svg")
+          .append("svg")
+          .attr("id", "main-mapped")
+          .style("width", "100%")
+          .style("height", "100%");
     let scale = d3.select("svg#main-mapped>g#map-scale").node()
       ? d3.select("svg#main-mapped>g#map-scale")
       : svg.append("g").attr("id", "map-scale");
@@ -1014,8 +1192,7 @@ export class MandaMap extends Component {
       iconDisable,
       intensityDisable,
       colorDisabled,
-      textureVal,
-      viewport
+      textureVal
     } = this.state;
 
     const tProps = {
@@ -1133,19 +1310,19 @@ export class MandaMap extends Component {
 
     let niceMap = "";
 
-    switch (textureVal) {
-      case "natural":
-        niceMap = (
-          <ReactMapGL
-            {...viewport}
-            mapboxApiAccessToken={"pk.eyJ1IjoiY2FybGRlbm5pcyIsImEiOiJjazIxZzl5Y3EwYzRjM2Nucm9tNHByMmxxIn0._MG8WyHvx4q4-ygT_o1SbA"}
-            onViewportChange={viewport => this.setState({ viewport })}
-          />
-        );
-        break;
-      default:
-        niceMap = "";
-    }
+    // switch (textureVal) {
+    //   case "natural":
+    //     niceMap = (
+    //       <ReactMapGL
+    //         {...viewport}
+    //         mapboxApiAccessToken={"pk.eyJ1IjoiY2FybGRlbm5pcyIsImEiOiJjazIxZzl5Y3EwYzRjM2Nucm9tNHByMmxxIn0._MG8WyHvx4q4-ygT_o1SbA"}
+    //         onViewportChange={viewport => this.setState({ viewport })}
+    //       />
+    //     );
+    //     break;
+    //   default:
+    //     niceMap = "";
+    // }
 
     return (
       <Fragment>
@@ -1229,7 +1406,7 @@ export class MandaMap extends Component {
               </div>
             </div>
           </div>
-          <div className="main-map-svg">
+          <div className="main-map-svg" id="main-map-svg">
             <svg id="main-mapped" style={{ width: "100%", height: "100%" }}>
               <g id="map-scale" className="map-scale"></g>
             </svg>
