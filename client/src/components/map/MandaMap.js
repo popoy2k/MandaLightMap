@@ -45,7 +45,21 @@ export class MandaMap extends Component {
     showIntensity: false,
     iconDisable: false,
     intensityDisable: false,
-    textureVal: "choropleth"
+    textureVal: "choropleth",
+    leafletMap: "",
+    vectorRadScale: false,
+    vectorRadScaleDisable: false,
+    vectorIntensity: false,
+    vectorIntensityDisable: false,
+    vectorBrgyName: false,
+    vectorBrgyNameDisable: false,
+    brgyIconInstance: [],
+    customIcon: L.icon({
+      iconUrl: "https://image.flaticon.com/icons/svg/1666/1666066.svg",
+      iconSize: [30, 50]
+    }),
+    intensityLegend: "",
+    scaleLegend: ""
   };
 
   static propTypes = {
@@ -53,6 +67,193 @@ export class MandaMap extends Component {
     getMapData: PropTypes.func.isRequired,
     map: PropTypes.object,
     mainData: PropTypes.array
+  };
+
+  vectorRadScaleChange = value => {
+    this.setState({ vectorRadScale: value.target.checked });
+    this.geoVectorRadianceScale(null, value.target.checked);
+  };
+
+  geoVectorRadianceScale = (data = null, state = false) => {
+    const { leafletMap, currMainData, scaleLegend } = this.state;
+    const { mainMap: initMap } = this.props.map;
+    const initData = data || currMainData;
+
+    if (scaleLegend) {
+      leafletMap.removeControl(scaleLegend);
+    }
+
+    leafletMap.eachLayer(layer => {
+      if (Object.keys(layer).includes("feature")) {
+        leafletMap.removeLayer(layer);
+      }
+    });
+
+    if (!initData || !initData.length || !state) {
+      this.setState({ scaleLegend: "" });
+      this.geoVectorChange(currMainData);
+      return;
+    }
+
+    const initIDs = initData.map(mVal => mVal.id);
+    const geoData = {
+      type: "featureCollection",
+      features: [
+        ...initMap.filter(fVal => initIDs.includes(fVal.properties.ID_3))
+      ]
+    };
+
+    L.geoJSON(geoData)
+      .bindPopup(this.popupInteractive)
+      .bindTooltip(layer => String(layer.feature.properties.NAME_3), {
+        sticky: true
+      })
+
+      .setStyle(feature => ({
+        fillColor: this.getScaleColor(
+          initData.filter(fVal => fVal.id === feature.properties.ID_3)[0].mean
+        ),
+        className: String(feature.properties.ID_3),
+        weight: 2,
+        opacity: 1,
+        color: "white",
+        dashArray: "3",
+        fillOpacity: 0.7
+      }))
+      .addTo(leafletMap);
+
+    const legend = L.control({ position: "bottomright" });
+    let self = this;
+    legend.onAdd = function(map) {
+      let div = L.DomUtil.create("div", "info legend"),
+        range = [80, 70, 60, 50, 40, 30, 20, 10];
+      div.innerHTML += `<strong>Radiance Scale</strong> <br />`;
+
+      range.forEach(feVal => {
+        let temp = `<i style="background: ${self.getScaleColor(feVal)}"></i> ${
+          feVal === 80 ? "80+" : feVal === 10 ? "10-" : feVal
+        } <br />`;
+        div.innerHTML += temp;
+      });
+
+      return div;
+    };
+    legend.addTo(leafletMap);
+    this.setState({ scaleLegend: legend });
+  };
+
+  vectorIntensityChange = value => {
+    this.setState({ vectorIntensity: value.target.checked });
+    this.geoVectorLightIntensity(null, value.target.checked);
+  };
+
+  getScaleColor = d => {
+    return d > 70
+      ? "#ffe624"
+      : d > 60
+      ? "#ffeb52"
+      : d > 50
+      ? "#fff49e"
+      : d > 40
+      ? "#ccc6c6"
+      : d > 30
+      ? "#a6a1a1"
+      : d > 20
+      ? "#6e6a6a"
+      : "#303030";
+  };
+
+  geoVectorLightIntensity = (data = null, status = false) => {
+    const { currMainData, leafletMap, intensityLegend } = this.state;
+    const initData = data || currMainData;
+    d3.selectAll("path").classed("high-pulse", false);
+    d3.selectAll("path").classed("low-pulse", false);
+
+    if (intensityLegend) {
+      leafletMap.removeControl(intensityLegend);
+    }
+
+    if (initData.length <= 1 || !status) {
+      this.setState({ intensityLegend: "" });
+      return;
+    }
+
+    let legend = L.control({ position: "topleft" });
+
+    legend.onAdd = function(map) {
+      let div = L.DomUtil.create("div", "info legend"),
+        colors = ["#14f04b", "#f82f07"];
+      div.innerHTML += "<strong>Light Intensity</strong> <br />";
+      colors.forEach(
+        (feVal, feIndex) =>
+          (div.innerHTML += `<i style="background:${feVal}"></i>${
+            feIndex === 0 ? "Lowest" : "Highest"
+          } <br />`)
+      );
+
+      return div;
+    };
+
+    legend.addTo(leafletMap);
+
+    this.setState({ intensityLegend: legend });
+
+    let finalData = initData
+      .map(mVal => ({ id: mVal.id, mean: mVal.mean }))
+      .sort((a, b) => a.mean - b.mean);
+    finalData = [finalData[0], finalData.slice(-1)[0]];
+    let IDs = finalData.map(mVal => String(mVal.id));
+
+    d3.selectAll("path").each(function() {
+      if (
+        this.classList.length &&
+        this.classList[1] === "leaflet-interactive"
+      ) {
+        if (IDs.includes(this.classList[0])) {
+          switch (this.classList[0]) {
+            case `${IDs[0]}`:
+              this.classList.add("low-pulse");
+              break;
+            case `${IDs[1]}`:
+              this.classList.add("high-pulse");
+              break;
+            default:
+          }
+        }
+      }
+    });
+  };
+
+  geoVectorChange = (value = null) => {
+    const { map } = this.props;
+    const { leafletMap } = this.state;
+
+    leafletMap.eachLayer(function(layer) {
+      if (Object.keys(layer).includes("feature")) {
+        leafletMap.removeLayer(layer);
+      }
+    });
+    if (!value) {
+      return;
+    }
+
+    const IDs = value.map(mVal => mVal.id);
+    const finalMap = {
+      type: "featureCollection",
+      features: [
+        ...map.mainMap.filter(fVal => IDs.includes(fVal.properties.ID_3))
+      ]
+    };
+
+    L.geoJSON(finalMap)
+      .bindPopup(this.popupInteractive)
+      .bindTooltip(layer => String(layer.feature.properties.NAME_3), {
+        sticky: true
+      })
+      .setStyle(function(layer) {
+        return { className: String(layer.properties.ID_3) };
+      })
+      .addTo(leafletMap);
   };
 
   intensityChange = value => {
@@ -231,30 +432,20 @@ export class MandaMap extends Component {
     }
 
     const { map } = this.props;
+    const { leafletMap } = this.state;
     d3.select("div.main-map-svg")
       .attr("class", "main-map-svg")
       .attr("id", "main-map-svg")
       .selectAll("*")
       .remove();
 
-    /*
-      0.002508 & 0.001125 
-      Workaround to polygons to be aligned
-    */
-
-    let sample = map.mainMap.map(mVal => ({
-      ...mVal,
-      geometry: {
-        ...mVal.geometry,
-        coordinates: mVal.geometry.coordinates.map(m2Val =>
-          m2Val.map(m3Val => [m3Val[0] + 0.002908, m3Val[1] - 0.0010525])
-        )
-      }
-    }));
+    if (d3.select("div#leaflet-map").style("display") === "flex") {
+      d3.select("div#leaflet-map").style("display", "none");
+    }
 
     this.setState({ showIcon: false, showIntensity: false });
 
-    let geoData = { type: "featureCollection", features: [...sample] };
+    let geoData = { type: "featureCollection", features: [...map.mainMap] };
 
     switch (value) {
       case "choropleth":
@@ -263,33 +454,29 @@ export class MandaMap extends Component {
         this.renderMap(map);
         break;
       case "natural":
-        let thisMap = L.map("main-map-svg", {
-          center: [14.58108681, 121.03394965],
-          zoom: 14,
-          zoomControl: false
-        });
+        d3.select("div#leaflet-map").style("display", "flex");
 
+        leafletMap.eachLayer(function(layer) {
+          if (layer) {
+            leafletMap.removeLayer(layer);
+          }
+        });
         L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
           maxZoom: 20,
           maxNativeZoom: 17,
           attribution:
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
-        }).addTo(thisMap);
+        }).addTo(leafletMap);
 
         L.geoJSON(geoData)
-          .addTo(thisMap)
-          .bindPopup(this.popupInteractive);
-
-        // let marker;
-
-        // thisMap.on("click", function(event) {
-        //   if (marker) {
-        //     thisMap.removeLayer(marker);
-        //   }
-
-        //   const { lat, lng } = event.latlng;
-        //   marker = new L.Marker([lat, lng]).addTo(thisMap);
-        // });
+          .bindPopup(this.popupInteractive)
+          .bindTooltip(layer => String(layer.feature.properties.NAME_3), {
+            sticky: true
+          })
+          .setStyle(function(layer) {
+            return { className: String(layer.properties.ID_3) };
+          })
+          .addTo(leafletMap);
 
         break;
       case "roads":
@@ -419,8 +606,11 @@ export class MandaMap extends Component {
   };
 
   treeChange = value => {
+    const { brgyValue } = this.state;
+
     this.setMainData(value);
     this.setState({ treeValue: value });
+    this.setNewData(brgyValue);
   };
 
   setChoroColor = value => {
@@ -470,10 +660,12 @@ export class MandaMap extends Component {
       lipoMeanMapData,
       lipoMaxMapData,
       lipoMinMapData,
-      showIcon
+      showIcon,
+      textureVal
     } = this.state;
     if (value.length < 1) {
       this.setState({ currMainData: [] });
+      this.geoVectorLightIntensity(null, false);
       return this.reRenderMap(d3.schemePurples[9]);
     }
 
@@ -542,7 +734,7 @@ export class MandaMap extends Component {
 
     this.reFill();
 
-    if (showIcon) {
+    if (showIcon && textureVal === "choropleth") {
       this.addLocationName(selectedData);
     }
   };
@@ -555,7 +747,9 @@ export class MandaMap extends Component {
         brgyValue: value,
         showIntensity: false,
         intensityDisable: true,
-        colorDisabled: true
+        colorDisabled: true,
+        vectorIntensityDisable: true,
+        vectorRadScaleDisable: true
       });
       return;
     }
@@ -563,7 +757,9 @@ export class MandaMap extends Component {
       brgyValue: value,
       showIntensity: false,
       intensityDisable: false,
-      colorDisabled: false
+      colorDisabled: false,
+      vectorIntensityDisable: false,
+      vectorRadScaleDisable: false
     });
   };
 
@@ -573,7 +769,9 @@ export class MandaMap extends Component {
       lipoMeanMapData,
       lipoMinMapData,
       lipoMaxMapData,
-      mainMapData
+      mainMapData,
+      textureVal,
+      vectorIntensity
     } = this.state;
 
     let initValue = value.map(val => val.split("-"));
@@ -597,6 +795,10 @@ export class MandaMap extends Component {
       lipoMeanMapData.clear();
       lipoMinMapData.clear();
       lipoMaxMapData.clear();
+      if (textureVal !== "choropleth") {
+        this.geoVectorChange();
+        this.geoVectorLightIntensity();
+      }
       return;
     }
 
@@ -664,6 +866,13 @@ export class MandaMap extends Component {
         }),
         { loc_area: "0", loc_pop: "0" }
       );
+
+    if (textureVal !== "choropleth") {
+      this.geoVectorChange(finalData);
+      if (vectorIntensity) {
+        this.geoVectorLightIntensity(finalData, true);
+      }
+    }
 
     this.setState({
       currMainData: finalData,
@@ -788,6 +997,14 @@ export class MandaMap extends Component {
       this.setChoroColor({ key: "02-Purple" });
       this.renderMap(map);
     }
+
+    this.setState({
+      leafletMap: L.map("leaflet-map", {
+        center: [14.58108681, 121.03394965],
+        zoom: 14,
+        zoomControl: false
+      })
+    });
   }
 
   setCurrentSelected = data => {
@@ -1227,7 +1444,11 @@ export class MandaMap extends Component {
       iconDisable,
       intensityDisable,
       colorDisabled,
-      textureVal
+      textureVal,
+      vectorRadScale,
+      vectorRadScaleDisable,
+      vectorIntensity,
+      vectorIntensityDisable
     } = this.state;
 
     const tProps = {
@@ -1266,76 +1487,105 @@ export class MandaMap extends Component {
       maxTagCount: 2,
       maxTagPlaceholder: args => `Too many to show.. (${args.length} items)`
     };
-    let isColored = (
-      <div>
-        <div className="form-group">
-          <h4>Color</h4>
-          <Select
-            style={{ width: "100%" }}
-            defaultValue={colorValue}
-            onChange={this.colorChange}
-            disabled={colorDisabled}
-            labelInValue
-          >
-            <OptGroup label="Sequential">
-              <Option key="02-Purple" value="02-Purple">
-                Purple
-              </Option>
-              <Option key="02-Green" value="02-Green">
-                Green
-              </Option>
-              <Option key="02-Blue" value="02-Blue">
-                Blue
-              </Option>
-              <Option key="02-Grey" value="02-Grey">
-                Grey
-              </Option>
-              <Option key="02-Orange" value="02-Orange">
-                Orange
-              </Option>
-            </OptGroup>
-            <OptGroup label="Diverging">
-              <Option key="02-Dawn" value="02-Dawn">
-                Dawn
-              </Option>
-              <Option key="02-Midnight" value="02-Midnight">
-                Midnight
-              </Option>
-              <Option key="02-Spring" value="02-Spring">
-                Spring
-              </Option>
-              <Option key="02-Grass" value="02-Grass">
-                Grass
-              </Option>
-              <Option key="02-Ocean" value="02-Ocean">
-                Ocean
-              </Option>
-            </OptGroup>
-          </Select>
-        </div>
-        <Row>
-          <Checkbox
-            onChange={this.iconChange}
-            checked={showIcon}
-            disabled={iconDisable}
-          >
-            Show Area Information
-          </Checkbox>
-        </Row>
-        <Row>
-          <Checkbox
-            onChange={this.intensityChange}
-            checked={showIntensity}
-            disabled={intensityDisable}
-          >
-            Highlight Radiance Intensity
-          </Checkbox>
-        </Row>
-      </div>
-    );
 
-    if (textureVal !== "choropleth") {
-      isColored = "";
+    let isColored = "";
+
+    switch (textureVal) {
+      case "choropleth":
+        isColored = (
+          <div>
+            <div className="form-group">
+              <h4>Color</h4>
+              <Select
+                style={{ width: "100%" }}
+                defaultValue={colorValue}
+                onChange={this.colorChange}
+                disabled={colorDisabled}
+                labelInValue
+              >
+                <OptGroup label="Sequential">
+                  <Option key="02-Purple" value="02-Purple">
+                    Purple
+                  </Option>
+                  <Option key="02-Green" value="02-Green">
+                    Green
+                  </Option>
+                  <Option key="02-Blue" value="02-Blue">
+                    Blue
+                  </Option>
+                  <Option key="02-Grey" value="02-Grey">
+                    Grey
+                  </Option>
+                  <Option key="02-Orange" value="02-Orange">
+                    Orange
+                  </Option>
+                </OptGroup>
+                <OptGroup label="Diverging">
+                  <Option key="02-Dawn" value="02-Dawn">
+                    Dawn
+                  </Option>
+                  <Option key="02-Midnight" value="02-Midnight">
+                    Midnight
+                  </Option>
+                  <Option key="02-Spring" value="02-Spring">
+                    Spring
+                  </Option>
+                  <Option key="02-Grass" value="02-Grass">
+                    Grass
+                  </Option>
+                  <Option key="02-Ocean" value="02-Ocean">
+                    Ocean
+                  </Option>
+                </OptGroup>
+              </Select>
+            </div>
+            <Row>
+              <Checkbox
+                onChange={this.iconChange}
+                checked={showIcon}
+                disabled={iconDisable}
+              >
+                Show Area Information
+              </Checkbox>
+            </Row>
+            <Row>
+              <Checkbox
+                onChange={this.intensityChange}
+                checked={showIntensity}
+                disabled={intensityDisable}
+              >
+                Highlight Radiance Intensity
+              </Checkbox>
+            </Row>
+          </div>
+        );
+        break;
+      case "natural":
+        isColored = (
+          <div>
+            <Row>
+              <Checkbox
+                checked={vectorRadScale}
+                disabled={vectorRadScaleDisable}
+                onChange={this.vectorRadScaleChange}
+              >
+                Radiance Scale
+              </Checkbox>
+            </Row>
+            <Row>
+              <Checkbox
+                checked={vectorIntensity}
+                disabled={vectorIntensityDisable}
+                onChange={this.vectorIntensityChange}
+              >
+                Light Intensity
+              </Checkbox>
+            </Row>
+          </div>
+        );
+        break;
+      default:
+        isColored = "";
     }
 
     const { mainData } = this.props;
@@ -1344,20 +1594,6 @@ export class MandaMap extends Component {
     }
 
     let niceMap = "";
-
-    // switch (textureVal) {
-    //   case "natural":
-    //     niceMap = (
-    //       <ReactMapGL
-    //         {...viewport}
-    //         mapboxApiAccessToken={"pk.eyJ1IjoiY2FybGRlbm5pcyIsImEiOiJjazIxZzl5Y3EwYzRjM2Nucm9tNHByMmxxIn0._MG8WyHvx4q4-ygT_o1SbA"}
-    //         onViewportChange={viewport => this.setState({ viewport })}
-    //       />
-    //     );
-    //     break;
-    //   default:
-    //     niceMap = "";
-    // }
 
     return (
       <Fragment>
@@ -1432,8 +1668,9 @@ export class MandaMap extends Component {
                       style={{ width: "100%" }}
                     >
                       <Radio.Button value="choropleth">Choropleth</Radio.Button>
-                      <Radio.Button value="natural">Natural Earth</Radio.Button>
-                      <Radio.Button value="roads">Roads</Radio.Button>
+                      <Radio.Button value="natural">
+                        Interactive Map
+                      </Radio.Button>
                     </Radio.Group>
                   </div>
                 </div>
@@ -1447,6 +1684,12 @@ export class MandaMap extends Component {
             </svg>
             {niceMap}
           </div>
+
+          <div
+            className="leaflet-map"
+            id="leaflet-map"
+            style={{ display: "none" }}
+          ></div>
         </section>
       </Fragment>
     );
