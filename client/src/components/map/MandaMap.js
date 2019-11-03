@@ -425,7 +425,7 @@ export class MandaMap extends Component {
     }
 
     const { map } = this.props;
-    const { leafletMap } = this.state;
+    let { leafletMap } = this.state;
     d3.select("div.main-map-svg")
       .attr("class", "main-map-svg")
       .attr("id", "main-map-svg")
@@ -448,6 +448,13 @@ export class MandaMap extends Component {
         break;
       case "natural":
         d3.select("div#leaflet-map").style("display", "flex");
+        if (!leafletMap) {
+          leafletMap = L.map("leaflet-map", {
+            center: [14.58108681, 121.03394965],
+            zoom: 14,
+            zoomControl: false
+          });
+        }
 
         leafletMap.eachLayer(function(layer) {
           if (layer) {
@@ -470,9 +477,7 @@ export class MandaMap extends Component {
             return { className: String(layer.properties.ID_3) };
           })
           .addTo(leafletMap);
-
-        break;
-      case "roads":
+        this.setState({ leafletMap });
         break;
       default:
         return;
