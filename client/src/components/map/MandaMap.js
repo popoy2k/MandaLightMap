@@ -448,25 +448,86 @@ export class MandaMap extends Component {
         break;
       case "natural":
         d3.select("div#leaflet-map").style("display", "flex");
+        let osFrance = L.tileLayer(
+          "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+          {
+            id: "MapID",
+            maxZoom: 20,
+            maxNativeZoom: 17,
+            attribution:
+              '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
+          }
+        );
+        let tfTransportDark = L.tileLayer(
+          "https://{s}.tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=336a2deec6504dfda79e31f016f4aae9",
+          {
+            id: "MapID",
+            attribution:
+              '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            apikey: "336a2deec6504dfda79e31f016f4aae9",
+            maxZoom: 20,
+            maxNativeZoom: 17
+          }
+        );
+
+        let tfTransport = L.tileLayer(
+          "https://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=336a2deec6504dfda79e31f016f4aae9",
+          {
+            id: "MapID",
+            attribution:
+              '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            apikey: "336a2deec6504dfda79e31f016f4aae9",
+            maxZoom: 20,
+            maxNativeZoom: 17
+          }
+        );
+
+        let tfOpenCycle = L.tileLayer(
+          "https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=336a2deec6504dfda79e31f016f4aae9",
+          {
+            id: "MapID",
+            attribution:
+              '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            apikey: "336a2deec6504dfda79e31f016f4aae9",
+            maxZoom: 20,
+            maxNativeZoom: 17
+          }
+        );
+
+        let tfSpinal = L.tileLayer(
+          "https://{s}.tile.thunderforest.com/spinal-map/{z}/{x}/{y}.png?apikey=336a2deec6504dfda79e31f016f4aae9",
+          {
+            id: "MapID",
+            attribution:
+              '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            apikey: "336a2deec6504dfda79e31f016f4aae9",
+            maxZoom: 20,
+            maxNativeZoom: 17
+          }
+        );
+
         if (!leafletMap) {
           leafletMap = L.map("leaflet-map", {
-            center: [14.58108681, 121.03394965],
-            zoom: 14,
-            zoomControl: false
-          });
+            layers: [osFrance]
+          }).setView([14.58108681, 121.03394965], 14);
+          const baseLayers = {
+            "OpenStreet - France": osFrance,
+            Transport: tfTransport,
+            "Transport Dark": tfTransportDark,
+            "Open Cycle": tfOpenCycle,
+            Hell: tfSpinal
+          };
+          L.control
+            .layers(baseLayers)
+            .addTo(leafletMap)
+            .expand();
         }
 
         leafletMap.eachLayer(function(layer) {
-          if (layer) {
+          if (Object.keys(layer).includes("feature")) {
             leafletMap.removeLayer(layer);
           }
         });
-        L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
-          maxZoom: 20,
-          maxNativeZoom: 17,
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
-        }).addTo(leafletMap);
 
         L.geoJSON(geoData)
           .bindPopup(this.popupInteractive)
@@ -994,13 +1055,6 @@ export class MandaMap extends Component {
       this.setMainData(["2019-All"]);
       this.setChoroColor({ key: "02-Purple" });
       this.renderMap(map);
-      this.setState({
-        leafletMap: L.map("leaflet-map", {
-          center: [14.58108681, 121.03394965],
-          zoom: 14,
-          zoomControl: false
-        })
-      });
     }
   }
 
