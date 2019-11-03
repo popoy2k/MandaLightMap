@@ -51,13 +51,6 @@ export class MandaMap extends Component {
     vectorRadScaleDisable: false,
     vectorIntensity: false,
     vectorIntensityDisable: false,
-    vectorBrgyName: false,
-    vectorBrgyNameDisable: false,
-    brgyIconInstance: [],
-    customIcon: L.icon({
-      iconUrl: "https://image.flaticon.com/icons/svg/1666/1666066.svg",
-      iconSize: [30, 50]
-    }),
     intensityLegend: "",
     scaleLegend: ""
   };
@@ -996,15 +989,14 @@ export class MandaMap extends Component {
       this.setMainData(["2019-All"]);
       this.setChoroColor({ key: "02-Purple" });
       this.renderMap(map);
+      this.setState({
+        leafletMap: L.map("leaflet-map", {
+          center: [14.58108681, 121.03394965],
+          zoom: 14,
+          zoomControl: false
+        })
+      });
     }
-
-    this.setState({
-      leafletMap: L.map("leaflet-map", {
-        center: [14.58108681, 121.03394965],
-        zoom: 14,
-        zoomControl: false
-      })
-    });
   }
 
   setCurrentSelected = data => {
