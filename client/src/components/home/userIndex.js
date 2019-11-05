@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import { Layout, Menu, Icon, Avatar } from "antd";
+import { Layout, Menu, Icon, Avatar, Table } from "antd";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { verifyToken } from "../../actions/auth";
+import { verifyToken, getTableData } from "../../actions/auth";
 import { Redirect } from "react-router-dom";
 
 const { Header, Sider, Content } = Layout;
@@ -11,21 +11,26 @@ export class userIndex extends Component {
     collapsed: false,
     size: 60,
     opacity: 1,
-    tab: "1"
+    tab: "1",
+    lipoTableData: []
   };
 
-  propTypes = {
+  static propTypes = {
     verifyToken: PropTypes.func.isRequired,
-    auth: PropTypes.object.isRequired
+    getTableData: PropTypes.func.isRequired,
+    auth: PropTypes.object.isRequired,
+    home: PropTypes.object.isRequired
   };
 
   componentDidMount() {
     document.title = "Skótos - User";
-
     const { token, isAuthenticated } = this.props.auth;
-
+    const { home } = this.props;
     if (token && !isAuthenticated) {
       this.props.verifyToken();
+    }
+    if (!home.length) {
+      this.props.getTableData();
     }
   }
 
@@ -55,6 +60,7 @@ export class userIndex extends Component {
         content = (
           <div>
             <h3>Light Pollution Statistical Data</h3>
+            <Table />
           </div>
         );
         break;
@@ -116,10 +122,11 @@ export class userIndex extends Component {
 }
 
 const mapStateToProps = state => ({
-  auth: state.auth
+  auth: state.auth,
+  home: state.home
 });
 
 export default connect(
   mapStateToProps,
-  { verifyToken }
+  { verifyToken, getTableData }
 )(userIndex);

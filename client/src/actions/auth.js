@@ -14,7 +14,9 @@ import {
   GOOGLE_LOGIN_SUCCESS,
   GOOGLE_LOGIN_ERROR,
   VERIFY_TOKEN_SUCCESS,
-  VERIFY_TOKEN_ERROR
+  VERIFY_TOKEN_ERROR,
+  LIPO_DATA_TABLE_ERROR,
+  LIPO_DATA_TABLE_SUCCESS
 } from "./types";
 import axios from "axios";
 
@@ -180,5 +182,20 @@ export const verifyToken = () => (dispatch, getState) => {
       dispatch({
         type: VERIFY_TOKEN_ERROR
       });
+    });
+};
+
+export const getTableData = () => (dispatch, getState) => {
+  axios
+    .post("/data/lipo/table", null, getConfig(getState))
+    .then(resData => {
+      console.log(resData.data);
+      dispatch({
+        type: LIPO_DATA_TABLE_SUCCESS,
+        payload: resData.data.msg
+      });
+    })
+    .catch(errRes => {
+      dispatch({ type: LIPO_DATA_TABLE_ERROR });
     });
 };

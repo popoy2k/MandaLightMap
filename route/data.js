@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const passport = require("passport");
 const MandaLipo = require("../model/MandaLipo");
+const { verifyRequest, lipoTable } = require("../middleware/custom");
 
 router.route("/landing").get((req, res) => {
   MandaLipo.find({ year: "2019", month: "01" }).exec((err, resData) => {
@@ -37,5 +38,9 @@ router.route("/custom").post(
   },
   (req, res) => {}
 );
+
+router.route("/lipo/table").post(verifyRequest, lipoTable, (req, res) => {
+  // to be handled
+});
 
 module.exports = router;

@@ -1,6 +1,8 @@
 const User = require("../model/User");
+const MandaLipo = require("../model/MandaLipo");
 const Activator = require("../utility/Activator");
 const JWT = require("jsonwebtoken");
+const { areaData } = require("./areaInfo");
 
 const customActivate = (req, res, next) => {
   const { token } = req.params;
@@ -112,4 +114,57 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-module.exports = { customActivate, verifyToken };
+const verifyRequest = (req, res, next) => {
+  const bearer = req.headers["x-auth-token"] || null;
+
+  if (bearer === null) {
+    res.status(400);
+    return next("router");
+  }
+
+  const token = bearer.split(" ").slice(-1)[0];
+
+  if (!token || token.indexOf("bearer") > -1) {
+    res.status(400);
+    return next("router");
+  }
+
+  JWT.verify(token, process.env.JWT_SECRET, (verifyErr, resDecode) => {
+    if (verifyErr) {
+      res.status(403).json({ status: "error", msg: "Invalid Credentials." });
+      return next("router");
+    }
+
+    return next();
+  });
+};
+
+const lipoTable = (req, res, next) => {
+  MandaLipo.find({})
+    .select("-_id")
+    .exec((err, resData) => {
+      if (err) {
+        res.status(400).json({ status: "error", msg: "Something went wrong." });
+        return next("router");
+      }
+
+      // let tempData = JSON.parse(JSON.stringify(resData)).map(mVal => ({
+      //   year: mVal.year,
+      //   month: mVal.month,
+      //   lipoData: mVal.lipoData
+      // }));
+
+      // let finalData = resData.map(mVal => ({ ...mVal, ...areaData }));
+      // console.log(typeof resData, typeof areaData);
+      const newData = resData.map(mVal => ({
+        year: mVal.year,
+        month: mVal.month,
+        lipoData: mVal.lipoData
+      }));
+      console.log(newData);
+      res.status(200).json({ status: "success", msg: { data: newData } });
+      next();
+    });
+};
+
+module.exports = { customActivate, verifyToken, lipoTable, verifyRequest };
