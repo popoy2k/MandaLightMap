@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { Layout, Menu, Icon, Avatar, Table } from "antd";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
@@ -70,53 +70,55 @@ export class userIndex extends Component {
     }
 
     return (
-      <Layout>
-        <Sider
-          trigger={null}
-          collapsible
-          collapsed={this.state.collapsed}
-          theme="light"
-        >
-          <div className="logo sidebar-logo">
-            <Avatar
-              size={this.state.size}
-              src="https://image.flaticon.com/icons/svg/139/139706.svg"
-            />
-            <span
-              className="sidebar-logo-label"
-              style={{ opacity: this.state.opacity }}
-            >
-              Skótos
-            </span>
-          </div>
-          <Menu
-            theme="light"
-            mode="inline"
-            defaultSelectedKeys={["1"]}
-            onClick={this.menuClicked}
-          >
-            <Menu.Item key="1">
-              <Icon type="bulb" />
-              <span>Light Pollution Data</span>
-            </Menu.Item>
-            <Menu.Item key="2">
-              <Icon type="reconciliation" />
-              <span>Health Records</span>
-            </Menu.Item>
-          </Menu>
-        </Sider>
+      <Fragment>
         <Layout>
-          <Header style={{ background: "#fff", padding: 0 }}>
-            <Icon
-              className="trigger"
-              type={this.state.collapsed ? "menu-unfold" : "menu-fold"}
-              onClick={this.toggle}
-            />
-            <Icon type="setting" className="user-cogs" />
-          </Header>
-          <Content className="user-content-main">{content}</Content>
+          <Sider
+            trigger={null}
+            collapsible
+            collapsed={this.state.collapsed}
+            theme="light"
+          >
+            <div className="logo sidebar-logo">
+              <Avatar
+                size={this.state.size}
+                src="https://image.flaticon.com/icons/svg/139/139706.svg"
+              />
+              <span
+                className="sidebar-logo-label"
+                style={{ opacity: this.state.opacity }}
+              >
+                Skótos
+              </span>
+            </div>
+            <Menu
+              theme="light"
+              mode="inline"
+              defaultSelectedKeys={["1"]}
+              onClick={this.menuClicked}
+            >
+              <Menu.Item key="1">
+                <Icon type="bulb" />
+                <span>Light Pollution Data</span>
+              </Menu.Item>
+              <Menu.Item key="2">
+                <Icon type="reconciliation" />
+                <span>Health Records</span>
+              </Menu.Item>
+            </Menu>
+          </Sider>
+          <Layout>
+            <Header style={{ background: "#fff", padding: 0 }}>
+              <Icon
+                className="trigger"
+                type={this.state.collapsed ? "menu-unfold" : "menu-fold"}
+                onClick={this.toggle}
+              />
+              <Icon type="setting" className="user-cogs" />
+            </Header>
+            <Content className="user-content-main">{content}</Content>
+          </Layout>
         </Layout>
-      </Layout>
+      </Fragment>
     );
   }
 }

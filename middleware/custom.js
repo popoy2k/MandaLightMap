@@ -148,20 +148,20 @@ const lipoTable = (req, res, next) => {
         return next("router");
       }
 
-      // let tempData = JSON.parse(JSON.stringify(resData)).map(mVal => ({
-      //   year: mVal.year,
-      //   month: mVal.month,
-      //   lipoData: mVal.lipoData
-      // }));
-
-      // let finalData = resData.map(mVal => ({ ...mVal, ...areaData }));
-      // console.log(typeof resData, typeof areaData);
-      const newData = resData.map(mVal => ({
+      let newData = resData.map(mVal => ({
         year: mVal.year,
         month: mVal.month,
         lipoData: mVal.lipoData
       }));
-      console.log(newData);
+      newData = newData.map(mVal => ({
+        ...mVal,
+        lipoData: mVal.lipoData.map(m2Val => ({
+          mean: m2Val.mean,
+          min: m2Val.min,
+          max: m2Val.max,
+          ...areaData.filter(fVal => fVal.id === m2Val.mapId)[0]
+        }))
+      }));
       res.status(200).json({ status: "success", msg: { data: newData } });
       next();
     });
