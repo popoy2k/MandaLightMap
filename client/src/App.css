@@ -364,7 +364,7 @@ hr {
 }
 
 .third-content .cards .card {
-  color: #fff;
+  color: #fff !important;
   height: 50vh;
   width: 20%;
   margin: auto;
@@ -373,6 +373,10 @@ hr {
   border: 2px solid#fff;
   background: transparent;
   align-items: center;
+}
+
+.third-content .cards .card h4 {
+  color: #fff !important;
 }
 
 .third-content .cards .card .rel-icons {
@@ -652,6 +656,13 @@ hr {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
+  height: 25% !important;
+}
+
+.sk-or {
+  margin: 10px auto;
+  color: #555;
+  font-size: 18px;
 }
 
 .custom-sign-in svg {
@@ -937,8 +948,8 @@ svg {
 
 .leaflet-map {
   width: 70%;
-  height: 100vh;
-  min-height: 100vh;
+  height: 90vh;
+  min-height: 60vh;
   /* display: none; */
   margin-top: 1%;
   right: 1%;
@@ -1073,3 +1084,62 @@ svg {
 }
 
 /* End of Sk SVG */
+
+/* Sidebar */
+
+.ant-layout {
+  min-height: 100vh !important;
+}
+
+.anticon {
+  margin-left: 2%;
+}
+
+#components-layout-demo-custom-trigger .trigger {
+  font-size: 18px;
+  line-height: 64px;
+  padding: 0 24px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+#components-layout-demo-custom-trigger .trigger:hover {
+  color: #1890ff;
+}
+
+#components-layout-demo-custom-trigger .logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px;
+}
+
+.sidebar-logo {
+  margin-bottom: 50px;
+  width: 100%;
+  text-align: center;
+  padding: 0;
+  position: relative;
+  top: 20px;
+}
+.sidebar-logo-label {
+  display: block !important;
+  margin-top: 20px;
+  font-size: 28px;
+}
+
+.user-cogs {
+  font-size: 18px;
+  line-height: 64px;
+  padding: 0 24px;
+  cursor: pointer;
+  transition: color 0.3s;
+  float: right;
+}
+
+.user-content-main {
+  margin: 24px 16px;
+  padding: 24px;
+  background: #fff;
+  min-height: 280;
+}
+/* End of sidebar */

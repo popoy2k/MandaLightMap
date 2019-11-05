@@ -1,24 +1,13 @@
 import React, { Component, Fragment } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
-import { signinUser } from "../../actions/auth";
+import { signinUser, googleSignIn, verifyToken } from "../../actions/auth";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
 import { GoogleLogin } from "react-google-login";
-import GitHubLogin from "react-github-login";
 
 import { ReactComponent as GLogo } from "./GoogleLogo.svg";
-import { ReactComponent as GitLogo } from "./Github.svg";
-
-function GitLogoComponent(props) {
-  return (
-    <span>
-      <GitLogo className={props.className} />
-      {props.text}
-    </span>
-  );
-}
 
 export class login extends Component {
   state = {
@@ -28,11 +17,19 @@ export class login extends Component {
   };
 
   componentDidMount() {
+    const { token, isAuthenticated } = this.props.auth;
+    if (token !== null && isAuthenticated === null) {
+      this.props.verifyToken();
+    }
+
     document.title = "Skótos - Sign in";
   }
 
   static propTypes = {
-    signinUser: PropTypes.func.isRequired
+    signinUser: PropTypes.func.isRequired,
+    googleSignIn: PropTypes.func.isRequired,
+    verifyToken: PropTypes.func.isRequired,
+    auth: PropTypes.object.isRequired
   };
 
   onChange = e => this.setState({ [e.target.name]: e.target.value });
@@ -47,15 +44,18 @@ export class login extends Component {
   };
 
   onThirdPartySignIn = value => {
-    console.log(value);
+    const googleObj = value.profileObj;
+    this.props.googleSignIn(googleObj);
   };
 
   render() {
-    const responseGoogle = response => {
-      this.onThirdPartySignIn(response);
-    };
+    const { isAuthenticated } = this.props.auth;
 
-    const responseGithub = response => {
+    if (isAuthenticated) {
+      return <Redirect to="/home/user" />;
+    }
+
+    const responseGoogle = response => {
       this.onThirdPartySignIn(response);
     };
 
@@ -85,18 +85,8 @@ export class login extends Component {
                     onFailure={responseGoogle}
                     cookiePolicy={"single_host_origin"}
                   />
-                  <GitHubLogin
-                    clientId={process.env.REACT_APP_GITHUB_CLIENT_ID}
-                    onSuccess={responseGithub}
-                    onFailure={responseGithub}
-                    className="custom-sign-in GitLink"
-                    buttonText={
-                      <GitLogoComponent
-                        className="sk-svg-middle"
-                        text="GitHub"
-                      />
-                    }
-                  />
+
+                  <span className="sk-or">Or</span>
                 </div>
                 <div className="sk-manual">
                   <form method="POST" onSubmit={this.onSubmit}>
@@ -143,7 +133,11 @@ export class login extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  auth: state.auth
+});
+
 export default connect(
-  null,
-  { signinUser }
+  mapStateToProps,
+  { signinUser, googleSignIn, verifyToken }
 )(login);

@@ -10,7 +10,11 @@ import {
   LOAD_MAIN_MAP_ERROR,
   LOAD_MAIN_MAP_SUCCESS,
   LOAD_MAIN_MAP_DATA_SUCCESS,
-  LOAD_MAIN_MAP_DATA_ERROR
+  LOAD_MAIN_MAP_DATA_ERROR,
+  GOOGLE_LOGIN_SUCCESS,
+  GOOGLE_LOGIN_ERROR,
+  VERIFY_TOKEN_SUCCESS,
+  VERIFY_TOKEN_ERROR
 } from "./types";
 import axios from "axios";
 
@@ -143,6 +147,38 @@ export const getMapData = mapObj => (dispatch, getState) => {
       dispatch({
         type: LOAD_MAIN_MAP_DATA_ERROR,
         payload: resErr.response.data
+      });
+    });
+};
+
+export const googleSignIn = clientObj => (dispatch, getState) => {
+  axios
+    .post("/auth/google/signin", JSON.stringify(clientObj), getConfig(getState))
+    .then(resData => {
+      dispatch({
+        type: GOOGLE_LOGIN_SUCCESS,
+        payload: resData.data.msg
+      });
+    })
+    .catch(errData => {
+      dispatch({
+        type: GOOGLE_LOGIN_ERROR
+      });
+    });
+};
+
+export const verifyToken = () => (dispatch, getState) => {
+  axios
+    .post("/auth/verify/token", null, getConfig(getState))
+    .then(resData => {
+      dispatch({
+        type: VERIFY_TOKEN_SUCCESS,
+        payload: resData.data
+      });
+    })
+    .catch(errData => {
+      dispatch({
+        type: VERIFY_TOKEN_ERROR
       });
     });
 };

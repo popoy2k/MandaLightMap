@@ -52,12 +52,17 @@ const UserSchema = new Schema({
     },
     creationType: {
       type: String,
-      enum: ["Local", "Google", "Github"],
+      enum: ["Local", "Google"],
       default: "Local"
     },
     creationId: {
       type: String,
       default: ""
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user"
     }
   }
 });

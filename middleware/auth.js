@@ -4,6 +4,7 @@ const User = require("../model/User");
 const Mailer = require("../utility/Mailer");
 const genRand = require("../utility/RandomBytes");
 const crypto = require("crypto");
+const JWT = require("jsonwebtoken");
 
 passport.use(
   "Local.signup",
@@ -147,16 +148,27 @@ passport.use(
                 creationId
               } = resData.acctInfo;
 
-              return done(null, {
-                status: "success",
-                data: {
-                  firstName,
-                  lastName,
-                  email,
-                  creationType,
-                  creationId
+              JWT.sign(
+                { creationId, email, type: creationType },
+                process.env.JWT_SECRET,
+                { expiresIn: "1h" },
+                (err, encoded) => {
+                  if (err) {
+                    return done(null, {
+                      status: "error",
+                      msg: "Something went wrong"
+                    });
+                  }
+
+                  return done(null, {
+                    status: "success",
+                    msg: {
+                      token: encoded,
+                      user: { email, firstName, lastName }
+                    }
+                  });
                 }
-              });
+              );
             })
             .catch(isError => {
               return done(null, {
@@ -318,6 +330,94 @@ passport.use(
             });
           });
         });
+    }
+  )
+);
+
+passport.use(
+  "Local.google_signin",
+  new LocalStrat(
+    {
+      usernameField: "email",
+      passwordField: "name",
+      passReqToCallback: true
+    },
+    (req, email, name, done) => {
+      const { familyName, givenName, googleId } = req.body;
+      if ((!familyName, !givenName, !googleId, !email, !name)) {
+        return done(null, {
+          status: "error",
+          msg: "Please fill all parameters."
+        });
+      }
+
+      User.findOne({ "acctInfo.creationId": googleId }, (errData, resData) => {
+        if (errData) {
+          return done(null, {
+            status: "error",
+            msg: "Something went wrong"
+          });
+        }
+
+        if (resData) {
+          const {
+            creationId,
+            email,
+            firstName,
+            lastName,
+            creationType
+          } = resData.acctInfo;
+          JWT.sign(
+            { creationId, email, type: creationType },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" },
+            (err, encoded) => {
+              return done(null, {
+                status: "success",
+                msg: { token: encoded, user: { email, firstName, lastName } }
+              });
+            }
+          );
+        }
+
+        let newUser = new User({
+          acctInfo: {
+            firstName: givenName,
+            lastName: familyName,
+            email,
+            activationInfo: { isActivated: true },
+            creationType: "Google",
+            creationId: googleId
+          }
+        });
+        newUser.save(err => {
+          if (err) {
+            return done(null, {
+              status: "error",
+              msg: "Something went wrong."
+            });
+          }
+
+          const {
+            creationId,
+            email,
+            firstName,
+            lastName,
+            creationType
+          } = newUser.acctInfo;
+          JWT.sign(
+            { creationId, email, type: creationType },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" },
+            (err, encoded) => {
+              return done(null, {
+                status: "success",
+                msg: { token: encoded, user: { email, firstName, lastName } }
+              });
+            }
+          );
+        });
+      });
     }
   )
 );

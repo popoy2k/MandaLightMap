@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 
 export class NavBar extends Component {
   componentDidMount() {
-    window.addEventListener("scroll", () => {
+    window.addEventListener("scroll", function() {
+      let nav = document.querySelector("nav");
+
       if (window.scrollY > 50) {
-        document.querySelector("nav").classList.add("black");
+        nav.classList.add("black");
       } else {
-        document.querySelector("nav").classList.remove("black");
+        nav.classList.remove("black");
       }
     });
   }
