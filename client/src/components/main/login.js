@@ -5,18 +5,30 @@ import { signinUser } from "../../actions/auth";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
+import { GoogleLogin } from "react-google-login";
+import GitHubLogin from "react-github-login";
+
 import { ReactComponent as GLogo } from "./GoogleLogo.svg";
 import { ReactComponent as GitLogo } from "./Github.svg";
-export class login extends Component {
-  constructor(props) {
-    super(props);
-    document.title = "Skótos - Sign in";
 
-    this.state = {
-      email: "",
-      password: "",
-      disabled: ""
-    };
+function GitLogoComponent(props) {
+  return (
+    <span>
+      <GitLogo className={props.className} />
+      {props.text}
+    </span>
+  );
+}
+
+export class login extends Component {
+  state = {
+    email: "",
+    password: "",
+    disabled: ""
+  };
+
+  componentDidMount() {
+    document.title = "Skótos - Sign in";
   }
 
   static propTypes = {
@@ -34,7 +46,19 @@ export class login extends Component {
     }
   };
 
+  onThirdPartySignIn = value => {
+    console.log(value);
+  };
+
   render() {
+    const responseGoogle = response => {
+      this.onThirdPartySignIn(response);
+    };
+
+    const responseGithub = response => {
+      this.onThirdPartySignIn(response);
+    };
+
     const { email, password, disabled } = this.state;
     return (
       <Fragment>
@@ -44,15 +68,35 @@ export class login extends Component {
               <h1>Sign in</h1>
               <div className="sk-flex">
                 <div className="sk-third-party">
-                  <Link to="/" className="custom-sign-in GLink">
-                    <GLogo />
-                    Google
-                  </Link>
-                  <Link to="/" className="custom-sign-in GitLink">
-                    {" "}
-                    <GitLogo />
-                    Github
-                  </Link>
+                  <GoogleLogin
+                    clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+                    buttonText="Login"
+                    render={renderProps => (
+                      <button
+                        className="custom-sign-in GLink"
+                        onClick={renderProps.onClick}
+                        disabled={renderProps.disabled}
+                      >
+                        <GLogo className="sk-svg-middle" />
+                        Google
+                      </button>
+                    )}
+                    onSuccess={responseGoogle}
+                    onFailure={responseGoogle}
+                    cookiePolicy={"single_host_origin"}
+                  />
+                  <GitHubLogin
+                    clientId={process.env.REACT_APP_GITHUB_CLIENT_ID}
+                    onSuccess={responseGithub}
+                    onFailure={responseGithub}
+                    className="custom-sign-in GitLink"
+                    buttonText={
+                      <GitLogoComponent
+                        className="sk-svg-middle"
+                        text="GitHub"
+                      />
+                    }
+                  />
                 </div>
                 <div className="sk-manual">
                   <form method="POST" onSubmit={this.onSubmit}>
