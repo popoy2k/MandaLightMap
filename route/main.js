@@ -96,7 +96,7 @@ router.route("/google/signin").post(
           return next();
         }
         res.status(200).json(msg);
-        return next();
+        return next("router");
       }
     )(req, res, next);
   },

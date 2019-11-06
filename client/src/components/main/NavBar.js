@@ -5,11 +5,12 @@ export class NavBar extends Component {
   componentDidMount() {
     window.addEventListener("scroll", function() {
       let nav = document.querySelector("nav");
-
-      if (window.scrollY > 50) {
-        nav.classList.add("black");
-      } else {
-        nav.classList.remove("black");
+      if (nav) {
+        if (window.scrollY > 50) {
+          nav.classList.add("black");
+        } else {
+          nav.classList.remove("black");
+        }
       }
     });
   }

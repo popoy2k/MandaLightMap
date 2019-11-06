@@ -1091,19 +1091,15 @@ svg {
   min-height: 100vh !important;
 }
 
-.anticon {
-  margin-left: 2%;
-}
-
-#components-layout-demo-custom-trigger .trigger {
-  font-size: 18px;
-  line-height: 64px;
-  padding: 0 24px;
+.trigger {
+  font-size: 30px;
+  line-height: 74px;
+  padding: 0 14px;
   cursor: pointer;
   transition: color 0.3s;
 }
 
-#components-layout-demo-custom-trigger .trigger:hover {
+.trigger:hover {
   color: #1890ff;
 }
 
@@ -1128,12 +1124,17 @@ svg {
 }
 
 .user-cogs {
-  font-size: 18px;
-  line-height: 64px;
-  padding: 0 24px;
+  font-size: 30px;
+  line-height: 74px;
+  padding-right: 24px;
   cursor: pointer;
   transition: color 0.3s;
   float: right;
+  transition: 0.3s;
+}
+
+.user-cogs:hover {
+  color: #1890ff;
 }
 
 .user-content-main {
@@ -1141,5 +1142,9 @@ svg {
   padding: 24px;
   background: #fff;
   min-height: 280;
+}
+
+.tableTooltip {
+  cursor: pointer;
 }
 /* End of sidebar */

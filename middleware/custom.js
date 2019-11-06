@@ -148,23 +148,57 @@ const lipoTable = (req, res, next) => {
         return next("router");
       }
 
-      let newData = resData.map(mVal => ({
+      let newData = resData.map((mVal, mIndex) => ({
+        key: mIndex,
         year: mVal.year,
         month: mVal.month,
-        lipoData: mVal.lipoData
+        drawerData: JSON.stringify({ year: mVal.year, month: mVal.month }),
+        dataType: "VCM"
       }));
-      newData = newData.map(mVal => ({
-        ...mVal,
-        lipoData: mVal.lipoData.map(m2Val => ({
-          mean: m2Val.mean,
-          min: m2Val.min,
-          max: m2Val.max,
-          ...areaData.filter(fVal => fVal.id === m2Val.mapId)[0]
-        }))
-      }));
-      res.status(200).json({ status: "success", msg: { data: newData } });
-      next();
+
+      // console.log(newData);
+
+      setTimeout(() => {
+        res.status(200).json({ status: "success", msg: { data: newData } });
+        return next("router");
+      }, 2000);
     });
 };
 
-module.exports = { customActivate, verifyToken, lipoTable, verifyRequest };
+const lipoSingle = (req, res, next) => {
+  if (!req.body) {
+    res.status(400).json({ status: "error", msg: "Something went wrong." });
+    return next("router");
+  }
+
+  const { year, month } = req.body;
+  MandaLipo.findOne({ year, month })
+    .select("-year -month")
+    .exec((err, resData) => {
+      if (err) {
+        res.status(400).json({ status: "error", msg: "Something went wrong." });
+        return next("router");
+      }
+      let finalData = resData.lipoData;
+      finalData = finalData.map((mVal, mIndex) => ({
+        key: mIndex,
+        mean: mVal.mean,
+        min: mVal.min,
+        max: mVal.max,
+        ...areaData.filter(fVal => fVal.id === mVal.mapId)[0]
+      }));
+
+      setTimeout(() => {
+        res.status(200).json({ status: "success", msg: { data: finalData } });
+        return next();
+      }, 2000);
+    });
+};
+
+module.exports = {
+  customActivate,
+  verifyToken,
+  lipoTable,
+  verifyRequest,
+  lipoSingle
+};

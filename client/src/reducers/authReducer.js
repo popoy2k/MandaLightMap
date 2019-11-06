@@ -7,7 +7,8 @@ import {
   GOOGLE_LOGIN_ERROR,
   VERIFY_TOKEN_SUCCESS,
   VERIFY_TOKEN_ERROR,
-  REQUEST_ERROR
+  REQUEST_ERROR,
+  SIGN_OUT
 } from "../actions/types";
 
 const initialState = {
@@ -37,6 +38,7 @@ export default (state = initialState, action) => {
     case SIGNUP_ERROR:
     case SIGNIN_ERROR:
     case REQUEST_ERROR:
+    case SIGN_OUT:
       localStorage.removeItem("token");
       return {
         ...state,

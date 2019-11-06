@@ -16,7 +16,10 @@ import {
   VERIFY_TOKEN_SUCCESS,
   VERIFY_TOKEN_ERROR,
   LIPO_DATA_TABLE_ERROR,
-  LIPO_DATA_TABLE_SUCCESS
+  LIPO_DATA_TABLE_SUCCESS,
+  LIPO_DATA_SINGLE_REQUEST_SUCCESS,
+  LIPO_DATA_SINGLE_REQUEST_ERROR,
+  SIGN_OUT
 } from "./types";
 import axios from "axios";
 
@@ -189,7 +192,6 @@ export const getTableData = () => (dispatch, getState) => {
   axios
     .post("/data/lipo/table", null, getConfig(getState))
     .then(resData => {
-      console.log(resData.data);
       dispatch({
         type: LIPO_DATA_TABLE_SUCCESS,
         payload: resData.data.msg
@@ -198,4 +200,24 @@ export const getTableData = () => (dispatch, getState) => {
     .catch(errRes => {
       dispatch({ type: LIPO_DATA_TABLE_ERROR });
     });
+};
+
+export const getSingleLipoData = dataObj => (dispatch, getState) => {
+  axios
+    .post("/data/lipo/single", JSON.stringify(dataObj), getConfig(getState))
+    .then(resData => {
+      dispatch({
+        type: LIPO_DATA_SINGLE_REQUEST_SUCCESS,
+        payload: resData.data
+      });
+    })
+    .catch(resErr => {
+      dispatch({
+        type: LIPO_DATA_SINGLE_REQUEST_ERROR
+      });
+    });
+};
+
+export const logout = () => dispatch => {
+  dispatch({ type: SIGN_OUT });
 };

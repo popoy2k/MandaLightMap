@@ -380,43 +380,46 @@ passport.use(
           );
         }
 
-        let newUser = new User({
-          acctInfo: {
-            firstName: givenName,
-            lastName: familyName,
-            email,
-            activationInfo: { isActivated: true },
-            creationType: "Google",
-            creationId: googleId
-          }
-        });
-        newUser.save(err => {
-          if (err) {
-            return done(null, {
-              status: "error",
-              msg: "Something went wrong."
-            });
-          }
+        if (!resData) {
+          let newUser = new User({
+            acctInfo: {
+              firstName: givenName,
+              lastName: familyName,
+              email,
+              activationInfo: { isActivated: true },
+              creationType: "Google",
+              creationId: googleId
+            }
+          });
 
-          const {
-            creationId,
-            email,
-            firstName,
-            lastName,
-            creationType
-          } = newUser.acctInfo;
-          JWT.sign(
-            { creationId, email, type: creationType },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" },
-            (err, encoded) => {
+          newUser.save(err => {
+            if (err) {
               return done(null, {
-                status: "success",
-                msg: { token: encoded, user: { email, firstName, lastName } }
+                status: "error",
+                msg: "Something went wrong."
               });
             }
-          );
-        });
+
+            const {
+              creationId,
+              email,
+              firstName,
+              lastName,
+              creationType
+            } = newUser.acctInfo;
+            JWT.sign(
+              { creationId, email, type: creationType },
+              process.env.JWT_SECRET,
+              { expiresIn: "1h" },
+              (err, encoded) => {
+                return done(null, {
+                  status: "success",
+                  msg: { token: encoded, user: { email, firstName, lastName } }
+                });
+              }
+            );
+          });
+        }
       });
     }
   )
