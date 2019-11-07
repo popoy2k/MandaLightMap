@@ -1148,3 +1148,16 @@ svg {
   cursor: pointer;
 }
 /* End of sidebar */
+
+/* Download btn */
+
+.download-btn {
+  margin-top: 20px;
+  padding: 20px 15px;
+  width: auto;
+  height: auto;
+  min-width: 100%;
+  min-height: 100px;
+}
+
+/* End of Download btn */

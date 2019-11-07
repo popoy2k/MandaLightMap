@@ -218,6 +218,21 @@ export const getSingleLipoData = dataObj => (dispatch, getState) => {
     });
 };
 
+export const requestDownloadURL = fileObj => (dispatch, getState) => {
+  axios
+    .post(
+      "/data/lipo/testing",
+      JSON.stringify({ fileRequest: fileObj }),
+      getConfig(getState)
+    )
+    .then(resData => {
+      console.log(resData.data);
+    })
+    .catch(resErr => {
+      console.log(resErr.response);
+    });
+};
+
 export const logout = () => dispatch => {
   dispatch({ type: SIGN_OUT });
 };

@@ -1,13 +1,11 @@
 import React, { Component, Fragment } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import NavBar from "./NavBar";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { getLanding } from "../../actions/auth";
+import { getLanding, getMainMap } from "../../actions/auth";
 
 // Map related imports
-import { feature as Feature } from "topojson-client";
 import * as d3 from "d3";
 
 // Font Awesome
@@ -33,12 +31,14 @@ export class landing extends Component {
 
   static propTypes = {
     getLanding: PropTypes.func.isRequired,
+    getMainMap: PropTypes.func.isRequired,
+    map: PropTypes.object,
     landing: PropTypes.object
   };
 
-  componentDidUpdate(prevState) {
-    const { landing } = this.props;
+  renderLandingMap = (map, initData = null) => {
     let { svgW, svgH, svgInst, mapData } = this.state;
+    const mapLiPoData = initData || mapData;
 
     let colorScale = d3
       .scaleThreshold()
@@ -46,111 +46,119 @@ export class landing extends Component {
       .range(d3.schemePurples[9]);
 
     let rateScale = d3.select(".map-svg");
+    d3.select(svgInst)
+      .attr("width", svgW)
+      .attr("height", svgH)
+      .append("g")
+      .selectAll("path")
+      .data(map)
+      .enter()
+      .append("path")
+      .attr("d", this.path())
+      .attr("cursor", "pointer")
+      .attr("class", "brgy")
+      .attr("fill", function(d) {
+        d.total = mapLiPoData.get(d.properties.ID_3) || 0;
+        return colorScale(d.total);
+      })
+      .on("mouseover", brgyData => {
+        const { ID_3, NAME_3, area_3, population_3 } = brgyData.properties;
+        let currLiPo = parseFloat(mapLiPoData.get(ID_3)).toFixed(2) || 0;
 
-    if (prevState.landing !== landing) {
-      landing.data.forEach(val => mapData.set(val.mapId, val.mean));
-      axios
-        .get(
-          "https://raw.githubusercontent.com/popoy2k/MandaLightMap/master/Choropleth/NCR/Mandaluyong/MandaTopo.json"
-        )
-        .then(data => {
-          d3.select(svgInst)
-            .attr("width", svgW)
-            .attr("height", svgH)
-            .append("g")
-            .selectAll("path")
-            .data(Feature(data.data, data.data.objects.Mandaluyong).features)
-            .enter()
-            .append("path")
-            .attr("d", this.path())
-            .attr("cursor", "pointer")
-            .attr("class", "brgy")
-            .attr("fill", function(d) {
-              d.total = mapData.get(d.properties.ID_3) || 0;
-              return colorScale(d.total);
-            })
-            .on("mouseover", brgyData => {
-              const {
-                ID_3,
-                NAME_3,
-                area_3,
-                population_3
-              } = brgyData.properties;
-              let currLiPo = parseFloat(mapData.get(ID_3)).toFixed(2) || 0;
-
-              this.setState({
-                currBrgy: `Brgy. ${NAME_3}`,
-                currLA: area_3,
-                currPop: population_3,
-                currLiPo
-              });
-            })
-            .on("mouseout", e => {
-              const { area_1, population_1 } = e.properties;
-              this.setState({
-                currBrgy: "Mandaluyong City",
-                currLiPo: "43.32",
-                currLA: area_1,
-                currPop: population_1
-              });
-            });
-
-          let x = d3
-            .scaleLinear()
-            .domain([1, 10])
-            .rangeRound([50, 100]);
-          let gRS = rateScale
-            .append("g")
-            .attr("transform", "translate(-20,50)");
-
-          gRS
-            .selectAll("rect")
-            .data(
-              colorScale.range().map(function(d) {
-                d = colorScale.invertExtent(d);
-
-                if (d[0] == null) d[0] = x.domain()[0];
-                if (d[1] == null) d[1] = x.domain()[1];
-
-                if (d[0] <= 1) d[0] = 15;
-
-                return d;
-              })
-            )
-            .enter()
-            .append("rect")
-            .attr("height", 8)
-
-            .attr("x", function(d) {
-              return x(d[0]);
-            })
-            .attr("width", function(d) {
-              return x(d[1]) - x(d[0]);
-            })
-            .attr("fill", function(d) {
-              return colorScale(d[0]);
-            });
-          gRS
-            .append("text")
-            .attr("x", x.range()[0])
-            .attr("y", -6)
-            .attr("fill", "#000")
-            .attr("text-anchor", "start")
-            .attr("font-weight", "bold")
-            .attr("font-size", "12px")
-            .attr("transform", "translate(80,0)")
-            .text("Radiance Scale");
-
-          gRS
-            .call(
-              d3
-                .axisBottom(x)
-                .tickSize(13)
-                .tickValues(colorScale.domain().filter(val => val <= 60))
-            )
-            .select(".domain")
-            .remove();
+        this.setState({
+          currBrgy: `Brgy. ${NAME_3}`,
+          currLA: area_3,
+          currPop: population_3,
+          currLiPo
         });
+      })
+      .on("mouseout", e => {
+        const { area_1, population_1 } = e.properties;
+        this.setState({
+          currBrgy: "Mandaluyong City",
+          currLiPo: "43.32",
+          currLA: area_1,
+          currPop: population_1
+        });
+      });
+
+    let x = d3
+      .scaleLinear()
+      .domain([1, 10])
+      .rangeRound([50, 100]);
+    let gRS = rateScale.append("g").attr("transform", "translate(-20,50)");
+
+    gRS
+      .selectAll("rect")
+      .data(
+        colorScale.range().map(function(d) {
+          d = colorScale.invertExtent(d);
+
+          if (d[0] == null) d[0] = x.domain()[0];
+          if (d[1] == null) d[1] = x.domain()[1];
+
+          if (d[0] <= 1) d[0] = 15;
+
+          return d;
+        })
+      )
+      .enter()
+      .append("rect")
+      .attr("height", 8)
+
+      .attr("x", function(d) {
+        return x(d[0]);
+      })
+      .attr("width", function(d) {
+        return x(d[1]) - x(d[0]);
+      })
+      .attr("fill", function(d) {
+        return colorScale(d[0]);
+      });
+    gRS
+      .append("text")
+      .attr("x", x.range()[0])
+      .attr("y", -6)
+      .attr("fill", "#000")
+      .attr("text-anchor", "start")
+      .attr("font-weight", "bold")
+      .attr("font-size", "12px")
+      .attr("transform", "translate(80,0)")
+      .text("Radiance Scale");
+
+    gRS
+      .call(
+        d3
+          .axisBottom(x)
+          .tickSize(13)
+          .tickValues(colorScale.domain().filter(val => val <= 60))
+      )
+      .select(".domain")
+      .remove();
+  };
+
+  componentDidUpdate(prevProps) {
+    const { landing, map } = this.props;
+    const { mapData } = this.state;
+
+    if (Object.entries(landing).length && map.mainMap) {
+      landing.data.forEach(val => mapData.set(val.mapId, val.mean));
+      this.renderLandingMap(map.mainMap, mapData);
+    }
+  }
+
+  componentDidMount() {
+    const { map, mapData, landing } = this.props;
+    if (!map.mainMap) {
+      this.props.getMainMap();
+    }
+
+    if (Object.entries(landing).length) {
+      this.props.getLanding();
+    }
+
+    if (map.mainMap) {
+      this.renderLandingMap(map.mainMap, mapData);
     }
   }
 
@@ -309,10 +317,11 @@ export class landing extends Component {
 }
 
 const mapStateToProps = state => ({
-  landing: state.data.landingData
+  landing: state.data.landingData,
+  map: state.map
 });
 
 export default connect(
   mapStateToProps,
-  { getLanding }
+  { getLanding, getMainMap }
 )(landing);

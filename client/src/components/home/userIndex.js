@@ -7,7 +7,10 @@ import {
   Table,
   Tooltip,
   Button,
-  Drawer
+  Drawer,
+  Row,
+  Col,
+  Dropdown
 } from "antd";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
@@ -15,7 +18,8 @@ import {
   verifyToken,
   getTableData,
   getSingleLipoData,
-  logout
+  logout,
+  requestDownloadURL
 } from "../../actions/auth";
 import { Redirect } from "react-router-dom";
 
@@ -49,10 +53,13 @@ export class userIndex extends Component {
     lipoTableLoading: true,
     lipoTableData: null,
     lipoSelectedRowKeys: [],
+    lipoSelectedRowData: [],
     selectedYear: "",
     selectedMonth: "",
     selectedTableLoading: true,
-    currentSingleSelected: ""
+    currentSingleSelected: "",
+    downloadDisable: true,
+    downloading: false
   };
 
   static propTypes = {
@@ -60,6 +67,7 @@ export class userIndex extends Component {
     getTableData: PropTypes.func.isRequired,
     getSingleLipoData: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
+    requestDownloadURL: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
     home: PropTypes.object.isRequired
   };
@@ -87,6 +95,23 @@ export class userIndex extends Component {
   logout = () => {
     this.props.logout();
     return <Redirect to="/" />;
+  };
+
+  downloadFile = e => {
+    const { lipoSelectedRowData, downloading } = this.state;
+    if (!downloading && lipoSelectedRowData.length) {
+      let selectedData = [];
+      [...new Set(lipoSelectedRowData.map(mVal => JSON.parse(mVal).year))].map(
+        m2Val =>
+          selectedData.push({
+            year: m2Val,
+            months: lipoSelectedRowData
+              .filter(fVal => JSON.parse(fVal).year === m2Val)
+              .map(m3Val => JSON.parse(m3Val).month)
+          })
+      );
+      this.props.requestDownloadURL(selectedData);
+    }
   };
 
   componentDidUpdate(prevProps) {
@@ -133,7 +158,7 @@ export class userIndex extends Component {
     this.setState({ tab: value.key });
   };
   render() {
-    const { isAuthenticated } = this.props.auth;
+    const { isAuthenticated, token } = this.props.auth;
 
     const {
       tab,
@@ -144,10 +169,11 @@ export class userIndex extends Component {
       selectedTableLoading,
       currentSingleSelected,
       lipoTableLoading,
-      lipoTableData
+      lipoTableData,
+      downloadDisable
     } = this.state;
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !token) {
       return <Redirect to="/auth/login" />;
     }
 
@@ -231,8 +257,14 @@ export class userIndex extends Component {
 
     const lipoTableSelect = {
       selectedRowKeys: lipoSelectedRowKeys,
-      onChange: selectedRowKeys => {
-        this.setState({ lipoSelectedRowKeys: selectedRowKeys });
+      onChange: (selectedRowKeys, selectedRowData) => {
+        this.setState({
+          lipoSelectedRowKeys: selectedRowKeys,
+          lipoSelectedRowData: selectedRowData.length
+            ? selectedRowData.map(mVal => mVal.drawerData)
+            : [],
+          downloadDisable: !selectedRowKeys.length ? true : false
+        });
       },
       hideDefaultSelections: true,
       selections: [
@@ -241,14 +273,23 @@ export class userIndex extends Component {
           text: "Select All ",
           onSelect: () => {
             this.setState({
-              lipoSelectedRowKeys: [...Array(lipoTableData.length).keys()]
+              lipoSelectedRowKeys: [...Array(lipoTableData.length).keys()],
+              lipoSelectedRowData: lipoTableData.length
+                ? lipoTableData.map(mVal => mVal.drawerData)
+                : [],
+              downloadDisable: false
             });
           }
         },
         {
           key: "unselect-all-data",
           text: "Unselect All ",
-          onSelect: () => this.setState({ lipoSelectedRowKeys: [] })
+          onSelect: () =>
+            this.setState({
+              lipoSelectedRowKeys: [],
+              lipoSelectedRowData: [],
+              downloadDisable: true
+            })
         }
       ]
     };
@@ -269,6 +310,7 @@ export class userIndex extends Component {
         title: "District",
         dataIndex: "district",
         key: "district",
+        render: data => <span>District {data}</span>,
         filters: [
           { text: "District 1", value: 1 },
           { text: "District 2", value: 2 }
@@ -280,7 +322,9 @@ export class userIndex extends Component {
         title: "Population",
         dataIndex: "loc_pop",
         key: "loc_pop",
-        sorter: (a, b) => a.loc_pop - b.loc_pop
+        sorter: (a, b) =>
+          parseInt(a.loc_pop.split(",").join("")) -
+          parseInt(b.loc_pop.split(",").join(""))
       },
       {
         title: "Land Area",
@@ -311,12 +355,38 @@ export class userIndex extends Component {
       }
     ];
 
+    const downloadOverlay = (
+      <Menu>
+        <Menu.Item key="1">CSV</Menu.Item>
+        <Menu.Item key="2">JSON</Menu.Item>
+      </Menu>
+    );
+
     let content = "";
     switch (tab) {
       case "1":
         content = (
           <div>
-            <h3>Light Pollution Statistical Data</h3>
+            <Row style={{ marginBottom: "15px" }}>
+              <Col span={12}>
+                <h3>Light Pollution Statistical Data</h3>
+              </Col>
+              <Col span={12} push={9}>
+                <Dropdown.Button
+                  type="primary"
+                  disabled={downloadDisable}
+                  overlay={downloadOverlay}
+                  placement="bottomRight"
+                  icon={<Icon type="download" />}
+                  size="large"
+                  onClick={this.downloadFile}
+                  title="Download Excel"
+                >
+                  Download
+                </Dropdown.Button>
+              </Col>
+            </Row>
+
             <Table
               scroll={{ x: "max-content" }}
               loading={lipoTableLoading}
@@ -326,7 +396,6 @@ export class userIndex extends Component {
               pagination={{ pageSize: 10 }}
               size={"small"}
             />
-            <div className="download-btn"></div>
           </div>
         );
         break;
@@ -424,5 +493,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { verifyToken, getTableData, getSingleLipoData, logout }
+  { verifyToken, getTableData, getSingleLipoData, logout, requestDownloadURL }
 )(userIndex);

@@ -3,6 +3,7 @@ const MandaLipo = require("../model/MandaLipo");
 const Activator = require("../utility/Activator");
 const JWT = require("jsonwebtoken");
 const { areaData } = require("./areaInfo");
+const FC = require("../utility/FileCreator");
 
 const customActivate = (req, res, next) => {
   const { token } = req.params;
@@ -195,10 +196,22 @@ const lipoSingle = (req, res, next) => {
     });
 };
 
+const lipoRequest = (req, res, next) => {
+  const { fileRequest } = req.body;
+  const initYear = [...new Set(fileRequest.map(mVal => mVal.year))];
+
+  FC.createFile({ years: initYear, mainRequest: fileRequest, type: "excel" })
+    .then(resData => res.status(200).json(resData))
+    .catch(console.error);
+
+  return next();
+};
+
 module.exports = {
   customActivate,
   verifyToken,
   lipoTable,
   verifyRequest,
-  lipoSingle
+  lipoSingle,
+  lipoRequest
 };

@@ -4,7 +4,8 @@ const MandaLipo = require("../model/MandaLipo");
 const {
   verifyRequest,
   lipoTable,
-  lipoSingle
+  lipoSingle,
+  lipoRequest
 } = require("../middleware/custom");
 
 router.route("/landing").get((req, res) => {
@@ -49,6 +50,11 @@ router.route("/lipo/table").post(verifyRequest, lipoTable, (req, res) => {
 
 router.route("/lipo/single").post(verifyRequest, lipoSingle, (req, res) => {
   // to be handled
+});
+
+router.route("/lipo/testing").post(verifyRequest, lipoRequest, (req, res) => {
+  // to be handled
+  // res.status(200).send("Shit");
 });
 
 module.exports = router;
