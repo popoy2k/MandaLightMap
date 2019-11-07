@@ -45,6 +45,17 @@ export class landing extends Component {
       .domain(d3.range(20, 100, 5))
       .range(d3.schemePurples[9]);
 
+    if (
+      d3
+        .select(".map-svg")
+        .selectAll("*")
+        .node()
+    ) {
+      d3.select(".map-svg")
+        .selectAll("*")
+        .remove();
+    }
+
     let rateScale = d3.select(".map-svg");
     d3.select(svgInst)
       .attr("width", svgW)
@@ -141,24 +152,26 @@ export class landing extends Component {
     const { landing, map } = this.props;
     const { mapData } = this.state;
 
-    if (Object.entries(landing).length && map.mainMap) {
+    if (prevProps.landing !== landing) {
       landing.data.forEach(val => mapData.set(val.mapId, val.mean));
+    }
+    if (
+      (prevProps.map !== map || prevProps.landing !== landing) &&
+      map.mainMap !== null
+    ) {
       this.renderLandingMap(map.mainMap, mapData);
     }
   }
 
   componentDidMount() {
-    const { map, mapData, landing } = this.props;
+    const { map, landing } = this.props;
+
     if (!map.mainMap) {
       this.props.getMainMap();
     }
 
     if (Object.entries(landing).length) {
       this.props.getLanding();
-    }
-
-    if (map.mainMap) {
-      this.renderLandingMap(map.mainMap, mapData);
     }
   }
 
