@@ -69,7 +69,8 @@ export class userIndex extends Component {
     logout: PropTypes.func.isRequired,
     requestDownloadURL: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
-    home: PropTypes.object.isRequired
+    home: PropTypes.object.isRequired,
+    downloadUrl: PropTypes.node
   };
 
   showLipoDrawer = e => {
@@ -110,17 +111,24 @@ export class userIndex extends Component {
               .map(m3Val => JSON.parse(m3Val).month)
           })
       );
-      this.props.requestDownloadURL(selectedData);
+      this.props.requestDownloadURL({ selectedData, type: "excel" });
+      this.setState({ downloading: true });
     }
   };
 
   componentDidUpdate(prevProps) {
     const { lipoSingleData, lipoTable } = this.props.home;
+    const { downloadUrl } = this.props;
     if (lipoSingleData !== prevProps.home.lipoSingleData) {
       this.setState({
         currentSingleSelected: lipoSingleData,
         selectedTableLoading: false
       });
+    }
+
+    if (prevProps.downloadUrl !== downloadUrl) {
+      window.open(downloadUrl);
+      this.setState({ download: false });
     }
 
     if (lipoTable !== prevProps.home.lipoTable) {
@@ -157,6 +165,7 @@ export class userIndex extends Component {
   menuClicked = value => {
     this.setState({ tab: value.key });
   };
+
   render() {
     const { isAuthenticated, token } = this.props.auth;
 
@@ -170,7 +179,8 @@ export class userIndex extends Component {
       currentSingleSelected,
       lipoTableLoading,
       lipoTableData,
-      downloadDisable
+      downloadDisable,
+      downloading
     } = this.state;
 
     if (!isAuthenticated && !token) {
@@ -382,7 +392,7 @@ export class userIndex extends Component {
                   onClick={this.downloadFile}
                   title="Download Excel"
                 >
-                  Download
+                  {downloading ? "" : "Download"}
                 </Dropdown.Button>
               </Col>
             </Row>
@@ -488,7 +498,8 @@ export class userIndex extends Component {
 
 const mapStateToProps = state => ({
   auth: state.auth,
-  home: state.home
+  home: state.home,
+  downloadUrl: state.home.lipoDownloadUrl
 });
 
 export default connect(

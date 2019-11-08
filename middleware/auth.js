@@ -140,18 +140,20 @@ passport.use(
                   msg: "Email/Password is incorrect."
                 });
               }
+
+              const { _id } = resData;
+
               const {
                 firstName,
                 lastName,
                 email,
-                creationType,
-                creationId
+                creationType
               } = resData.acctInfo;
 
               JWT.sign(
-                { creationId, email, type: creationType },
+                { creationId: _id, email, type: creationType },
                 process.env.JWT_SECRET,
-                { expiresIn: "1h" },
+                { expiresIn: "1d" },
                 (err, encoded) => {
                   if (err) {
                     return done(null, {
@@ -360,17 +362,13 @@ passport.use(
         }
 
         if (resData) {
-          const {
-            creationId,
-            email,
-            firstName,
-            lastName,
-            creationType
-          } = resData.acctInfo;
+          const { _id } = resData;
+
+          const { email, firstName, lastName, creationType } = resData.acctInfo;
           JWT.sign(
-            { creationId, email, type: creationType },
+            { creationId: _id, email, type: creationType },
             process.env.JWT_SECRET,
-            { expiresIn: "1h" },
+            { expiresIn: "1d" },
             (err, encoded) => {
               return done(null, {
                 status: "success",
@@ -400,17 +398,18 @@ passport.use(
               });
             }
 
+            const { _id } = newUser;
+
             const {
-              creationId,
               email,
               firstName,
               lastName,
               creationType
             } = newUser.acctInfo;
             JWT.sign(
-              { creationId, email, type: creationType },
+              { creationId: _id, email, type: creationType },
               process.env.JWT_SECRET,
-              { expiresIn: "1h" },
+              { expiresIn: "1d" },
               (err, encoded) => {
                 return done(null, {
                   status: "success",

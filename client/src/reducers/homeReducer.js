@@ -2,12 +2,15 @@ import {
   LIPO_DATA_TABLE_ERROR,
   LIPO_DATA_TABLE_SUCCESS,
   LIPO_DATA_SINGLE_REQUEST_SUCCESS,
-  LIPO_DATA_SINGLE_REQUEST_ERROR
+  LIPO_DATA_SINGLE_REQUEST_ERROR,
+  LIPO_DATA_DOWNLOAD_SUCCESS,
+  LIPO_DATA_DOWNLOAD_ERROR
 } from "../actions/types";
 
 const initialState = {
   lipoTable: null,
   lipoSingleData: null,
+  lipoDownloadUrl: null,
   healthTable: null
 };
 
@@ -32,6 +35,16 @@ export default (state = initialState, action) => {
       return {
         ...state,
         lipoSingleData: null
+      };
+    case LIPO_DATA_DOWNLOAD_SUCCESS:
+      return {
+        ...state,
+        lipoDownloadUrl: action.payload
+      };
+    case LIPO_DATA_DOWNLOAD_ERROR:
+      return {
+        ...state,
+        lipoDownloadUrl: null
       };
     default:
       return state;

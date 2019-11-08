@@ -5,7 +5,8 @@ const {
   verifyRequest,
   lipoTable,
   lipoSingle,
-  lipoRequest
+  lipoRequest,
+  downloadFile
 } = require("../middleware/custom");
 
 router.route("/landing").get((req, res) => {
@@ -52,9 +53,11 @@ router.route("/lipo/single").post(verifyRequest, lipoSingle, (req, res) => {
   // to be handled
 });
 
-router.route("/lipo/testing").post(verifyRequest, lipoRequest, (req, res) => {
+router.route("/lipo/download").post(verifyRequest, lipoRequest, (req, res) => {
   // to be handled
-  // res.status(200).send("Shit");
 });
 
+router.route("/lipo/download/:slug").get(downloadFile, (req, res) => {
+  // to be handled
+});
 module.exports = router;

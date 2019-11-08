@@ -4,6 +4,9 @@ const Activator = require("../utility/Activator");
 const JWT = require("jsonwebtoken");
 const { areaData } = require("./areaInfo");
 const FC = require("../utility/FileCreator");
+const DLInfo = require("../model/Download");
+const path = require("path");
+const storagePath = path.join(path.dirname(__dirname), "storage");
 
 const customActivate = (req, res, next) => {
   const { token } = req.params;
@@ -77,28 +80,24 @@ const verifyToken = (req, res, next) => {
     }
 
     const { creationId: initId, email: initEmail, type: initType } = decoded;
-    User.findOne({ "acctInfo.creationId": initId }, (fetchErr, resData) => {
+    User.findOne({ _id: initId }, (fetchErr, resData) => {
       if (fetchErr) {
         res.status(400);
         return next("router");
       }
 
-      const {
-        email,
-        creationType,
-        creationId,
-        firstName,
-        lastName
-      } = resData.acctInfo;
+      const { _id } = resData;
+
+      const { email, creationType, firstName, lastName } = resData.acctInfo;
       if (initEmail !== email || creationType !== initType) {
         res.status(400);
         return next("router");
       }
 
       JWT.sign(
-        { creationId, email, type: creationType },
+        { creationId: _id, email, type: creationType },
         process.env.JWT_SECRET,
-        { expiresIn: "1h" },
+        { expiresIn: "1d" },
         (signErr, encoded) => {
           if (signErr) {
             res.status(400);
@@ -136,6 +135,7 @@ const verifyRequest = (req, res, next) => {
       return next("router");
     }
 
+    req.userId = resDecode.creationId;
     return next();
   });
 };
@@ -156,8 +156,6 @@ const lipoTable = (req, res, next) => {
         drawerData: JSON.stringify({ year: mVal.year, month: mVal.month }),
         dataType: "VCM"
       }));
-
-      // console.log(newData);
 
       setTimeout(() => {
         res.status(200).json({ status: "success", msg: { data: newData } });
@@ -197,14 +195,40 @@ const lipoSingle = (req, res, next) => {
 };
 
 const lipoRequest = (req, res, next) => {
-  const { fileRequest } = req.body;
+  const { fileRequest, type } = req.body;
   const initYear = [...new Set(fileRequest.map(mVal => mVal.year))];
 
-  FC.createFile({ years: initYear, mainRequest: fileRequest, type: "excel" })
+  console.log(req.hostname);
+
+  FC.createFile({
+    years: initYear,
+    mainRequest: fileRequest,
+    type,
+    userId: req.userId,
+    baseURL: `${req.protocol}://${req.hostname}:${process.env.PORT}/data/lipo/download/`
+  })
     .then(resData => res.status(200).json(resData))
     .catch(console.error);
 
   return next();
+};
+
+const downloadFile = (req, res, next) => {
+  const { slug } = req.params;
+  DLInfo.findOne({ fileSlug: slug })
+    .select("fileName")
+    .exec((resErr, resData) => {
+      if (resErr || !resData) {
+        res.status(400).send("Link has expired");
+        return next("router");
+      }
+
+      res.download(
+        path.join(storagePath, resData.fileName),
+        "MandaluyongCityLiPo.xlsx"
+      );
+      return next();
+    });
 };
 
 module.exports = {
@@ -213,5 +237,6 @@ module.exports = {
   lipoTable,
   verifyRequest,
   lipoSingle,
-  lipoRequest
+  lipoRequest,
+  downloadFile
 };

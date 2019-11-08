@@ -4,6 +4,7 @@ const storagePath = path.join(path.dirname(__dirname), "storage");
 const crypto = require("crypto");
 const xl = require("excel4node");
 const { areaData } = require("../middleware/areaInfo");
+const DLInfo = require("../model/Download");
 
 // Carl 2019 to Carl Current:
 // Oh! Gago di mo maintindihan no! Gago ka kasi e HAHAHAHAHAH
@@ -29,8 +30,9 @@ const getMonth = num => {
 module.exports.createFile = function(mainObj) {
   return new Promise(async function(resolve, reject) {
     try {
-      const { years, mainRequest, type } = mainObj;
+      const { years, mainRequest, type, userId, baseURL } = mainObj;
       const randBuff = await crypto.randomBytes(16).toString("hex");
+      const randUrl = await crypto.randomBytes(32).toString("hex");
       MandaLipos.find({ year: { $in: years } })
         .select("-_id")
         .exec((err, resData) => {
@@ -95,8 +97,21 @@ module.exports.createFile = function(mainObj) {
                   });
                 });
               });
-              wb.write(path.join(storagePath, `${randBuff}.xlsx`));
-              return resolve(`${randBuff}.xlsx`);
+
+              let DownInfo = new DLInfo({
+                userId,
+                fileName: `${randBuff}.xlsx`,
+                fileSlug: randUrl
+              });
+
+              DownInfo.save(err => {
+                if (err) {
+                  return reject(err);
+                }
+                wb.write(path.join(storagePath, `${randBuff}.xlsx`));
+                return resolve(baseURL + randUrl);
+              });
+
               break;
             case "json":
               break;
