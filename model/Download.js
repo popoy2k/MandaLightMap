@@ -14,6 +14,10 @@ const DownloadInfo = new Schema({
     type: String,
     required: true
   },
+  extName: {
+    type: String,
+    required: true
+  },
   requestedDate: {
     type: Date,
     default: Date.now

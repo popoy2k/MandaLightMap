@@ -198,8 +198,6 @@ const lipoRequest = (req, res, next) => {
   const { fileRequest, type } = req.body;
   const initYear = [...new Set(fileRequest.map(mVal => mVal.year))];
 
-  console.log(req.hostname);
-
   FC.createFile({
     years: initYear,
     mainRequest: fileRequest,
@@ -216,18 +214,20 @@ const lipoRequest = (req, res, next) => {
 const downloadFile = (req, res, next) => {
   const { slug } = req.params;
   DLInfo.findOne({ fileSlug: slug })
-    .select("fileName")
+    .select("fileName extName")
     .exec((resErr, resData) => {
       if (resErr || !resData) {
         res.status(400).send("Link has expired");
         return next("router");
       }
 
-      res.download(
-        path.join(storagePath, resData.fileName),
-        "MandaluyongCityLiPo.xlsx"
-      );
-      return next();
+      setTimeout(() => {
+        res.download(
+          path.join(storagePath, resData.fileName),
+          `MandaluyongCityLiPo.${resData.extName}`
+        );
+        return next();
+      }, 2000);
     });
 };
 

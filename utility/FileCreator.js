@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const xl = require("excel4node");
 const { areaData } = require("../middleware/areaInfo");
 const DLInfo = require("../model/Download");
+const fs = require("fs");
 
 // Carl 2019 to Carl Current:
 // Oh! Gago di mo maintindihan no! Gago ka kasi e HAHAHAHAHAH
@@ -101,7 +102,8 @@ module.exports.createFile = function(mainObj) {
               let DownInfo = new DLInfo({
                 userId,
                 fileName: `${randBuff}.xlsx`,
-                fileSlug: randUrl
+                fileSlug: randUrl,
+                extName: "xlsx"
               });
 
               DownInfo.save(err => {
@@ -114,8 +116,68 @@ module.exports.createFile = function(mainObj) {
 
               break;
             case "json":
+              const jsonFinal = JSON.stringify(finalData);
+              fs.writeFile(
+                path.join(storagePath, `${randBuff}.json`),
+                jsonFinal,
+                function(err) {
+                  if (err) {
+                    return reject(err);
+                  }
+                  let DownInfo = new DLInfo({
+                    userId,
+                    fileName: `${randBuff}.json`,
+                    fileSlug: randUrl,
+                    extName: "json"
+                  });
+
+                  DownInfo.save(err => {
+                    if (err) {
+                      return reject(err);
+                    }
+                    return resolve(baseURL + randUrl);
+                  });
+                }
+              );
               break;
             case "csv":
+              let initCSV =
+                "year,month,GISId,areaName,district,population,landArea,radMean,radMax,radMin\n";
+              finalData.forEach(feVal => {
+                feVal.data.forEach(fe2Val => {
+                  fe2Val.lipoData.forEach(fe3Val => {
+                    initCSV += `${feVal.year},${fe2Val.month},${fe3Val.id},${
+                      fe3Val.loc_name
+                    },${fe3Val.district},${fe3Val.loc_pop
+                      .split(",")
+                      .join("")},${fe3Val.loc_area},${fe3Val.mean},${
+                      fe3Val.max
+                    },${fe3Val.min}\n`;
+                  });
+                });
+              });
+              fs.writeFile(
+                path.join(storagePath, `${randBuff}.csv`),
+                initCSV,
+                err => {
+                  if (err) {
+                    return reject(err);
+                  }
+                  let DownInfo = new DLInfo({
+                    userId,
+                    fileName: `${randBuff}.csv`,
+                    fileSlug: randUrl,
+                    extName: "csv"
+                  });
+
+                  DownInfo.save(err => {
+                    if (err) {
+                      return reject(err);
+                    }
+                    return resolve(baseURL + randUrl);
+                  });
+                }
+              );
               break;
             default:
               return reject({ status: "error", msg: "Something went wrong" });

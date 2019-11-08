@@ -3,6 +3,8 @@ const app = express();
 const path = require("path");
 const mongoose = require("mongoose");
 const passport = require("passport");
+const Helper = require("./utility/Helper");
+
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
@@ -23,6 +25,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(passport.initialize());
+
+// Things todo Asynchronously
+Helper.isDir(path.join(__dirname, "storage"), function(isValid) {
+  console.log(!isValid ? isValid : "");
+});
 
 // Middleware
 require("./middleware/auth");

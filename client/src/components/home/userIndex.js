@@ -1,3 +1,4 @@
+import Loader from "react-loader-spinner";
 import React, { Component, Fragment } from "react";
 import {
   Layout,
@@ -21,7 +22,10 @@ import {
   logout,
   requestDownloadURL
 } from "../../actions/auth";
+
 import { Redirect } from "react-router-dom";
+
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
 const { Header, Sider, Content } = Layout;
 
@@ -98,7 +102,10 @@ export class userIndex extends Component {
     return <Redirect to="/" />;
   };
 
-  downloadFile = e => {
+  downloadRequest = type => {
+    if (!type) {
+      return;
+    }
     const { lipoSelectedRowData, downloading } = this.state;
     if (!downloading && lipoSelectedRowData.length) {
       let selectedData = [];
@@ -111,9 +118,13 @@ export class userIndex extends Component {
               .map(m3Val => JSON.parse(m3Val).month)
           })
       );
-      this.props.requestDownloadURL({ selectedData, type: "excel" });
-      this.setState({ downloading: true });
+      this.props.requestDownloadURL({ selectedData, type });
+      this.setState({ downloading: true, downloadDisable: true });
     }
+  };
+
+  downloadFile = e => {
+    this.downloadRequest("excel");
   };
 
   componentDidUpdate(prevProps) {
@@ -127,8 +138,11 @@ export class userIndex extends Component {
     }
 
     if (prevProps.downloadUrl !== downloadUrl) {
-      window.open(downloadUrl);
-      this.setState({ download: false });
+      setTimeout(() => {
+        window.open(downloadUrl);
+      }, 100);
+
+      this.setState({ downloading: false, downloadDisable: false });
     }
 
     if (lipoTable !== prevProps.home.lipoTable) {
@@ -164,6 +178,11 @@ export class userIndex extends Component {
 
   menuClicked = value => {
     this.setState({ tab: value.key });
+  };
+
+  MenuDLChange = e => {
+    const type = parseInt(e.key) === 1 ? "csv" : "json";
+    this.downloadRequest(type);
   };
 
   render() {
@@ -366,7 +385,7 @@ export class userIndex extends Component {
     ];
 
     const downloadOverlay = (
-      <Menu>
+      <Menu onClick={this.MenuDLChange}>
         <Menu.Item key="1">CSV</Menu.Item>
         <Menu.Item key="2">JSON</Menu.Item>
       </Menu>
@@ -389,10 +408,20 @@ export class userIndex extends Component {
                   placement="bottomRight"
                   icon={<Icon type="download" />}
                   size="large"
+                  style={{ width: "200px" }}
                   onClick={this.downloadFile}
                   title="Download Excel"
                 >
-                  {downloading ? "" : "Download"}
+                  {downloading ? (
+                    <Loader
+                      type="Triangle"
+                      color="#FFF"
+                      height={20}
+                      width={20}
+                    />
+                  ) : (
+                    "Download"
+                  )}
                 </Dropdown.Button>
               </Col>
             </Row>
