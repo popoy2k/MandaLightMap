@@ -26,6 +26,7 @@ import {
 import { Redirect } from "react-router-dom";
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+import ButtonGroup from "antd/lib/button/button-group";
 
 const { Header, Sider, Content } = Layout;
 
@@ -47,6 +48,61 @@ const getMonth = num => {
   return months[parseInt(num) - 1];
 };
 
+const getMonthInt = name => {
+  const months = [
+    {
+      month: "January",
+      number: 1
+    },
+    {
+      month: "February",
+      number: 2
+    },
+    {
+      month: "March",
+      number: 3
+    },
+    {
+      month: "April",
+      number: 4
+    },
+    {
+      month: "May",
+      number: 5
+    },
+    {
+      month: "June",
+      number: 6
+    },
+    {
+      month: "July",
+      number: 7
+    },
+    {
+      month: "August",
+      number: 8
+    },
+    {
+      month: "September",
+      number: 9
+    },
+    {
+      month: "October",
+      number: 10
+    },
+    {
+      month: "November",
+      number: 11
+    },
+    {
+      month: "December",
+      number: 12
+    }
+  ];
+
+  return months.filter(feVal => feVal.month === name)[0].number || null;
+};
+
 export class userIndex extends Component {
   state = {
     collapsed: false,
@@ -63,7 +119,8 @@ export class userIndex extends Component {
     selectedTableLoading: true,
     currentSingleSelected: "",
     downloadDisable: true,
-    downloading: false
+    downloading: false,
+    singleDownload: false
   };
 
   static propTypes = {
@@ -118,6 +175,7 @@ export class userIndex extends Component {
               .map(m3Val => JSON.parse(m3Val).month)
           })
       );
+      console.log(selectedData);
       this.props.requestDownloadURL({ selectedData, type });
       this.setState({ downloading: true, downloadDisable: true });
     }
@@ -142,7 +200,11 @@ export class userIndex extends Component {
         window.open(downloadUrl);
       }, 100);
 
-      this.setState({ downloading: false, downloadDisable: false });
+      this.setState({
+        downloading: false,
+        singleDownload: false,
+        downloadDisable: false
+      });
     }
 
     if (lipoTable !== prevProps.home.lipoTable) {
@@ -185,6 +247,47 @@ export class userIndex extends Component {
     this.downloadRequest(type);
   };
 
+  singleDownloadRequest = e => {
+    const { type } = e.target.dataset;
+    if (isNaN(parseInt(type)) || parseInt(type) > 3 || parseInt(type) < 1) {
+      return;
+    }
+
+    const { selectedYear, selectedMonth } = this.state;
+
+    let finalMonth = getMonthInt(selectedMonth);
+
+    if (!finalMonth) {
+      return;
+    }
+
+    let finalType;
+    switch (parseInt(type)) {
+      case 1:
+        finalType = "excel";
+        break;
+      case 2:
+        finalType = "csv";
+        break;
+      case 3:
+        finalType = "json";
+        break;
+      default:
+        return;
+    }
+
+    this.props.requestDownloadURL({
+      selectedData: [
+        {
+          year: selectedYear,
+          months: [finalMonth < 10 ? `0${finalMonth}` : `${finalMonth}`]
+        }
+      ],
+      type: finalType
+    });
+    this.setState({ singleDownload: true, downloading: true });
+  };
+
   render() {
     const { isAuthenticated, token } = this.props.auth;
 
@@ -199,7 +302,8 @@ export class userIndex extends Component {
       lipoTableLoading,
       lipoTableData,
       downloadDisable,
-      downloading
+      downloading,
+      singleDownload
     } = this.state;
 
     if (!isAuthenticated && !token) {
@@ -408,7 +512,6 @@ export class userIndex extends Component {
                   placement="bottomRight"
                   icon={<Icon type="download" />}
                   size="large"
-                  style={{ width: "200px" }}
                   onClick={this.downloadFile}
                   title="Download Excel"
                 >
@@ -504,9 +607,40 @@ export class userIndex extends Component {
                 closable={false}
                 onClose={this.closeLipoDrawer}
               >
-                <h2>
-                  {selectedMonth}, {selectedYear}
-                </h2>
+                <div style={{ marginBottom: "10px" }}>
+                  <h2>
+                    {selectedMonth}, {selectedYear}
+                  </h2>
+                  <ButtonGroup onClick={this.singleDownloadRequest}>
+                    <Button
+                      type="primary"
+                      disabled={singleDownload}
+                      data-type="1"
+                      size="small"
+                    >
+                      Excel
+                    </Button>
+
+                    <Button
+                      type="primary"
+                      disabled={singleDownload}
+                      data-type="2"
+                      size="small"
+                    >
+                      CSV
+                    </Button>
+
+                    <Button
+                      type="primary"
+                      disabled={singleDownload}
+                      data-type="3"
+                      size="small"
+                    >
+                      JSON
+                    </Button>
+                  </ButtonGroup>
+                </div>
+
                 <Table
                   columns={singleSelectedColumn}
                   size="small"
