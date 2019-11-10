@@ -34,6 +34,7 @@ import resetPass from "./components/main/resetPass";
 import landing from "./components/main/landing";
 import MandaMap from "./components/map/MandaMap";
 import userIndex from "./components/home/userIndex";
+import adminIndex from "./components/home/adminIndex";
 
 library.add(
   fab,
@@ -64,6 +65,7 @@ export class App extends Component {
             <Route path="/auth/ufor/" component={forgetPass} />
             <Route path="/map" component={MandaMap} />
             <Route path="/home/user" component={userIndex} />
+            <Route path="/home/admin" component={adminIndex} />
           </Switch>
         </Router>
       </Provider>

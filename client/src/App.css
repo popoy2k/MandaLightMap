@@ -1161,3 +1161,16 @@ svg {
 }
 
 /* End of Download btn */
+
+/* add data */
+
+.ant-form {
+  max-width: 500px !important;
+  margin: 0 auto !important;
+}
+
+.ant-calendar-picker {
+  width: 100%;
+}
+
+/* end of add data */
