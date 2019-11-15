@@ -16,7 +16,8 @@ import {
   Form,
   Typography,
   Upload,
-  message
+  message,
+  notification
 } from "antd";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
@@ -25,7 +26,8 @@ import {
   getTableData,
   getSingleLipoData,
   logout,
-  requestDownloadURL
+  requestDownloadURL,
+  uploadValidate
 } from "../../actions/auth";
 
 import { Redirect } from "react-router-dom";
@@ -127,7 +129,9 @@ export class adminIndex extends Component {
     currentSingleSelected: "",
     downloadDisable: true,
     downloading: false,
-    singleDownload: false
+    singleDownload: false,
+    uploadFileList: [],
+    uploading: false
   };
 
   static propTypes = {
@@ -136,9 +140,14 @@ export class adminIndex extends Component {
     getSingleLipoData: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     requestDownloadURL: PropTypes.func.isRequired,
+    uploadValidate: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
     home: PropTypes.object.isRequired,
-    downloadUrl: PropTypes.node
+    downloadUrl: PropTypes.node,
+    uploadStat: PropTypes.oneOfType([
+      PropTypes.object,
+      PropTypes.instanceOf(null)
+    ])
   };
 
   showLipoDrawer = e => {
@@ -180,7 +189,6 @@ export class adminIndex extends Component {
               .map(m3Val => JSON.parse(m3Val).month)
           })
       );
-      console.log(selectedData);
       this.props.requestDownloadURL({ selectedData, type });
       this.setState({ downloading: true, downloadDisable: true });
     }
@@ -190,9 +198,10 @@ export class adminIndex extends Component {
     this.downloadRequest("excel");
   };
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     const { lipoSingleData, lipoTable } = this.props.home;
-    const { downloadUrl } = this.props;
+    const { downloadUrl, uploadStat } = this.props;
+    const { uploadFileList } = this.state;
     if (lipoSingleData !== prevProps.home.lipoSingleData) {
       this.setState({
         currentSingleSelected: lipoSingleData,
@@ -214,6 +223,29 @@ export class adminIndex extends Component {
 
     if (lipoTable !== prevProps.home.lipoTable) {
       this.setState({ lipoTableLoading: false, lipoTableData: lipoTable });
+    }
+
+    if (prevState.uploadFileList !== uploadFileList && uploadFileList.length) {
+      const formData = new FormData();
+      formData.append("file", uploadFileList[0]);
+      this.props.uploadValidate(formData);
+    }
+
+    if (prevProps.uploadStat !== uploadStat) {
+      message.destroy();
+      const { status, msg } = uploadStat;
+      notification[status]({
+        message: "Server Notification",
+        description: `${msg}`,
+        duration: 10,
+        icon: (
+          <Icon
+            type={status === "success" ? "smile" : "frown"}
+            style={{ color: status === "success" ? "#3285fa" : "#ff2626" }}
+          />
+        )
+      });
+      this.setState({ uploadFileList: [], uploading: false });
     }
   }
 
@@ -295,24 +327,6 @@ export class adminIndex extends Component {
 
   render() {
     const { isAuthenticated, token } = this.props.auth;
-
-    const uploadProps = {
-      name: "file",
-      accept: ".json",
-      action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
-      onChange(info) {
-        const { status } = info.file;
-        if (status !== "uploading") {
-          console.log(info.file, info.fileList);
-        }
-        if (status === "done") {
-          message.success(`${info.file.name} file uploaded successfully.`);
-        } else if (status === "error") {
-          message.error(`${info.file.name} file upload failed.`);
-        }
-      }
-    };
-
     const {
       tab,
       lipoSelectedRowKeys,
@@ -325,8 +339,20 @@ export class adminIndex extends Component {
       lipoTableData,
       downloadDisable,
       downloading,
-      singleDownload
+      singleDownload,
+      uploadFileList
     } = this.state;
+
+    const uploadProps = {
+      name: "file",
+      accept: ".json",
+      fileList: uploadFileList,
+      beforeUpload: (file, fileList) => {
+        this.setState({ uploadFileList: [...fileList], uploading: true });
+        message.loading("File is being process...", 0);
+        return false;
+      }
+    };
 
     if (!isAuthenticated && !token) {
       return <Redirect to="/auth/login" />;
@@ -715,12 +741,20 @@ export class adminIndex extends Component {
 const mapStateToProps = state => ({
   auth: state.auth,
   home: state.home,
-  downloadUrl: state.home.lipoDownloadUrl
+  downloadUrl: state.home.lipoDownloadUrl,
+  uploadStat: state.home.lipoUpload
 });
 
 export default Form.create()(
   connect(
     mapStateToProps,
-    { verifyToken, getTableData, getSingleLipoData, logout, requestDownloadURL }
+    {
+      verifyToken,
+      getTableData,
+      getSingleLipoData,
+      logout,
+      requestDownloadURL,
+      uploadValidate
+    }
   )(adminIndex)
 );

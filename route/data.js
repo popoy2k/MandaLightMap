@@ -6,8 +6,16 @@ const {
   lipoTable,
   lipoSingle,
   lipoRequest,
-  downloadFile
+  downloadFile,
+  handleFile
 } = require("../middleware/custom");
+
+const multer = require("multer");
+const storage = multer.memoryStorage();
+
+const upload = multer({
+  storage: storage
+});
 
 router.route("/landing").get((req, res) => {
   MandaLipo.find({ year: "2019", month: "01" }).exec((err, resData) => {
@@ -30,6 +38,7 @@ router.route("/custom").post(
   (req, res, next) => {
     passport.authenticate(
       "Local.custom_map_data",
+
       { session: false },
       (err, msg, info) => {
         if (msg.status === "error") {
@@ -60,4 +69,11 @@ router.route("/lipo/download").post(verifyRequest, lipoRequest, (req, res) => {
 router.route("/lipo/download/:slug").get(downloadFile, (req, res) => {
   // to be handled
 });
+
+router
+  .route("/lipo/upload")
+  .post(verifyRequest, upload.single("file"), handleFile, (req, res) => {
+    // to be handled
+  });
+
 module.exports = router;

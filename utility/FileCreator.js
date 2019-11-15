@@ -7,7 +7,7 @@ const { areaData } = require("../middleware/areaInfo");
 const DLInfo = require("../model/Download");
 const fs = require("fs");
 
-// Carl 2019 to Carl Current:
+//2019-Carl to Current-Carl:
 // Oh! Gago di mo maintindihan no! Gago ka kasi e HAHAHAHAHAH
 
 const getMonth = num => {

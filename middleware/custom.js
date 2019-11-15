@@ -5,8 +5,10 @@ const JWT = require("jsonwebtoken");
 const { areaData } = require("./areaInfo");
 const FC = require("../utility/FileCreator");
 const DLInfo = require("../model/Download");
+const ULInfo = require("../model/Upload");
 const path = require("path");
 const storagePath = path.join(path.dirname(__dirname), "storage");
+const Helper = require("../utility/Helper");
 
 const customActivate = (req, res, next) => {
   const { token } = req.params;
@@ -231,6 +233,60 @@ const downloadFile = (req, res, next) => {
     });
 };
 
+const handleFile = (req, res, next) => {
+  try {
+    const fileBuffer = JSON.parse(req.file.buffer);
+    const { userId } = req;
+    Helper.isValidUploadJSON(fileBuffer, (err, isValid) => {
+      if (err) {
+        res.status(400).json({ status: "error", msg: err });
+        return next();
+      }
+      let forCheckingData = isValid.map(mVal => ({
+        ...mVal,
+        data: mVal.data.map(m2Val => m2Val.month)
+      }));
+      forCheckingData.forEach(feVal => {
+        const { year, data } = feVal;
+        MandaLipo.find({ $and: [{ year }, { month: { $in: data } }] })
+          .select("-lipoData")
+          .exec((err, resData) => {
+            if (err || resData.length) {
+              res.status(400).json({
+                status: "error",
+                msg: "Provided data shows duplicate in the database."
+              });
+              return next();
+            }
+          });
+      });
+
+      Helper.saveUpload(isValid, (err, filename) => {
+        if (err) {
+          res.status(400).json({ status: "error", msg: err });
+          return next();
+        }
+
+        let newUL = new ULInfo({ userId, fileName: filename, extName: "json" });
+        newUL.save(err => {
+          if (err) {
+            res.status(400).json({ status: "error", msg: err });
+            return next();
+          }
+        });
+        res.status(200).json({
+          status: "success",
+          msg: "Your file has been completely added"
+        });
+        return next("router");
+      });
+    });
+  } catch (e) {
+    res.status(500).json({ status: "error", msg: e });
+    next();
+  }
+};
+
 module.exports = {
   customActivate,
   verifyToken,
@@ -238,5 +294,6 @@ module.exports = {
   verifyRequest,
   lipoSingle,
   lipoRequest,
-  downloadFile
+  downloadFile,
+  handleFile
 };

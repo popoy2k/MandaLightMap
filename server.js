@@ -31,6 +31,10 @@ Helper.isDir(path.join(__dirname, "storage"), function(isValid) {
   console.log(!isValid ? isValid : "");
 });
 
+Helper.isDir(path.join(__dirname, "storage/upload"), function(isValid) {
+  console.log(!isValid ? isValid : "");
+});
+
 // Middleware
 require("./middleware/auth");
 require("./middleware/map");

@@ -21,6 +21,8 @@ import {
   LIPO_DATA_SINGLE_REQUEST_ERROR,
   LIPO_DATA_DOWNLOAD_SUCCESS,
   LIPO_DATA_DOWNLOAD_ERROR,
+  LIPO_DATA_UPLOAD_SUCCESS,
+  LIPO_DATA_UPLOAD_ERROR,
   SIGN_OUT
 } from "./types";
 import axios from "axios";
@@ -236,6 +238,23 @@ export const requestDownloadURL = fileObj => (dispatch, getState) => {
     .catch(resErr => {
       dispatch({
         type: LIPO_DATA_DOWNLOAD_ERROR
+      });
+    });
+};
+
+export const uploadValidate = file => (dispatch, getState) => {
+  axios
+    .post("/data/lipo/upload", file, getConfig(getState))
+    .then(resData => {
+      dispatch({
+        type: LIPO_DATA_UPLOAD_SUCCESS,
+        payload: resData.data
+      });
+    })
+    .catch(resErr => {
+      dispatch({
+        type: LIPO_DATA_UPLOAD_ERROR,
+        payload: resErr.response.data
       });
     });
 };
