@@ -1,14 +1,17 @@
 const User = require("../model/User");
 const MandaLipo = require("../model/MandaLipo");
 const Activator = require("../utility/Activator");
+const DLInfo = require("../model/Download");
+const ULInfo = require("../model/Upload");
 const JWT = require("jsonwebtoken");
 const { areaData } = require("./areaInfo");
 const FC = require("../utility/FileCreator");
-const DLInfo = require("../model/Download");
-const ULInfo = require("../model/Upload");
 const path = require("path");
-const storagePath = path.join(path.dirname(__dirname), "storage");
 const Helper = require("../utility/Helper");
+
+const storagePath = path.join(path.dirname(__dirname), "storage");
+
+const upperFirst = str => str.charAt(0).toUpperCase() + str.slice(1);
 
 const customActivate = (req, res, next) => {
   const { token } = req.params;
@@ -260,6 +263,15 @@ const handleFile = (req, res, next) => {
             }
           });
       });
+      const finalSave = [];
+      isValid.forEach(feVal => {
+        const { year, data } = feVal;
+        data.forEach(fe2Val => {
+          const { month, lipoData } = fe2Val;
+          finalSave.push({ year, month, lipoData });
+        });
+      });
+      MandaLipo.insertMany(finalSave);
 
       Helper.saveUpload(isValid, (err, filename) => {
         if (err) {
@@ -287,6 +299,140 @@ const handleFile = (req, res, next) => {
   }
 };
 
+const userTable = (req, res, next) => {
+  User.aggregate([
+    {
+      $project: {
+        acctInfo: {
+          fullname: {
+            $concat: ["$acctInfo.firstName", " ", "$acctInfo.lastName"]
+          },
+          role: 1,
+          email: 1,
+          dateCreated: 1,
+          activationInfo: { isActivated: 1 },
+          creationType: 1
+        }
+      }
+    }
+  ]).exec((err, resData) => {
+    if (err) {
+      res.status(400).json({ status: "error", msg: "Something went wrong." });
+      return next("router");
+    }
+    if (!resData) {
+      res.status(200).json({ status: "success", data: null });
+    }
+
+    let dataSource = resData
+      .map((mVal, index) => ({
+        key: index,
+        _id: mVal._id,
+        ...mVal.acctInfo
+      }))
+      .map(m2Val => ({
+        ...m2Val,
+        isActivated: m2Val.activationInfo.isActivated
+      }))
+      .map(m3Val => {
+        delete m3Val["activationInfo"];
+        return m3Val;
+      });
+
+    res.status(200).json({ status: "success", data: dataSource });
+    return next();
+  });
+};
+
+const downloadTable = (req, res, next) => {
+  DLInfo.aggregate([
+    {
+      $lookup: {
+        from: "userscolls",
+        localField: "userId",
+        foreignField: "_id",
+        as: "userInfo"
+      }
+    },
+    {
+      $project: {
+        fileName: 1,
+        requestedDate: 1,
+        fileSlug: 1,
+        userInfo: { acctInfo: { firstName: 1, lastName: 1 } }
+      }
+    }
+  ]).exec((err, data) => {
+    if (err) {
+      res.status(400).json({ status: "error", msg: "Something went wrong." });
+      return next("router");
+    }
+
+    if (!data) {
+      res.status(200).json({ status: "error", data: null });
+    }
+    const finalData = data
+      .map((mVal, index) => ({
+        ...mVal,
+        key: index,
+        userInfo: [mVal.userInfo[0].acctInfo].map(m2Val => ({
+          fullname: `${m2Val.firstName} ${m2Val.lastName}`,
+          email: m2Val.email
+        }))
+      }))
+      .map(m2Val => {
+        const { fullname } = m2Val.userInfo[0];
+        delete m2Val["userInfo"];
+        return {
+          ...m2Val,
+          fullname,
+          fileURL: `${req.protocol}://${req.hostname}:${process.env.PORT}/data/lipo/download/${m2Val.fileSlug}`
+        };
+      });
+    res.status(200).json({ status: "success", data: finalData });
+    return next();
+  });
+};
+
+const userDetails = (req, res, next) => {
+  const { id } = req.body;
+  User.findOne({ _id: id })
+    .select(
+      "acctInfo.activationInfo.isActivated acctInfo.creationType acctInfo.role acctInfo.firstName acctInfo.lastName acctInfo.email acctInfo.dateCreated"
+    )
+    .exec((err, data) => {
+      if (err || !data) {
+        res.status(400).json({ status: "error", msg: "Something went wrong" });
+        return next("router");
+      }
+
+      let finalData = [data.acctInfo].map(mVal => {
+        const {
+          firstName,
+          lastName,
+          email,
+          activationInfo,
+          dateCreated,
+          creationType,
+          role
+        } = mVal;
+        return {
+          firstName,
+          lastName,
+          fullName: `${lastName}, ${firstName}`,
+          email,
+          isActivated: activationInfo.isActivated,
+          dateCreated,
+          creationType,
+          role: upperFirst(role)
+        };
+      });
+
+      res.status(200).json({ status: "success", data: finalData[0] });
+      next();
+    });
+};
+
 module.exports = {
   customActivate,
   verifyToken,
@@ -295,5 +441,8 @@ module.exports = {
   lipoSingle,
   lipoRequest,
   downloadFile,
-  handleFile
+  handleFile,
+  userTable,
+  downloadTable,
+  userDetails
 };

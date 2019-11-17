@@ -1,5 +1,5 @@
 import Loader from "react-loader-spinner";
-
+import moment from "moment";
 import React, { Component, Fragment } from "react";
 import {
   Layout,
@@ -10,14 +10,17 @@ import {
   Tooltip,
   Button,
   Drawer,
+  Descriptions,
   Row,
   Col,
   Dropdown,
-  Form,
   Typography,
   Upload,
+  Tag,
   message,
-  notification
+  notification,
+  Badge,
+  Spin
 } from "antd";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
@@ -27,7 +30,10 @@ import {
   getSingleLipoData,
   logout,
   requestDownloadURL,
-  uploadValidate
+  uploadValidate,
+  getUserTableData,
+  getDownloadTableData,
+  getUserDetails
 } from "../../actions/auth";
 
 import { Redirect } from "react-router-dom";
@@ -131,7 +137,14 @@ export class adminIndex extends Component {
     downloading: false,
     singleDownload: false,
     uploadFileList: [],
-    uploading: false
+    uploading: false,
+    userTableList: [],
+    userTableLoading: true,
+    userDrawer: false,
+    userDetailsList: [],
+    userDetailLoading: true,
+    downloadTableList: [],
+    downloadtableLoading: true
   };
 
   static propTypes = {
@@ -141,11 +154,18 @@ export class adminIndex extends Component {
     logout: PropTypes.func.isRequired,
     requestDownloadURL: PropTypes.func.isRequired,
     uploadValidate: PropTypes.func.isRequired,
+    getUserTableData: PropTypes.func.isRequired,
+    getDownloadTableData: PropTypes.func.isRequired,
+    getUserDetails: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
     home: PropTypes.object.isRequired,
     downloadUrl: PropTypes.node,
     uploadStat: PropTypes.oneOfType([
       PropTypes.object,
+      PropTypes.instanceOf(null)
+    ]),
+    userTable: PropTypes.oneOfType([
+      PropTypes.array,
       PropTypes.instanceOf(null)
     ])
   };
@@ -166,6 +186,17 @@ export class adminIndex extends Component {
       drawerLipo: false,
       currentSingleSelected: ""
     });
+  };
+
+  closeUserDrawer = () => {
+    this.setState({ userDrawer: false });
+  };
+
+  userDetailsClick = e => {
+    const { id } = e.target.dataset;
+    this.props.getUserDetails({ id });
+
+    this.setState({ userDrawer: true, userDetailLoading: true });
   };
 
   logout = () => {
@@ -200,8 +231,30 @@ export class adminIndex extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { lipoSingleData, lipoTable } = this.props.home;
-    const { downloadUrl, uploadStat } = this.props;
+    const {
+      downloadUrl,
+      uploadStat,
+      userTable,
+      downloadTable,
+      userDetails
+    } = this.props;
     const { uploadFileList } = this.state;
+
+    if (prevProps.userDetails !== userDetails) {
+      this.setState({ userDetailsList: userDetails, userDetailLoading: false });
+    }
+
+    if (prevProps.userTable !== userTable) {
+      this.setState({ userTableList: userTable, userTableLoading: false });
+    }
+
+    if (prevProps.downloadTable !== downloadTable) {
+      this.setState({
+        downloadTableList: downloadTable,
+        downloadTableLoading: false
+      });
+    }
+
     if (lipoSingleData !== prevProps.home.lipoSingleData) {
       this.setState({
         currentSingleSelected: lipoSingleData,
@@ -252,13 +305,21 @@ export class adminIndex extends Component {
   componentDidMount() {
     document.title = "Skótos - User";
     const { token, isAuthenticated } = this.props.auth;
-    const { lipoTableData } = this.state;
+    const { lipoTableData, userTableList, downloadTableList } = this.state;
 
     if (token && !isAuthenticated) {
       this.props.verifyToken();
     }
     if (lipoTableData === null) {
       this.props.getTableData();
+    }
+
+    if (!userTableList.length) {
+      this.props.getUserTableData();
+    }
+
+    if (!downloadTableList.length) {
+      this.props.getDownloadTableData();
     }
 
     if (lipoTableData) {
@@ -327,6 +388,7 @@ export class adminIndex extends Component {
 
   render() {
     const { isAuthenticated, token } = this.props.auth;
+
     const {
       tab,
       lipoSelectedRowKeys,
@@ -340,7 +402,15 @@ export class adminIndex extends Component {
       downloadDisable,
       downloading,
       singleDownload,
-      uploadFileList
+      uploadFileList,
+      uploading,
+      userTableList,
+      userTableLoading,
+      userDetailLoading,
+      userDrawer,
+      userDetailsList,
+      downloadTableList,
+      downloadTableLoading
     } = this.state;
 
     const uploadProps = {
@@ -536,6 +606,108 @@ export class adminIndex extends Component {
       }
     ];
 
+    const userTableColumn = [
+      {
+        title: "Fullname",
+        dataIndex: "fullname",
+        key: "fullname"
+      },
+      {
+        title: "Role",
+        dataIndex: "role",
+        key: "role",
+        render: text => {
+          let newText = text.charAt(0).toUpperCase() + text.slice(1);
+          return (
+            <Tag color={text === "admin" ? "green" : "cyan"}>{newText}</Tag>
+          );
+        }
+      },
+      {
+        title: "Email",
+        dataIndex: "email",
+        key: "email"
+      },
+      {
+        title: "Account Type",
+        dataIndex: "creationType",
+        key: "creationType",
+        render: type => {
+          return (
+            <span>
+              <Icon
+                type={type === "Google" ? "google" : "global"}
+                style={{ color: type === "Google" ? "#f65314" : "#00A1F1" }}
+              />{" "}
+              &nbsp;
+              {type}
+            </span>
+          );
+        }
+      },
+      {
+        title: "Action",
+        dataIndex: "_id",
+        key: "_id",
+        render: id => (
+          <Button
+            type="primary"
+            onClick={this.userDetailsClick}
+            shape="round"
+            size="small"
+            icon="file"
+            data-id={id}
+            ghost
+          >
+            Details
+          </Button>
+        )
+      }
+    ];
+
+    const downloadTableColumn = [
+      {
+        title: "Fullname",
+        dataIndex: "fullname",
+        key: "fullname"
+      },
+      {
+        title: "File Name",
+        dataIndex: "fileName",
+        key: "fileName"
+      },
+      {
+        title: "Download Date",
+        dataIndex: "requestedDate",
+        key: "requestedDate",
+        render: date => (
+          <span style={{ cursor: "pointer" }}>
+            <Tooltip title={moment(date).fromNow()} placement="top">
+              {moment(date).format("MMM Do, YYYY h:mm a")}
+            </Tooltip>
+          </span>
+        )
+      },
+      {
+        title: "Action",
+        dataIndex: "fileURL",
+        key: "fileURL",
+        render: url => (
+          <Button
+            icon="download"
+            href={url}
+            target="_blank"
+            type="primary"
+            shape="round"
+            size="small"
+            ghost
+          >
+            Download
+          </Button>
+        )
+      }
+    ];
+
     const downloadOverlay = (
       <Menu onClick={this.MenuDLChange}>
         <Menu.Item key="1">CSV</Menu.Item>
@@ -595,7 +767,7 @@ export class adminIndex extends Component {
                   Data. See here what format to upload new Light Pollution Data
                 </Text>
 
-                <Dragger {...uploadProps}>
+                <Dragger {...uploadProps} disabled={uploading}>
                   <p className="ant-upload-drag-icon">
                     <Icon type="inbox" />
                   </p>
@@ -613,6 +785,44 @@ export class adminIndex extends Component {
         );
         break;
       case "2":
+        break;
+      case "3":
+        content = (
+          <div>
+            <Row>
+              <h3>User Management</h3>
+            </Row>
+            <Row>
+              <Table
+                scroll={{ x: "max-content" }}
+                pagination={{ pageSize: 10 }}
+                loading={userTableLoading}
+                size={"small"}
+                columns={userTableColumn}
+                dataSource={userTableList}
+              ></Table>
+            </Row>
+          </div>
+        );
+        break;
+      case "4":
+        content = (
+          <div>
+            <Row>
+              <h3>Download Records</h3>
+            </Row>
+            <Row>
+              <Table
+                scroll={{ x: "max-content" }}
+                pagination={{ pageSize: 10 }}
+                loading={downloadTableLoading}
+                size={"small"}
+                columns={downloadTableColumn}
+                dataSource={downloadTableList}
+              ></Table>
+            </Row>
+          </div>
+        );
         break;
       default:
     }
@@ -730,6 +940,60 @@ export class adminIndex extends Component {
                   scroll={{ x: "max-content" }}
                 />
               </Drawer>
+              <Drawer
+                width={640}
+                placement="right"
+                visible={userDrawer}
+                closable={false}
+                onClose={this.closeUserDrawer}
+              >
+                <div>
+                  <Spin spinning={userDetailLoading} tip="Fetching data...">
+                    <h2>{userDetailsList ? userDetailsList.fullName : ""}</h2>
+                    <Descriptions size="small" col="2">
+                      <Descriptions.Item label="First Name">
+                        {userDetailsList ? userDetailsList.firstName : ""}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Last Name">
+                        {userDetailsList ? userDetailsList.lastName : ""}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Email">
+                        {userDetailsList ? userDetailsList.email : ""}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Date Created">
+                        {userDetailsList
+                          ? moment(userDetailsList.dateCreated).format("L")
+                          : ""}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Account Type">
+                        {userDetailsList ? userDetailsList.creationType : ""}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Role">
+                        {userDetailsList ? userDetailsList.role : ""}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Status">
+                        <Badge
+                          status="processing"
+                          text={
+                            userDetailsList
+                              ? userDetailsList.isActivated
+                                ? "Active"
+                                : "Inactive"
+                              : ""
+                          }
+                          color={
+                            userDetailsList
+                              ? userDetailsList.isActivated
+                                ? "green"
+                                : "red"
+                              : ""
+                          }
+                        />
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </Spin>
+                </div>
+              </Drawer>
             </Content>
           </Layout>
         </Layout>
@@ -742,19 +1006,23 @@ const mapStateToProps = state => ({
   auth: state.auth,
   home: state.home,
   downloadUrl: state.home.lipoDownloadUrl,
-  uploadStat: state.home.lipoUpload
+  uploadStat: state.home.lipoUpload,
+  userTable: state.home.userTable,
+  downloadTable: state.home.downloadTable,
+  userDetails: state.home.userDetails
 });
 
-export default Form.create()(
-  connect(
-    mapStateToProps,
-    {
-      verifyToken,
-      getTableData,
-      getSingleLipoData,
-      logout,
-      requestDownloadURL,
-      uploadValidate
-    }
-  )(adminIndex)
-);
+export default connect(
+  mapStateToProps,
+  {
+    verifyToken,
+    getTableData,
+    getSingleLipoData,
+    logout,
+    requestDownloadURL,
+    uploadValidate,
+    getUserTableData,
+    getDownloadTableData,
+    getUserDetails
+  }
+)(adminIndex);

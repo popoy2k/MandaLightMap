@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 const DownloadInfo = new Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true
+    required: true,
+    ref: "usersColl"
   },
   fileName: {
     type: String,

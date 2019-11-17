@@ -7,7 +7,10 @@ const {
   lipoSingle,
   lipoRequest,
   downloadFile,
-  handleFile
+  handleFile,
+  userTable,
+  userDetails,
+  downloadTable
 } = require("../middleware/custom");
 
 const multer = require("multer");
@@ -73,6 +76,20 @@ router.route("/lipo/download/:slug").get(downloadFile, (req, res) => {
 router
   .route("/lipo/upload")
   .post(verifyRequest, upload.single("file"), handleFile, (req, res) => {
+    // to be handled
+  });
+
+router.route("/user/table").post(verifyRequest, userTable, (req, res) => {
+  // to be handled
+});
+
+router.route("/user/detail").post(verifyRequest, userDetails, (req, res) => {
+  // to be handled
+});
+
+router
+  .route("/download/table")
+  .post(verifyRequest, downloadTable, (req, res) => {
     // to be handled
   });
 

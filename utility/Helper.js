@@ -115,7 +115,7 @@ module.exports.isValidUploadJSON = async function(json, callback) {
           mean: m3Val.mean,
           max: m3Val.max,
           min: m3Val.min,
-          id: m3Val.id
+          mapId: m3Val.id
         }))
       }))
     }));

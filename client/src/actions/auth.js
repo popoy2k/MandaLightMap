@@ -23,7 +23,13 @@ import {
   LIPO_DATA_DOWNLOAD_ERROR,
   LIPO_DATA_UPLOAD_SUCCESS,
   LIPO_DATA_UPLOAD_ERROR,
-  SIGN_OUT
+  USER_DATA_TABLE_SUCCESS,
+  USER_DATA_TABLE_ERROR,
+  DOWNLOAD_DATA_TABLE_SUCCESS,
+  DOWNLOAD_DATA_TABLE_ERROR,
+  SIGN_OUT,
+  USER_DETAILS_SUCCESS,
+  USER_DETAILS_ERROR
 } from "./types";
 import axios from "axios";
 
@@ -255,6 +261,55 @@ export const uploadValidate = file => (dispatch, getState) => {
       dispatch({
         type: LIPO_DATA_UPLOAD_ERROR,
         payload: resErr.response.data
+      });
+    });
+};
+
+export const getUserTableData = () => (dispatch, getState) => {
+  axios
+    .post("/data/user/table", null, getConfig(getState))
+    .then(resData => {
+      dispatch({
+        type: USER_DATA_TABLE_SUCCESS,
+        payload: resData.data
+      });
+    })
+    .catch(resErr => {
+      console.log(resErr.response);
+      dispatch({
+        type: USER_DATA_TABLE_ERROR
+      });
+    });
+};
+
+export const getDownloadTableData = () => (dispatch, getState) => {
+  axios
+    .post("/data/download/table", null, getConfig(getState))
+    .then(resData => {
+      dispatch({
+        type: DOWNLOAD_DATA_TABLE_SUCCESS,
+        payload: resData.data
+      });
+    })
+    .catch(resErr => {
+      dispatch({
+        type: DOWNLOAD_DATA_TABLE_ERROR
+      });
+    });
+};
+
+export const getUserDetails = id => (dispatch, getState) => {
+  axios
+    .post("/data/user/detail", JSON.stringify(id), getConfig(getState))
+    .then(resData => {
+      dispatch({
+        type: USER_DETAILS_SUCCESS,
+        payload: resData.data
+      });
+    })
+    .catch(resErr => {
+      dispatch({
+        type: USER_DETAILS_ERROR
       });
     });
 };
