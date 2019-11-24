@@ -16,7 +16,7 @@ passport.use(
     },
     (req, email, password, cb) => {
       try {
-        if (!email || (!password || password !== req.body.rePassword)) {
+        if (!email || !password || password !== req.body.rePassword) {
           return cb(null, { status: "error", msg: "Please fill all fields." });
         }
 
@@ -147,7 +147,8 @@ passport.use(
                 firstName,
                 lastName,
                 email,
-                creationType
+                creationType,
+                role
               } = resData.acctInfo;
 
               JWT.sign(
@@ -166,7 +167,7 @@ passport.use(
                     status: "success",
                     msg: {
                       token: encoded,
-                      user: { email, firstName, lastName }
+                      user: { email, firstName, lastName, role }
                     }
                   });
                 }
@@ -364,7 +365,13 @@ passport.use(
         if (resData) {
           const { _id } = resData;
 
-          const { email, firstName, lastName, creationType } = resData.acctInfo;
+          const {
+            email,
+            firstName,
+            lastName,
+            creationType,
+            role
+          } = resData.acctInfo;
           JWT.sign(
             { creationId: _id, email, type: creationType },
             process.env.JWT_SECRET,
@@ -372,7 +379,10 @@ passport.use(
             (err, encoded) => {
               return done(null, {
                 status: "success",
-                msg: { token: encoded, user: { email, firstName, lastName } }
+                msg: {
+                  token: encoded,
+                  user: { email, firstName, lastName, role }
+                }
               });
             }
           );
@@ -404,7 +414,8 @@ passport.use(
               email,
               firstName,
               lastName,
-              creationType
+              creationType,
+              role
             } = newUser.acctInfo;
             JWT.sign(
               { creationId: _id, email, type: creationType },
@@ -413,7 +424,10 @@ passport.use(
               (err, encoded) => {
                 return done(null, {
                   status: "success",
-                  msg: { token: encoded, user: { email, firstName, lastName } }
+                  msg: {
+                    token: encoded,
+                    user: { email, firstName, lastName, role }
+                  }
                 });
               }
             );

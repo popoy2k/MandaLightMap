@@ -17,19 +17,20 @@ export class login extends Component {
   };
 
   componentDidMount() {
+    document.title = "Skótos - Sign in";
     const { token, isAuthenticated } = this.props.auth;
+
     if (token !== null && isAuthenticated === null) {
       this.props.verifyToken();
     }
-
-    document.title = "Skótos - Sign in";
   }
 
   static propTypes = {
     signinUser: PropTypes.func.isRequired,
     googleSignIn: PropTypes.func.isRequired,
     verifyToken: PropTypes.func.isRequired,
-    auth: PropTypes.object.isRequired
+    auth: PropTypes.object.isRequired,
+    user: PropTypes.oneOfType([PropTypes.object, PropTypes.instanceOf(null)])
   };
 
   onChange = e => this.setState({ [e.target.name]: e.target.value });
@@ -49,10 +50,15 @@ export class login extends Component {
   };
 
   render() {
-    const { isAuthenticated } = this.props.auth;
+    const { user } = this.props;
 
-    if (isAuthenticated) {
-      return <Redirect to="/home/user" />;
+    if (user) {
+      switch (user.role) {
+        case "admin":
+          return <Redirect to="/home/admin" />;
+        case "user":
+          return <Redirect to="/home/admin" />;
+      }
     }
 
     const responseGoogle = response => {
@@ -134,10 +140,12 @@ export class login extends Component {
 }
 
 const mapStateToProps = state => ({
-  auth: state.auth
+  auth: state.auth,
+  user: state.auth.user
 });
 
-export default connect(
-  mapStateToProps,
-  { signinUser, googleSignIn, verifyToken }
-)(login);
+export default connect(mapStateToProps, {
+  signinUser,
+  googleSignIn,
+  verifyToken
+})(login);

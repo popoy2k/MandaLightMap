@@ -93,7 +93,13 @@ const verifyToken = (req, res, next) => {
 
       const { _id } = resData;
 
-      const { email, creationType, firstName, lastName } = resData.acctInfo;
+      const {
+        email,
+        creationType,
+        firstName,
+        lastName,
+        role
+      } = resData.acctInfo;
       if (initEmail !== email || creationType !== initType) {
         res.status(400);
         return next("router");
@@ -111,7 +117,10 @@ const verifyToken = (req, res, next) => {
 
           res
             .status(200)
-            .json({ token: encoded, user: { email, firstName, lastName } });
+            .json({
+              token: encoded,
+              user: { email, firstName, lastName, role }
+            });
           return next();
         }
       );

@@ -198,19 +198,13 @@ export class landing extends Component {
             <hr />
             <div className="left-brand-sub-contianer">
               <p>
-                &nbsp;&nbsp; The word "
-                <strong>
-                  <i>Skótos</i>
-                </strong>
-                " is a Greek word that means Bright. This website is purposely
-                made to help researchers, students and other individuals that
-                seek "
-                <strong>
-                  <i>Mandaluyong City</i>
-                </strong>{" "}
-                " Light Pollution Data Statistics. And also, this website
-                provides articles, researches, studies related to light
-                pollution that can help their projects.
+                The word <strong>Skótos</strong> is a Greek word that means
+                Bright. This website is purposely made to help researchers,
+                students and other individuals that seek{" "}
+                <strong>Mandaluyong City</strong> Light Pollution Data
+                Statistics. And also, this website provides articles,
+                researches, studies related to light pollution that can help
+                their projects.
               </p>
             </div>
             <Link to="/auth/register" className="csp-btn">
@@ -221,11 +215,15 @@ export class landing extends Component {
         <section className="content">
           <h2>Mandaluyong City Statistical Map</h2>
           <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Minus
-            laborum, asperiores facilis molestiae ullam doloribus illo officia
-            et culpa natus adipisci, obcaecati magnam voluptas officiis ratione
-            corrupti voluptatibus excepturi quae.
+            This Choropleth map shows light intensity that was gathered in
+            April, 2019. Data was from The Earth Observations Group (EOG) at
+            National Oceanic and Atmospheric Admisitration (NOAA)/ National
+            Centers for Environmental Information (NCEI) they're producing a
+            version 1 suite of average radiance composite images using nighttime
+            data from the Visible Infrared Imaging Radiometer Suite (VIIRS)
+            Day/Night Band (DNB).
           </p>
+
           <div className="choropleth">
             <div className="data">
               <h2 className="currBrgy">{currBrgy}</h2>
@@ -260,17 +258,16 @@ export class landing extends Component {
         <section className="third-content">
           <h2>Related Studies</h2>
           <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quidem
-            voluptatibus unde quae itaque cumque totam vero esse recusandae
-            maxime consectetur!
+            Light Pollution has different effect in various of categories. Not
+            only in human health but also Animal, Energy, Safety and many more.
           </p>
           <div className="cards">
             <div className="card">
               <FontAwesomeIcon icon="paw" className="rel-icons" />
               <h4>Animal</h4>
               <p>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eius,
-                quidem.
+                Sea Turtles, Migratory bird and Nocturnal Creatures are the most
+                affected with Light Pollution
               </p>
               <Link className="third-btn" to="/">
                 Learn more.
@@ -280,8 +277,8 @@ export class landing extends Component {
               <FontAwesomeIcon className="rel-icons" icon="child" />
               <h4>Human</h4>
               <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Dolores, ullam?
+                Circadian Rhythm distruption, Breast cancer and many more that
+                Light Pollution can be a factor.
               </p>
               <Link className="third-btn" to="/">
                 Learn more.
@@ -334,7 +331,4 @@ const mapStateToProps = state => ({
   map: state.map
 });
 
-export default connect(
-  mapStateToProps,
-  { getLanding, getMainMap }
-)(landing);
+export default connect(mapStateToProps, { getLanding, getMainMap })(landing);
