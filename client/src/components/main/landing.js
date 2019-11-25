@@ -10,6 +10,9 @@ import * as d3 from "d3";
 
 // Font Awesome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ReactComponent as DOSTLogo } from "./DOST_seal.svg";
+import RTULogo from "./RTU_logo.png";
+import CEITLogo from "./CEIT_logo.png";
 
 export class landing extends Component {
   constructor(props) {
@@ -288,8 +291,8 @@ export class landing extends Component {
               <FontAwesomeIcon className="rel-icons" icon="industry" />
               <h4>Energy</h4>
               <p>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                Voluptates, voluptate.
+                Glare, Light Trespass, Unwanted and Unshielded Lighting are some
+                of the result of Light Pollution.
               </p>
               <Link className="third-btn" to="/">
                 Learn more.
@@ -299,8 +302,8 @@ export class landing extends Component {
               <FontAwesomeIcon className="rel-icons" icon="user-injured" />
               <h4>Safety</h4>
               <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque,
-                rerum!
+                Unproper lighting, High light temperature, and excessive
+                lighting can cause security integrity.
               </p>
 
               <Link className="third-btn" to="/">
@@ -320,7 +323,29 @@ export class landing extends Component {
             <Link to="/">Find here</Link>
           </div>
         </section>
-        <section className="fifth"></section>
+        <section className="fifth">
+          <h4>Collaborators</h4>
+          <div className="logo-container">
+            <DOSTLogo style={{ width: "50px", height: "50px" }} />{" "}
+            <p>Department of Science and Technology (DOST)</p>
+          </div>
+          <div className="logo-container">
+            <img
+              src={RTULogo}
+              alt="RTU Logo"
+              style={{ width: "50px", height: "50px" }}
+            />
+            <p>Rizal Technological University (RTU)</p>
+          </div>
+          <div className="logo-container">
+            <img
+              src={CEITLogo}
+              alt="RTU Logo"
+              style={{ width: "50px", height: "50px" }}
+            />
+            <p>College of Engineering and Industrial Technology (CEIT)</p>
+          </div>
+        </section>
       </Fragment>
     );
   }

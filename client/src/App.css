@@ -436,7 +436,7 @@ hr {
 
 .forth {
   width: 100%;
-  height: 100vh;
+  height: 50vh;
   background: rgba(255, 255, 255, 0.9);
 }
 
@@ -490,10 +490,32 @@ hr {
 
 .fifth {
   width: 100%;
-  height: 100vh;
-  background: rgba(91, 52, 231, 0.9);
+  height: 50vh;
+  background: rgba(34, 34, 34, 0.9);
 }
 
+.fifth h4 {
+  width: 90%;
+  margin: 0 auto;
+  text-align: left;
+  padding-top: 1%;
+  color: #fff;
+}
+
+.fifth .logo-container {
+  width: 90%;
+  margin: 0 auto;
+  padding: 10px;
+  margin-top: 10px;
+  display: flex;
+}
+
+.fifth .logo-container p {
+  display: inline-block;
+  margin: 10px;
+  padding: 0;
+  color: #fff;
+}
 /* End of Fifth */
 
 /* Registration */

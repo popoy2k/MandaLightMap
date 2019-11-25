@@ -58,6 +58,7 @@ export class login extends Component {
           return <Redirect to="/home/admin" />;
         case "user":
           return <Redirect to="/home/admin" />;
+        default:
       }
     }
 
