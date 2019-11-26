@@ -50,7 +50,12 @@ export class login extends Component {
   };
 
   render() {
+    const { token, isAuthenticated } = this.props.auth;
     const { user } = this.props;
+
+    if (!token || !isAuthenticated) {
+      return <Redirect to="/auth/login" />;
+    }
 
     if (user) {
       switch (user.role) {
@@ -59,6 +64,7 @@ export class login extends Component {
         case "user":
           return <Redirect to="/home/admin" />;
         default:
+          return <Redirect to="/auth/login" />;
       }
     }
 
