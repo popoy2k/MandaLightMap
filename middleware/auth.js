@@ -377,6 +377,7 @@ passport.use(
             process.env.JWT_SECRET,
             { expiresIn: "1d" },
             (err, encoded) => {
+              console.log("Token shitnesss => ", err, encoded);
               return done(null, {
                 status: "success",
                 msg: {
@@ -422,6 +423,7 @@ passport.use(
               process.env.JWT_SECRET,
               { expiresIn: "1d" },
               (err, encoded) => {
+                console.log("Token shitnesss => ", err, encoded);
                 return done(null, {
                   status: "success",
                   msg: {
