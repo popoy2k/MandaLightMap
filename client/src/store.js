@@ -13,9 +13,9 @@ composeFunc = compose(
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
 
-if (process.env.NODE_ENV === "production") {
-  composeFunc = compose(applyMiddleware(...middleware));
-}
+// if (process.env.NODE_ENV === "production") {
+//   composeFunc = compose(applyMiddleware(...middleware));
+// }
 const store = createStore(rootReducer, initialState, composeFunc);
 
 export default store;
