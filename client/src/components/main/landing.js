@@ -327,7 +327,11 @@ export class landing extends Component {
           <h4>Collaborators</h4>
           <div className="logo-container">
             <DOSTLogo style={{ width: "50px", height: "50px" }} />{" "}
-            <p>Department of Science and Technology (DOST)</p>
+            <p>
+              Department of Science and Technology (DOST) <br />
+              DOST Building, Gen. Santos Avenue Bicutan, Taguig City Metro
+              Manila 1631 Philippines
+            </p>
           </div>
           <div className="logo-container">
             <img
@@ -335,7 +339,10 @@ export class landing extends Component {
               alt="RTU Logo"
               style={{ width: "50px", height: "50px" }}
             />
-            <p>Rizal Technological University (RTU)</p>
+            <p>
+              Rizal Technological University (RTU) <br />
+              704 Boni Ave Cor Sacrepante, Mandaluyong, 1550 Metro Manila
+            </p>
           </div>
           <div className="logo-container">
             <img
@@ -343,7 +350,10 @@ export class landing extends Component {
               alt="RTU Logo"
               style={{ width: "50px", height: "50px" }}
             />
-            <p>College of Engineering and Industrial Technology (CEIT)</p>
+            <p>
+              College of Engineering and Industrial Technology (CEIT) <br />
+              704 Boni Ave Cor Sacrepante, Mandaluyong, 1550 Metro Manila
+            </p>
           </div>
         </section>
       </Fragment>

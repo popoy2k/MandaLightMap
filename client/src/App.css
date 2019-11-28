@@ -512,7 +512,7 @@ hr {
 
 .fifth .logo-container p {
   display: inline-block;
-  margin: 10px;
+  margin: 0 10px;
   padding: 0;
   color: #fff;
 }
@@ -1196,3 +1196,96 @@ svg {
 }
 
 /* end of add data */
+
+/* Side Panel */
+
+.side-panel {
+  border-radius: 10px;
+  /* background-color: rgba(195, 179, 255, 0.247);
+  box-shadow: 2px 2px 1px 2px rgba(186, 179, 211, 0.247); */
+  width: auto;
+  height: auto;
+  min-width: 200px;
+  max-width: 250px;
+  max-height: 450px;
+  padding: 15px;
+  margin: 50px;
+}
+
+/* End of Side Panel */
+
+.panel-header {
+  width: 100%;
+  height: 500px;
+  margin: 0 auto;
+  padding: 0;
+  background: url("./bg.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.panel-header h1 {
+  width: 90%;
+  margin: 0 auto;
+  text-align: center;
+  padding: 150px;
+  color: #fff;
+  font-size: 7em;
+}
+
+.main-panel {
+  display: flex;
+}
+
+.article-panel {
+  margin: 50px;
+}
+
+.article-panel p {
+  border-radius: 1.5px;
+  padding: 15px;
+  margin: 0;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  border-bottom: 1.5px solid rgba(91, 52, 231, 0.9);
+  box-shadow: 2px 1px 3px 1px #888;
+}
+
+.article-title {
+  font-size: 45px;
+  text-align: left;
+}
+
+.ant-menu-root.ant-menu-vertical,
+.ant-menu-root.ant-menu-vertical-left,
+.ant-menu-root.ant-menu-vertical-right,
+.ant-menu-root.ant-menu-inline {
+  box-shadow: 2px 1px 5px 1px #aaa !important;
+}
+.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+  background-color: rgba(91, 52, 231, 0.212) !important;
+  color: rgba(91, 52, 231, 0.9) !important;
+}
+
+/* .ant-menu-item:hover
+  .ant-menu-item-active
+  .ant-menu:not(.ant-menu-inline)
+  .ant-menu-submenu-open
+  .ant-menu-submenu-active
+  .ant-menu-submenu-title:hover {
+  color: rgba(91, 52, 231, 0.9) !important;
+} */
+
+.ant-menu-item:hover {
+  color: rgba(91, 52, 231, 0.9) !important;
+}
+.ant-menu-inline .ant-menu-item::after {
+  border-right: 3px solid rgba(91, 52, 231, 0.9) !important;
+}
+
+.ant-menu-submenu-title:hover,
+.ant-menu-submenu-selected,
+.ant-menu-submenu-selected:hover {
+  color: rgba(91, 52, 231, 0.9) !important;
+}

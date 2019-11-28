@@ -35,6 +35,7 @@ import landing from "./components/main/landing";
 import MandaMap from "./components/map/MandaMap";
 import userIndex from "./components/home/userIndex";
 import adminIndex from "./components/home/adminIndex";
+import intro from "./components/related/intro";
 
 library.add(
   fab,
@@ -66,6 +67,7 @@ export class App extends Component {
             <Route path="/map" component={MandaMap} />
             <Route path="/home/user" component={userIndex} />
             <Route path="/home/admin" component={adminIndex} />
+            <Route path="/related/introduction" component={intro} />
           </Switch>
         </Router>
       </Provider>

@@ -25,10 +25,7 @@ export class NavBar extends Component {
               <Link to="/">Home</Link>
             </li>
             <li>
-              <Link to="/">Health Concern</Link>
-            </li>
-            <li>
-              <Link to="/">Statistics</Link>
+              <Link to="/related/introduction">Related Studies</Link>
             </li>
             <li>
               <Link to="/map">Light Pollution Map</Link>
