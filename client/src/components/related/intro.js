@@ -34,21 +34,27 @@ export class intro extends Component {
               magni veniam voluptatum dolores maxime vitae cum quidem libero.
               Doloremque, unde error dolorum numquam exercitationem ea autem
               illum consequuntur id! Aliquam molestiae culpa officiis sunt eos.
-              Consequatur. Quos, at excepturi corporis quam ipsa quaerat
-              doloremque, ab, quasi molestiae dicta voluptates voluptate. Dicta
-              corporis itaque, nulla voluptate possimus perferendis accusantium
-              enim facilis vero reiciendis cum animi minus similique? Officiis
-              tempora error amet voluptatibus cum aliquid repudiandae voluptas
-              distinctio. Accusamus autem maxime placeat quia nam consequatur
-              iste maiores architecto! Numquam quisquam ad blanditiis quia
-              dolores autem velit quibusdam facilis? Obcaecati, reiciendis unde
-              illum nulla sequi ipsa expedita voluptates natus explicabo modi
-              dolorem amet quas ipsum dignissimos corrupti voluptas possimus
-              tempore ducimus tenetur repellendus nostrum odit, vitae vero?
-              Obcaecati, ratione! Possimus nemo officiis mollitia nostrum
-              voluptatem iste corrupti, porro dolores accusamus a, culpa animi.
-              Veniam dolor autem temporibus, illum alias nihil itaque tenetur
-              qui perspiciatis, perferendis quas doloremque, earum magnam!
+            </p>
+            <p>
+              Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+              Doloremque quo obcaecati facere quam quidem dolor temporibus
+              similique dignissimos impedit. Similique voluptate nisi omnis
+              nesciunt laborum, modi nam consequuntur sint rerum? Animi minima
+              accusantium explicabo optio et dolorem reiciendis praesentium in
+              consectetur modi debitis voluptatum veniam ipsam possimus fugiat
+              fugit nemo rem libero esse illo, repellendus quidem molestias!
+              Cum, aspernatur aperiam. Perferendis eum, quasi possimus numquam
+              vel velit molestiae, voluptatum doloribus illo rerum vitae aliquid
+              dignissimos distinctio debitis illum ducimus quisquam dolores
+              natus. Soluta, odit! Ipsam doloremque repudiandae natus illo
+              accusantium! Iure facilis, aliquam molestiae est quos eaque
+              distinctio expedita doloribus blanditiis impedit? Suscipit
+              expedita mollitia architecto, numquam ex nobis dicta odit deserunt
+              perspiciatis cum consequuntur iusto, corrupti, accusantium fugit
+              iste. Doloribus quasi architecto, aliquam veniam quae perferendis
+              maxime sint? Quaerat velit eos asperiores aspernatur amet.
+              Inventore ipsum assumenda sit vitae voluptatem quidem quibusdam
+              ab? Facilis commodi error dolorem quos autem.
             </p>
           </div>
         </div>

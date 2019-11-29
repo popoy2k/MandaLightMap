@@ -45,6 +45,67 @@ nav .logo {
   color: rgba(255, 255, 255, 0.9);
 }
 
+nav .drawerBtn {
+  float: right;
+  margin: 0;
+  padding: 18px 20px;
+  display: none;
+}
+
+.dbtn {
+  background-color: transparent;
+  color: #fff;
+  border: none;
+  font-size: 20px;
+}
+
+.dbtn:focus {
+  outline: none;
+}
+
+nav.black .dbtn {
+  color: rgba(91, 52, 231, 0.9) !important;
+}
+
+.drawerUL {
+  list-style: none;
+  float: right;
+  margin: 0;
+  padding: 0;
+}
+
+.drawerUL li {
+  list-style: none;
+  display: block;
+}
+
+.drawerUL li a {
+  display: block;
+  line-height: 100%;
+  padding: 12px 30px;
+  color: #151515;
+  text-transform: uppercase;
+  text-decoration: none !important;
+  transition: 0.3s;
+  border-bottom: 1px solid rgba(91, 52, 231, 0.8);
+  color: rgba(91, 52, 231, 0.8);
+}
+
+.drawerUL li a:focus {
+  outline: none;
+}
+
+.drawerUL li a.active {
+  background: rgba(91, 52, 231, 0.8);
+  color: #fff;
+}
+
+.drawerUL li a:hover {
+  background: rgba(91, 52, 231, 0.8);
+  border-bottom: 1px solid #fff;
+  color: #fff;
+}
+
 nav.black .logo {
   color: rgb(0, 0, 0);
 }
@@ -69,6 +130,108 @@ nav ul li a {
   text-decoration: none !important;
   transition: 0.3s;
   color: #fff;
+}
+
+@media (max-width: 1320px) {
+  .data {
+    width: 100% !important;
+  }
+
+  .data h2 {
+    margin: 0 auto !important;
+  }
+  .choropleth {
+    flex-wrap: wrap;
+  }
+
+  .landingTable {
+    margin: 0 auto !important;
+  }
+}
+
+@media (max-width: 1080px) {
+  /* nav ul li a {
+    display: block;
+  } */
+  nav ul {
+    display: none;
+  }
+
+  nav .logo {
+    padding-left: 0;
+  }
+
+  nav .drawerBtn {
+    display: block;
+  }
+
+  nav {
+    padding-right: 20px !important;
+    padding-left: 40px !important;
+  }
+}
+
+@media (max-width: 850px) {
+  section.bg-frst {
+    min-height: 400px !important;
+  }
+
+  .content h2 {
+    width: 60% !important;
+    font-size: 1.5rem !important;
+  }
+
+  .content p {
+    font-size: 14px !important;
+  }
+
+  .left-brand {
+    width: 70% !important;
+  }
+  .csp-btn {
+    font-size: 14px;
+  }
+  .left-brand-sub-contianer > p {
+    line-height: 150% !important;
+    font-size: 16px !important;
+    text-align: justify !important;
+  }
+
+  h1 {
+    font-size: 50px !important;
+  }
+}
+
+@media (max-width: 550px) {
+  section.bg-frst {
+    min-height: 300px !important;
+  }
+
+  .content h2 {
+    width: 90% !important;
+    font-size: 1rem !important;
+  }
+
+  .left-brand {
+    width: 90% !important;
+  }
+
+  .content p {
+    font-size: 12px !important;
+  }
+
+  .csp-btn {
+    font-size: 10px;
+  }
+
+  .left-brand-sub-contianer > p {
+    line-height: 150% !important;
+    font-size: 12px !important;
+    text-align: justify !important;
+  }
+  h1 {
+    font-size: 40px !important;
+  }
 }
 
 nav.black ul li a {
@@ -110,8 +273,10 @@ nav.black ul li a:hover {
 }
 
 section.bg-frst {
-  width: 100%;
-  height: 100vh;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  min-height: 500px;
   background: url("./bg.jpg");
   background-size: cover;
   background-position: center;
@@ -133,7 +298,6 @@ section.bg-frst > h1 {
   margin: 10px auto;
   width: 40%;
   text-align: center;
-  /* background: rgba(91, 52, 231, 0.99); */
   border-radius: 5px;
   color: rgba(91, 52, 231, 0.99);
   padding: 5px 30px;
@@ -142,9 +306,9 @@ section.bg-frst > h1 {
 .content p {
   width: 90%;
   margin: 10px auto;
-  text-align: center;
+  text-align: justify;
   font-size: 18px;
-  line-height: 30px;
+  line-height: 150%;
 }
 
 .content p.footer {
@@ -162,7 +326,7 @@ section.bg-frst > h1 {
 
 .left-brand {
   width: 55%;
-  padding: 12% 0 0 8%;
+  padding: 8% 0 0 8%;
 }
 
 .left-brand h1 {
@@ -470,7 +634,7 @@ hr {
 .forth .forth-btn a {
   text-decoration: none;
   margin-right: 4%;
-  padding: 10px 25px;
+  padding: 5px 25px;
   color: rgba(91, 52, 231, 0.9);
   border: 1.5px solid rgba(91, 52, 231, 0.9);
   border-radius: 50px;
@@ -792,8 +956,6 @@ hr {
 
 .landingTable {
   margin: 5px 0 0 auto;
-
-  /* border: 1px solid black; */
 }
 
 .landingTable tr td {
@@ -1244,10 +1406,11 @@ svg {
 .article-panel p {
   border-radius: 1.5px;
   padding: 15px;
-  margin: 0;
+  margin: 30px 0;
   max-width: 100%;
   width: auto;
   height: auto;
+  line-height: 150%;
   border-bottom: 1.5px solid rgba(91, 52, 231, 0.9);
   box-shadow: 2px 1px 3px 1px #888;
 }
@@ -1287,5 +1450,10 @@ svg {
 .ant-menu-submenu-title:hover,
 .ant-menu-submenu-selected,
 .ant-menu-submenu-selected:hover {
+  color: rgba(91, 52, 231, 0.9) !important;
+}
+
+.sublink:hover {
+  text-decoration: none;
   color: rgba(91, 52, 231, 0.9) !important;
 }

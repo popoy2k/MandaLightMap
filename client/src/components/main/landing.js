@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from "react";
 import { Link } from "react-router-dom";
 import NavBar from "./NavBar";
+// import NavBar from "../NavBar";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { getLanding, getMainMap } from "../../actions/auth";
@@ -272,7 +273,7 @@ export class landing extends Component {
                 Sea Turtles, Migratory bird and Nocturnal Creatures are the most
                 affected with Light Pollution
               </p>
-              <Link className="third-btn" to="/">
+              <Link className="third-btn" to="/related/introduction">
                 Learn more.
               </Link>
             </div>
@@ -283,7 +284,7 @@ export class landing extends Component {
                 Circadian Rhythm distruption, Breast cancer and many more that
                 Light Pollution can be a factor.
               </p>
-              <Link className="third-btn" to="/">
+              <Link className="third-btn" to="/related/introduction">
                 Learn more.
               </Link>
             </div>
@@ -294,7 +295,7 @@ export class landing extends Component {
                 Glare, Light Trespass, Unwanted and Unshielded Lighting are some
                 of the result of Light Pollution.
               </p>
-              <Link className="third-btn" to="/">
+              <Link className="third-btn" to="/related/introduction">
                 Learn more.
               </Link>
             </div>
@@ -306,7 +307,7 @@ export class landing extends Component {
                 lighting can cause security integrity.
               </p>
 
-              <Link className="third-btn" to="/">
+              <Link className="third-btn" to="/related/introduction">
                 Learn more.
               </Link>
             </div>
@@ -315,12 +316,11 @@ export class landing extends Component {
         <section className="forth">
           <h1>Want to access our data?</h1>
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Et sunt
-            esse labore dolores assumenda dolorem officia obcaecati iure, cum
-            laborum.
+            To see Skotos light pollution statistical data, login to your
+            account and get more details.
           </p>
           <div className="forth-btn">
-            <Link to="/">Find here</Link>
+            <Link to="/auth/login">Register/Sign in</Link>
           </div>
         </section>
         <section className="fifth">
