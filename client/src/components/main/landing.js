@@ -226,6 +226,13 @@ export class landing extends Component {
             version 1 suite of average radiance composite images using nighttime
             data from the Visible Infrared Imaging Radiometer Suite (VIIRS)
             Day/Night Band (DNB).
+            <br />
+            <span className="text-muted">
+              {" "}
+              *Data used was gathered from Earth Observation Group, NOAA
+              National Centers for Environmental Information (NCEI).For
+              questions contact kim.baugh@noaa.gov or kim.baugh@noaa.gov.
+            </span>
           </p>
 
           <div className="choropleth">

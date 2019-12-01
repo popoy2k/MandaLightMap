@@ -54,8 +54,13 @@ export class register extends Component {
       <Fragment>
         <div className="d-flex align-items-center" style={{ height: "100vh" }}>
           <div className="container">
-            <div className="sk-container">
-              <h1>Sign up</h1>
+            <div className="sk-container register-container">
+              <span>
+                <Link to="/" className="logo-link">
+                  Skotos
+                </Link>{" "}
+                / Sign up
+              </span>
               <div className="sk-flex">
                 <div className="sk-manual">
                   <form method="POST" onSubmit={this.onSubmit}>
@@ -133,7 +138,4 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(
-  mapStateToProps,
-  { signupUser }
-)(register);
+export default connect(mapStateToProps, { signupUser })(register);

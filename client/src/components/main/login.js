@@ -73,7 +73,12 @@ export class login extends Component {
         <div className="d-flex align-items-center" style={{ height: "100vh" }}>
           <div className="container">
             <div className="sk-container login-container">
-              <h1>Sign in</h1>
+              <span>
+                <Link to="/" className="logo-link">
+                  Skotos
+                </Link>{" "}
+                / Sign in
+              </span>
               <div className="sk-flex">
                 <div className="sk-third-party">
                   <GoogleLogin

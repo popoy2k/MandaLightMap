@@ -592,7 +592,10 @@ export class MandaMap extends Component {
     if (!value) {
       highlight
         .selectAll("rect")
-        .data([{ no: 1, name: "Lowest LiPo" }, { no: 2, name: "Highest LiPo" }])
+        .data([
+          { no: 1, name: "Lowest LiPo" },
+          { no: 2, name: "Highest LiPo" }
+        ])
         .enter()
         .append("rect")
         .attr("height", 15)
@@ -1652,15 +1655,21 @@ export class MandaMap extends Component {
         <section className="sec-map">
           <h2>Mandaluyong City: Light Pollution Map</h2>
           <p>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Iusto sunt
-            hic totam, et magni asperiores fugit quis fuga rerum doloribus ad
-            cupiditate eius quos deserunt tempore obcaecati a est reprehenderit
-            assumenda quaerat nam eos aliquam? Iure quae debitis consectetur
-            expedita doloribus tenetur, a autem. Facere molestias dicta
-            reiciendis omnis enim.
+            This Choropleth map shows light intensity that was gathered in
+            April, 2019. Data was from The Earth Observations Group (EOG) at
+            National Oceanic and Atmospheric Admisitration (NOAA)/ National
+            Centers for Environmental Information (NCEI) they're producing a
+            version 1 suite of average radiance composite images using nighttime
+            data from the Visible Infrared Imaging Radiometer Suite (VIIRS)
+            Day/Night Band (DNB).
+            <br />
+            <br /> *Data used was gathered from Earth Observation Group, NOAA
+            National Centers for Environmental Information (NCEI).For questions
+            contact kim.baugh@noaa.gov or kim.baugh@noaa.gov.
           </p>
         </section>
         <section className="main-map">
+        <div className="map-container">
           <div className="main-map-div">
             <div className="scoreboard-panel">
               <h2>Statistic</h2>
@@ -1730,7 +1739,7 @@ export class MandaMap extends Component {
             </div>
           </div>
           <div className="main-map-svg" id="main-map-svg">
-            <svg id="main-mapped" style={{ width: "100%", height: "100%" }}>
+            <svg id="main-mapped" style={{ width: "1000px", height: "750px" }}>
               <g id="map-scale" className="map-scale"></g>
             </svg>
             {niceMap}
@@ -1741,6 +1750,7 @@ export class MandaMap extends Component {
             id="leaflet-map"
             style={{ display: "none" }}
           ></div>
+          </div>
         </section>
       </Fragment>
     );
@@ -1752,7 +1762,4 @@ const mapStateToProps = state => ({
   mainData: state.data.mainMapData
 });
 
-export default connect(
-  mapStateToProps,
-  { getMainMap, getMapData }
-)(MandaMap);
+export default connect(mapStateToProps, { getMainMap, getMapData })(MandaMap);
