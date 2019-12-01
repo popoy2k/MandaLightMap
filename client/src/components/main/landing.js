@@ -21,7 +21,7 @@ export class landing extends Component {
     this.state = {
       MandaMap: null,
       svgW: 720,
-      svgH: 500,
+      svgH: 450,
       svgInst: ".map-svg",
       currBrgy: "Mandaluyong City",
       currPop: "386,276",
@@ -184,9 +184,9 @@ export class landing extends Component {
     return d3.geoPath().projection(
       d3
         .geoMercator()
-        .center([121.03, 14.578])
+        .center([121.0359, 14.575])
         .translate([svgH / 2, svgW / 2])
-        .scale(750000)
+        .scale(700000)
     );
   };
 
@@ -265,51 +265,61 @@ export class landing extends Component {
             Light Pollution has different effect in various of categories. Not
             only in human health but also Animal, Energy, Safety and many more.
           </p>
-          <div className="cards">
-            <div className="card">
-              <FontAwesomeIcon icon="paw" className="rel-icons" />
-              <h4>Animal</h4>
-              <p>
-                Sea Turtles, Migratory bird and Nocturnal Creatures are the most
-                affected with Light Pollution
-              </p>
-              <Link className="third-btn" to="/related/introduction">
-                Learn more.
-              </Link>
-            </div>
-            <div className="card">
-              <FontAwesomeIcon className="rel-icons" icon="child" />
-              <h4>Human</h4>
-              <p>
-                Circadian Rhythm distruption, Breast cancer and many more that
-                Light Pollution can be a factor.
-              </p>
-              <Link className="third-btn" to="/related/introduction">
-                Learn more.
-              </Link>
-            </div>
-            <div className="card">
-              <FontAwesomeIcon className="rel-icons" icon="industry" />
-              <h4>Energy</h4>
-              <p>
-                Glare, Light Trespass, Unwanted and Unshielded Lighting are some
-                of the result of Light Pollution.
-              </p>
-              <Link className="third-btn" to="/related/introduction">
-                Learn more.
-              </Link>
-            </div>
-            <div className="card">
-              <FontAwesomeIcon className="rel-icons" icon="user-injured" />
-              <h4>Safety</h4>
-              <p>
-                Unproper lighting, High light temperature, and excessive
-                lighting can cause security integrity.
-              </p>
+          <div className="form-group text-center">
+            <div className="row">
+              <div className="col-12 col-sm-12 col-md-12 col-lg-3 col-xl-3">
+                <div className="card-sk">
+                  <FontAwesomeIcon icon="paw" className="rel-icons" />
+                  <h4>Animal</h4>
+                  <p>
+                    Sea Turtles, Migratory bird and Nocturnal Creatures are the
+                    most affected with Light Pollution
+                  </p>
+                  <Link className="third-btn" to="/related/introduction">
+                    Learn more.
+                  </Link>
+                </div>
+              </div>
+              <div className="col-12 col-sm-12 col-md-12 col-lg-3 col-xl-3">
+                <div className="card-sk">
+                  <FontAwesomeIcon className="rel-icons" icon="child" />
+                  <h4>Human</h4>
+                  <p>
+                    Circadian Rhythm distruption, Breast cancer and many more
+                    that Light Pollution can be a factor.
+                  </p>
+                  <Link className="third-btn" to="/related/introduction">
+                    Learn more.
+                  </Link>
+                </div>
+              </div>
+              <div className="col-12 col-sm-12 col-md-12 col-lg-3 col-xl-3">
+                <div className="card-sk">
+                  <FontAwesomeIcon className="rel-icons" icon="industry" />
+                  <h4>Energy</h4>
+                  <p>
+                    Glare, Light Trespass, Unwanted and Unshielded Lighting are
+                    some of the result of Light Pollution.
+                  </p>
+                  <Link className="third-btn" to="/related/introduction">
+                    Learn more.
+                  </Link>
+                </div>
+              </div>
+              <div className="col-12 col-sm-12 col-md-12 col-lg-3 col-xl-3">
+                <div className="card-sk">
+                  <FontAwesomeIcon className="rel-icons" icon="user-injured" />
+                  <h4>Safety</h4>
+                  <p>
+                    Unproper lighting, High light temperature, and excessive
+                    lighting can cause security integrity.
+                  </p>
 
-              <Link className="third-btn" to="/related/introduction">
-                Learn more.
-              </Link>
+                  <Link className="third-btn" to="/related/introduction">
+                    Learn more.
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </section>
