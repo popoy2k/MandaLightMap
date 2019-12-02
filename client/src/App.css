@@ -1496,45 +1496,92 @@ svg {
   box-shadow: 2px 1px 3px 1px #888;
 }
 
+.article-image {
+  width: 50%;
+  height: auto;
+  /* max-height: 500px;
+  max-width: 250px; */
+  margin: 0 auto;
+  padding: 15px;
+  border-bottom: 1.5px solid rgba(91, 52, 231, 0.9);
+  box-shadow: 2px 1px 3px 1px #888;
+}
+
+.article-image img {
+  width: auto;
+  height: auto;
+}
+
+.article-img {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.article-img img {
+  width: auto;
+  height: auto;
+  max-width: 350px;
+  max-height: 350px;
+}
+u {
+  color: rgba(91, 52, 231, 0.9);
+  font-size: 15px;
+}
+
+.sk-strong {
+  color: rgba(91, 52, 231, 0.9);
+  font-size: 15px;
+  font-weight: bold;
+}
+
 .article-title {
   font-size: 45px;
   text-align: left;
 }
 
-.ant-menu-root.ant-menu-vertical,
-.ant-menu-root.ant-menu-vertical-left,
-.ant-menu-root.ant-menu-vertical-right,
-.ant-menu-root.ant-menu-inline {
+.custom-related-panel .ant-menu-root .ant-menu-vertical,
+.custom-related-panel .ant-menu-root.ant-menu-vertical-left,
+.custom-related-panel .ant-menu-root.ant-menu-vertical-right,
+.custom-related-panel .ant-menu-root.ant-menu-inline {
   box-shadow: 2px 1px 5px 1px #aaa !important;
 }
-.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+
+.custom-related-panel
+  .ant-menu:not(.ant-menu-horizontal)
+  .ant-menu-item-selected {
   background-color: rgba(91, 52, 231, 0.212) !important;
   color: rgba(91, 52, 231, 0.9) !important;
 }
 
-/* .ant-menu-item:hover
-  .ant-menu-item-active
-  .ant-menu:not(.ant-menu-inline)
-  .ant-menu-submenu-open
-  .ant-menu-submenu-active
-  .ant-menu-submenu-title:hover {
-  color: rgba(91, 52, 231, 0.9) !important;
-} */
-
-.ant-menu-item:hover {
+.custom-related-panel .ant-menu-item:hover {
   color: rgba(91, 52, 231, 0.9) !important;
 }
-.ant-menu-inline .ant-menu-item::after {
+.custom-related-panel .ant-menu-inline .ant-menu-item::after {
   border-right: 3px solid rgba(91, 52, 231, 0.9) !important;
 }
 
-.ant-menu-submenu-title:hover,
+.custom-related-panel .ant-menu-submenu-title:hover,
 .ant-menu-submenu-selected,
 .ant-menu-submenu-selected:hover {
   color: rgba(91, 52, 231, 0.9) !important;
 }
 
+.custom-related-panel .ant-menu-item-selected > a {
+  color: rgba(91, 52, 231, 0.9) !important;
+}
+
 .sublink:hover {
   text-decoration: none;
+  color: rgba(91, 52, 231, 0.9) !important;
+}
+
+.sk-custom-link {
+  color: rgba(91, 52, 231, 0.9) !important;
+  font-size: 15px;
+  font-weight: bold;
+  text-overflow: ellipsis !important;
+}
+
+.sk-custom-link:hover {
   color: rgba(91, 52, 231, 0.9) !important;
 }

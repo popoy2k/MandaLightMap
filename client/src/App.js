@@ -36,6 +36,9 @@ import MandaMap from "./components/map/MandaMap";
 import userIndex from "./components/home/userIndex";
 import adminIndex from "./components/home/adminIndex";
 import intro from "./components/related/intro";
+import introTopoJSON from "./components/related/introTopo";
+import QgisPlotting from "./components/related/QgisPlotting";
+import RasterPostgres from "./components/related/RasterPostgre";
 
 library.add(
   fab,
@@ -48,10 +51,7 @@ library.add(
   faChartArea
 );
 export class App extends Component {
-  componentDidMount() {
-    // store.dispatch(getMainMap());
-    // store.dispatch(getMapData({ mapObj: "2019-All" }));
-  }
+  componentDidMount() {}
 
   render() {
     return (
@@ -68,6 +68,15 @@ export class App extends Component {
             <Route path="/home/user" component={userIndex} />
             <Route path="/home/admin" component={adminIndex} />
             <Route path="/related/introduction" component={intro} />
+            <Route path="/related/GIS/introtopo/61" component={introTopoJSON} />
+            <Route
+              path="/related/GIS/qgisplotting/62"
+              component={QgisPlotting}
+            />
+            <Route
+              path="/related/GIS/postgresloadraster/63"
+              component={RasterPostgres}
+            />
           </Switch>
         </Router>
       </Provider>
