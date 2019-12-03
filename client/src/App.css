@@ -267,6 +267,7 @@ nav ul li a:focus {
 
 nav ul li a.active {
   background: rgba(91, 52, 231, 0.8);
+  border-bottom: 1px solid #fff;
   color: #fff;
 }
 

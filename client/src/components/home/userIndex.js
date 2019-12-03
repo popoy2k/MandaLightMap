@@ -131,7 +131,8 @@ export class userIndex extends Component {
     requestDownloadURL: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
     home: PropTypes.object.isRequired,
-    downloadUrl: PropTypes.node
+    downloadUrl: PropTypes.node,
+    user: PropTypes.oneOfType([PropTypes.instanceOf(null), PropTypes.object])
   };
 
   showLipoDrawer = e => {
@@ -290,7 +291,7 @@ export class userIndex extends Component {
 
   render() {
     const { isAuthenticated, token } = this.props.auth;
-
+    const { user } = this.props;
     const {
       tab,
       lipoSelectedRowKeys,
@@ -591,10 +592,13 @@ export class userIndex extends Component {
                 onClick={this.toggle}
               />
               <Tooltip placement="left" title="Logout">
-                <Icon
+                <Dropdown>
+                  {user.lastName}, {user.firstName}
+                </Dropdown>
+                {/* <Icon
                   type="close-circle"
                   className="user-cogs"
-                  onClick={this.logout}
+                  onClick={this.logout} */}
                 />
               </Tooltip>
             </Header>
@@ -662,10 +666,14 @@ export class userIndex extends Component {
 const mapStateToProps = state => ({
   auth: state.auth,
   home: state.home,
-  downloadUrl: state.home.lipoDownloadUrl
+  downloadUrl: state.home.lipoDownloadUrl,
+  user: state.auth.user
 });
 
-export default connect(
-  mapStateToProps,
-  { verifyToken, getTableData, getSingleLipoData, logout, requestDownloadURL }
-)(userIndex);
+export default connect(mapStateToProps, {
+  verifyToken,
+  getTableData,
+  getSingleLipoData,
+  logout,
+  requestDownloadURL
+})(userIndex);

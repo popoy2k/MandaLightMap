@@ -4,15 +4,30 @@ import { Drawer, Icon } from "antd";
 
 export class NavBar extends Component {
   state = {
-    visible: false
+    visible: false,
+    active: "home"
   };
 
   showDrawer = () => this.setState({ visible: true });
 
   onClose = () => this.setState({ visible: false });
+
+  tabSelected = tab => {
+    switch (tab) {
+      case "related":
+        return { tab: "related" };
+      case "map":
+        return { tab: "map" };
+      default:
+        return { tab: "home" };
+    }
+  };
+
   componentDidMount() {
     let nav = document.querySelector("nav");
-
+    const { pathname } = window.location;
+    const path = pathname.split("/")[1] || "";
+    const { tab } = this.tabSelected(path);
     if (nav) {
       if (window.scrollY > 50) {
         nav.classList.add("black");
@@ -29,9 +44,13 @@ export class NavBar extends Component {
         }
       }
     });
+
+    this.setState({ active: tab });
   }
 
   render() {
+    const { active } = this.state;
+
     return (
       <header>
         <nav>
@@ -40,13 +59,6 @@ export class NavBar extends Component {
             <button className="dbtn" onClick={this.showDrawer}>
               <Icon type="menu" />
             </button>
-            {/* <Button
-              type="primary"
-              onClick={this.showDrawer}
-              visible={!this.state.visible}
-              icon="menu"
-              ghost
-            ></Button> */}
           </div>
           <Drawer
             placement="right"
@@ -72,13 +84,22 @@ export class NavBar extends Component {
           </Drawer>
           <ul>
             <li>
-              <Link to="/">Home</Link>
+              <Link className={active === "home" ? "active" : ""} to="/">
+                Home
+              </Link>
             </li>
             <li>
-              <Link to="/related/introduction">Related Studies</Link>
+              <Link
+                className={active === "related" ? "active" : ""}
+                to="/related/introduction"
+              >
+                Related Studies
+              </Link>
             </li>
             <li>
-              <Link to="/map">Light Pollution Map</Link>
+              <Link className={active === "map" ? "active" : ""} to="/map">
+                Light Pollution Map
+              </Link>
             </li>
             <li>
               <Link to="/auth/login">For Developer</Link>

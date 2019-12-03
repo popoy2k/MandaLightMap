@@ -167,7 +167,8 @@ export class adminIndex extends Component {
     userTable: PropTypes.oneOfType([
       PropTypes.array,
       PropTypes.instanceOf(null)
-    ])
+    ]),
+    user: PropTypes.oneOfType([PropTypes.object, PropTypes.instanceOf(null)])
   };
 
   showLipoDrawer = e => {
@@ -388,7 +389,10 @@ export class adminIndex extends Component {
 
   render() {
     const { isAuthenticated, token } = this.props.auth;
-
+    const { user } = this.props;
+    if (!user) {
+      return <div></div>;
+    }
     const {
       tab,
       lipoSelectedRowKeys,
@@ -1009,20 +1013,18 @@ const mapStateToProps = state => ({
   uploadStat: state.home.lipoUpload,
   userTable: state.home.userTable,
   downloadTable: state.home.downloadTable,
-  userDetails: state.home.userDetails
+  userDetails: state.home.userDetails,
+  user: state.auth.user
 });
 
-export default connect(
-  mapStateToProps,
-  {
-    verifyToken,
-    getTableData,
-    getSingleLipoData,
-    logout,
-    requestDownloadURL,
-    uploadValidate,
-    getUserTableData,
-    getDownloadTableData,
-    getUserDetails
-  }
-)(adminIndex);
+export default connect(mapStateToProps, {
+  verifyToken,
+  getTableData,
+  getSingleLipoData,
+  logout,
+  requestDownloadURL,
+  uploadValidate,
+  getUserTableData,
+  getDownloadTableData,
+  getUserDetails
+})(adminIndex);
