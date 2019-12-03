@@ -31,6 +31,30 @@ export class SidePanel extends Component {
           openKeys: "Rel6",
           key: sub
         };
+      case "safety":
+        return {
+          title: "Safety",
+          openKeys: "Rel5",
+          key: sub
+        };
+      case "energy":
+        return {
+          title: "Energy",
+          openKeys: "Rel4",
+          key: sub
+        };
+      case "health":
+        return {
+          title: "Health",
+          openKeys: "Rel3",
+          key: sub
+        };
+      case "animal":
+        return {
+          title: "Animal",
+          openKeys: "Rel2",
+          key: sub
+        };
       default:
         return { title: "Introduction" };
     }
@@ -46,7 +70,7 @@ export class SidePanel extends Component {
               mode="inline"
               defaultOpenKeys={defOpenKeys}
               defaultSelectedKeys={selected}
-              style={{ width: "260px" }}
+              style={{ width: "260px", marginBottom: "10px" }}
             >
               <Menu.Item key="1">
                 {" "}
@@ -55,28 +79,107 @@ export class SidePanel extends Component {
                 </Link>{" "}
               </Menu.Item>
               <SubMenu key="Rel2" title={<span>Animal</span>}>
-                <Menu.Item key="21">Animal 1</Menu.Item>
-                <Menu.Item key="22">Animal 2</Menu.Item>
-                <Menu.Item key="23">Animal 3</Menu.Item>
-                <Menu.Item key="24">Animal 4</Menu.Item>
+                <Menu.Item key="21">
+                  <Link
+                    to="/related/animal/migratorybirds/21"
+                    className="sublink"
+                  >
+                    Migratory Birds
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="22">
+                  <Link to="/related/animal/FLAP/22" className="sublink">
+                    F.L.A.P
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="23">
+                  <Link
+                    to="/related/animal/effectsreproduction/23"
+                    className="sublink"
+                  >
+                    Effects in Reproduction
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="24">
+                  <Link to="/related/animal/WNV/24" className="sublink">
+                    West Nile Virus
+                  </Link>
+                </Menu.Item>
               </SubMenu>
               <SubMenu key="Rel3" title={<span>Human</span>}>
-                <Menu.Item key="31">Human 1</Menu.Item>
-                <Menu.Item key="32">Human 2</Menu.Item>
-                <Menu.Item key="33">Human 3</Menu.Item>
-                <Menu.Item key="34">Human 4</Menu.Item>
+                <Menu.Item key="31">
+                  <Link
+                    to="/related/health/melatoninproduction/31"
+                    className="sublink"
+                  >
+                    Melatonin Production
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="32">
+                  <Link
+                    to="/related/health/circadianrhtyhm/32"
+                    className="sublink"
+                  >
+                    Disruption of Circadian Rhythm
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="33">
+                  <Link
+                    to="/related/health/breastcancer/33"
+                    className="sublink"
+                  >
+                    Breast Cancer
+                  </Link>
+                </Menu.Item>
               </SubMenu>
               <SubMenu key="Rel4" title={<span>Energy</span>}>
-                <Menu.Item key="41">Energy 1</Menu.Item>
-                <Menu.Item key="42">Energy 2</Menu.Item>
-                <Menu.Item key="43">Energy 3</Menu.Item>
-                <Menu.Item key="44">Energy 4</Menu.Item>
+                <Menu.Item key="41">
+                  <Link
+                    to="/related/energy/lighttrespass/41"
+                    className="sublink"
+                  >
+                    Light Trespass
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="42">
+                  <Link to="/related/energy/glare/42" className="sublink">
+                    Glare
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="43">
+                  {" "}
+                  <Link to="/related/energy/skyglow/43" className="sublink">
+                    Sky Glow
+                  </Link>
+                </Menu.Item>
               </SubMenu>
               <SubMenu key="Rel5" title={<span>Safety</span>}>
-                <Menu.Item key="51">Safety 1</Menu.Item>
-                <Menu.Item key="52">Safety 2</Menu.Item>
-                <Menu.Item key="53">Safety 3</Menu.Item>
-                <Menu.Item key="54">Safety 4</Menu.Item>
+                <Menu.Item key="51">
+                  <Link
+                    to="/related/safety/unproperlighting/51"
+                    className="sublink"
+                  >
+                    Unproper Lighting
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="52">
+                  {" "}
+                  <Link
+                    to="/related/safety/highlighttemp/52"
+                    className="sublink"
+                  >
+                    High Light Temperature
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="53">
+                  {" "}
+                  <Link
+                    to="/related/safety/securityintegrity/53"
+                    className="sublink"
+                  >
+                    Light Cause Security Integrity
+                  </Link>
+                </Menu.Item>
               </SubMenu>
               <SubMenu
                 key="Rel6"
@@ -105,10 +208,7 @@ export class SidePanel extends Component {
                   </Link>
                 </Menu.Item>
                 <Menu.Item key="64">
-                  <Link
-                    to="/related/GIS/postgresloadraster/63"
-                    className="sublink"
-                  >
+                  <Link to="/related/GIS/gatherdata/64" className="sublink">
                     Gathering Data from PostgreSQL
                   </Link>
                 </Menu.Item>

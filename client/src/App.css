@@ -1496,8 +1496,12 @@ svg {
   box-shadow: 2px 1px 3px 1px #888;
 }
 
+.article-panel p h4 {
+  color: rgba(91, 52, 231, 0.9);
+}
+
 .article-image {
-  width: 50%;
+  width: 100%;
   height: auto;
   /* max-height: 500px;
   max-width: 250px; */

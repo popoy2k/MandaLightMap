@@ -39,6 +39,20 @@ import intro from "./components/related/intro";
 import introTopoJSON from "./components/related/introTopo";
 import QgisPlotting from "./components/related/QgisPlotting";
 import RasterPostgres from "./components/related/RasterPostgre";
+import GatherData from "./components/related/GatherData";
+import UnproperLight from "./components/related/UnproperLight";
+import HighLight from "./components/related/HighLight";
+import SecIntegrity from "./components/related/SecIntegrity";
+import LightTrespass from "./components/related/LightTrespass";
+import Glare from "./components/related/Glare";
+import SkyGlow from "./components/related/SkyGlow";
+import MelatoninProd from "./components/related/MelatoninProd";
+import CircadianRhythm from "./components/related/CircadianRhythm";
+import BreastCancer from "./components/related/BreastCancer";
+import MigratoryBird from "./components/related/MigratoryBirds";
+import FLAP from "./components/related/FLAP";
+import EffectRep from "./components/related/EffectRepro";
+import WNV from "./components/related/WNV";
 
 library.add(
   fab,
@@ -77,6 +91,50 @@ export class App extends Component {
               path="/related/GIS/postgresloadraster/63"
               component={RasterPostgres}
             />
+            <Route path="/related/GIS/gatherdata/64" component={GatherData} />
+            <Route
+              path="/related/safety/unproperlighting/51"
+              component={UnproperLight}
+            />
+            <Route
+              path="/related/safety/highlighttemp/52"
+              component={HighLight}
+            />
+            <Route
+              path="/related/safety/securityintegrity/53"
+              component={SecIntegrity}
+            />
+
+            <Route
+              path="/related/energy/lighttrespass/41"
+              component={LightTrespass}
+            />
+
+            <Route path="/related/energy/glare/42" component={Glare} />
+            <Route path="/related/energy/skyglow/43" component={SkyGlow} />
+            <Route
+              path="/related/health/melatoninproduction/31"
+              component={MelatoninProd}
+            />
+            <Route
+              path="/related/health/circadianrhtyhm/32"
+              component={CircadianRhythm}
+            />
+            <Route
+              path="/related/health/breastcancer/33"
+              component={BreastCancer}
+            />
+
+            <Route
+              path="/related/animal/migratorybirds/21"
+              component={MigratoryBird}
+            />
+            <Route path="/related/animal/FLAP/22" component={FLAP} />
+            <Route
+              path="/related/animal/effectsreproduction/23"
+              component={EffectRep}
+            />
+            <Route path="/related/animal/WNV/24" component={WNV} />
           </Switch>
         </Router>
       </Provider>
