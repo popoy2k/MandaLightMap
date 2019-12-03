@@ -43,14 +43,14 @@ export class Glare extends Component {
               luminance and the size of the glare source, the position of the
               glare source in relation to the line of sight and the background
               luminance against which the glare source is viewed.
-            </p>
-            <p>
+              <br />
+              <br />
               Consequently, when light planning the luminaire’s luminance should
               always be considered in relation to the background luminance. The
               closer the dazzling surface is to the eye, the greater the risk of
               discomfort glare.
-            </p>
-            <p>
+              <br />
+              <br />
               In open luminaires, especially those for compact and other intense
               light sources with high luminous flux, it is generally the light
               source itself or a mirror image in the specular reflector that
