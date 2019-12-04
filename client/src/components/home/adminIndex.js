@@ -17,6 +17,7 @@ import {
   Typography,
   Upload,
   Tag,
+  Radio,
   message,
   notification,
   Badge,
@@ -190,7 +191,7 @@ export class adminIndex extends Component {
   };
 
   closeUserDrawer = () => {
-    this.setState({ userDrawer: false });
+    this.setState({ userDrawer: false, userDetailsList: [] });
   };
 
   userDetailsClick = e => {
@@ -387,9 +388,19 @@ export class adminIndex extends Component {
     this.setState({ singleDownload: true, downloading: true });
   };
 
+  userClick = e => {
+    const { key } = e;
+    if (key === "1") {
+      this.logout();
+    }
+  };
+
   render() {
     const { isAuthenticated, token } = this.props.auth;
     const { user } = this.props;
+    if (!isAuthenticated && !token) {
+      return <Redirect to="/auth/login" />;
+    }
     if (!user) {
       return <div></div>;
     }
@@ -417,6 +428,19 @@ export class adminIndex extends Component {
       downloadTableLoading
     } = this.state;
 
+    let RoleRadio =
+      Object.entries(userDetailsList).length > 0 ? (
+        <div>
+          <Radio.Group
+            defaultValue={userDetailsList ? userDetailsList.role : "Admin"}
+          >
+            <Radio.Button value="Admin">Admin</Radio.Button>
+            <Radio.Button value="User">User</Radio.Button>
+          </Radio.Group>
+        </div>
+      ) : (
+        ""
+      );
     const uploadProps = {
       name: "file",
       accept: ".json",
@@ -427,10 +451,6 @@ export class adminIndex extends Component {
         return false;
       }
     };
-
-    if (!isAuthenticated && !token) {
-      return <Redirect to="/auth/login" />;
-    }
 
     const lipoColumn = [
       {
@@ -860,7 +880,7 @@ export class adminIndex extends Component {
             >
               <Menu.Item key="3">
                 <Icon type="team" />
-                <span>User Management</span>
+                <span>User Management </span>
               </Menu.Item>
               <Menu.Item key="4">
                 <Icon type="solution" />
@@ -883,13 +903,18 @@ export class adminIndex extends Component {
                 type={this.state.collapsed ? "menu-unfold" : "menu-fold"}
                 onClick={this.toggle}
               />
-              <Tooltip placement="left" title="Logout">
-                <Icon
-                  type="close-circle"
-                  className="user-cogs"
-                  onClick={this.logout}
-                />
-              </Tooltip>
+              <Dropdown
+                className="nav-name"
+                overlay={
+                  <Menu onClick={this.userClick}>
+                    <Menu.Item key="1">Logout</Menu.Item>
+                  </Menu>
+                }
+              >
+                <p>
+                  {`${user.lastName}, ${user.firstName}`} <Icon type="down" />
+                </p>
+              </Dropdown>
             </Header>
             <Content className="user-content-main">
               {content}
@@ -973,7 +998,7 @@ export class adminIndex extends Component {
                         {userDetailsList ? userDetailsList.creationType : ""}
                       </Descriptions.Item>
                       <Descriptions.Item label="Role">
-                        {userDetailsList ? userDetailsList.role : ""}
+                        {userDetailsList ? RoleRadio : ""}
                       </Descriptions.Item>
                       <Descriptions.Item label="Status">
                         <Badge

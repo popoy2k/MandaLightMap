@@ -2,7 +2,6 @@ const passport = require("passport");
 const LocalStrat = require("passport-local").Strategy;
 const User = require("../model/User");
 const Mailer = require("../utility/Mailer");
-const genRand = require("../utility/RandomBytes");
 const crypto = require("crypto");
 const JWT = require("jsonwebtoken");
 
@@ -41,7 +40,7 @@ passport.use(
             if (err) {
               return cb(null, {
                 status: "error",
-                msg: "Something went wrong."
+                msg: "There's a error on creating your account"
               });
             }
 
@@ -49,7 +48,7 @@ passport.use(
               if (randErro) {
                 return cb(null, {
                   status: "error",
-                  msg: "Something went wrong."
+                  msg: "There's a error on creating your account"
                 });
               }
 
@@ -62,11 +61,11 @@ passport.use(
                 You have successfully registered to our system, 
                 and to fully activate your account please click the link. 
                 You have <strong><i> 2 hours </i></strong> to activate your account.<br />
-                <a href="http://localhost:3000/auth/uact/${randBuff.toString(
-                  "hex"
-                )}">http://localhost:3000/auth/uact/${randBuff.toString(
-                  "hex"
-                )}</a>`
+                <a href="${req.protocol}://${
+                  req.hostname
+                }/auth/uact/${randBuff.toString("hex")}">${req.protocol}://${
+                  req.hostname
+                }/auth/uact/${randBuff.toString("hex")}</a>`
               })
                 .then(reas => {
                   newUser.acctInfo.activationInfo.activationToken = randBuff.toString(
@@ -79,7 +78,7 @@ passport.use(
                     if (lastErroNa) {
                       cb(null, {
                         status: "error",
-                        msg: "Something went wrong."
+                        msg: "There's a error on creating your account"
                       });
                     }
 
@@ -92,7 +91,7 @@ passport.use(
                 .catch(reas => {
                   return cb(null, {
                     status: "error",
-                    msg: "Something went wrong."
+                    msg: "There's a error on creating your account"
                   });
                 });
             });
@@ -101,7 +100,7 @@ passport.use(
       } catch (error) {
         return cb(null, {
           status: "error",
-          msg: "Something went wrong."
+          msg: "There's a error on creating your account"
         });
       }
     }

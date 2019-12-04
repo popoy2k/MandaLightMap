@@ -3,24 +3,54 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import { signupUser } from "../../actions/auth";
 import PropTypes from "prop-types";
+import { Alert } from "antd";
 
 export class register extends Component {
-  constructor(props) {
-    super(props);
-    document.title = "Skótos - Sign up";
+  state = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    rePassword: "",
+    disabled: "",
+    notif: ""
+  };
 
-    this.state = {
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      rePassword: "",
-      disabled: ""
-    };
+  componentDidUpdate(prevProps) {
+    const { notif } = this.props;
+    if (prevProps.notif !== notif) {
+      console.log(notif);
+      const { status } = notif;
+      const initNotif = (
+        <Alert
+          type={status}
+          message={status === "success" ? "Successful" : "Error"}
+          description={
+            status === "success"
+              ? `An confirmation is sent to ${notif["data"].email}`
+              : notif["msg"]
+          }
+          showIcon
+        />
+      );
+      this.setState({
+        notif: initNotif,
+        firstName: "",
+        lastName: "",
+        email: "",
+        disabled: ""
+      });
+    }
   }
+
+  componentDidMount() {
+    document.title = "Skótos - Sign up";
+  }
+
   static propTypes = {
     signupUser: PropTypes.func.isRequired,
-    auth: PropTypes.object.isRequired
+    auth: PropTypes.object.isRequired,
+    notif: PropTypes.oneOfType([PropTypes.object, PropTypes.instanceOf(null)])
   };
   onChange = e => {
     this.setState({ [e.target.name]: e.target.value });
@@ -47,13 +77,15 @@ export class register extends Component {
       email,
       password,
       rePassword,
-      disabled
+      disabled,
+      notif
     } = this.state;
 
     return (
       <Fragment>
         <div className="d-flex align-items-center" style={{ height: "100vh" }}>
           <div className="container">
+            <div className="sk-alert register-container">{notif}</div>
             <div className="sk-container register-container">
               <span>
                 <Link to="/" className="logo-link">
@@ -135,7 +167,8 @@ export class register extends Component {
 }
 
 const mapStateToProps = state => ({
-  auth: state.auth
+  auth: state.auth,
+  notif: state.notif.notif
 });
 
 export default connect(mapStateToProps, { signupUser })(register);

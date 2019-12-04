@@ -37,10 +37,10 @@ export class userActivate extends Component {
       <Fragment>
         <div className="d-flex align-items-center" style={{ height: "100vh" }}>
           <div className="container">
-            <div className="sk-container">
-              <h1 style={{ paddingTop: "10vh" }}>Congratulations!</h1>
+            <div className="sk-container activate-container">
+              <h1>Congratulations!</h1>
               <span className="sk-badge">{email}</span>
-              <p style={{ paddingTop: "10vh" }}>
+              <p>
                 Hi {firstName}, welcome to <strong>Skótos</strong> Web
                 Application by activating your account you have access to our
                 statistical data. Enjoy!

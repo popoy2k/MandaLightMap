@@ -7,10 +7,6 @@ router.route("/signup").post(
       "Local.signup",
       { session: false },
       (err, msg, info) => {
-        if (msg.status === "error") {
-          res.status(400).json(msg);
-          return next(err);
-        }
         res.status(200).json(msg);
         next();
       }

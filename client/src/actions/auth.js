@@ -51,10 +51,11 @@ export const signupUser = newUser => (dispatch, getState) => {
     .then(resData => {
       dispatch({
         type: SIGNUP_SUCCESS,
-        payload: resData
+        payload: resData.data
       });
     })
     .catch(errData => {
+      console.log(errData.response);
       dispatch({
         type: SIGNUP_ERROR,
         paylaod: errData.response.data
