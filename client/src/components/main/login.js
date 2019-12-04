@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from "react";
 import { Link, Redirect } from "react-router-dom";
+import { Alert } from "antd";
 
 import { signinUser, googleSignIn, verifyToken } from "../../actions/auth";
 import { connect } from "react-redux";
@@ -13,8 +14,25 @@ export class login extends Component {
   state = {
     email: "",
     password: "",
-    disabled: ""
+    disabled: "",
+    notif: ""
   };
+
+  componentDidUpdate(prevProps) {
+    const { notif } = this.props;
+    if (prevProps.notif !== notif) {
+      const { status } = notif;
+      const initNotif = (
+        <Alert
+          type={status}
+          message={status === "success" ? "Successful" : "Error"}
+          description={notif["msg"]}
+          showIcon
+        />
+      );
+      this.setState({ notif: initNotif, disabled: "" });
+    }
+  }
 
   componentDidMount() {
     document.title = "Skótos - Sign in";
@@ -30,7 +48,8 @@ export class login extends Component {
     googleSignIn: PropTypes.func.isRequired,
     verifyToken: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
-    user: PropTypes.oneOfType([PropTypes.object, PropTypes.instanceOf(null)])
+    user: PropTypes.oneOfType([PropTypes.object, PropTypes.instanceOf(null)]),
+    notif: PropTypes.oneOfType([PropTypes.object, PropTypes.instanceOf(null)])
   };
 
   onChange = e => this.setState({ [e.target.name]: e.target.value });
@@ -57,9 +76,9 @@ export class login extends Component {
         case "admin":
           return <Redirect to="/home/admin" />;
         case "user":
-          return <Redirect to="/home/admin" />;
+          return <Redirect to="/home/user" />;
         default:
-          return;
+          return <div></div>;
       }
     }
 
@@ -67,11 +86,12 @@ export class login extends Component {
       this.onThirdPartySignIn(response);
     };
 
-    const { email, password, disabled } = this.state;
+    const { email, password, disabled, notif } = this.state;
     return (
       <Fragment>
         <div className="d-flex align-items-center" style={{ height: "100vh" }}>
           <div className="container">
+            <div className="sk-alert login-container">{notif}</div>
             <div className="sk-container login-container">
               <span>
                 <Link to="/" className="logo-link">
@@ -88,7 +108,7 @@ export class login extends Component {
                       <button
                         className="custom-sign-in GLink"
                         onClick={renderProps.onClick}
-                        disabled={renderProps.disabled}
+                        disabled={disabled}
                       >
                         <GLogo className="sk-svg-middle" />
                         Google
@@ -148,7 +168,8 @@ export class login extends Component {
 
 const mapStateToProps = state => ({
   auth: state.auth,
-  user: state.auth.user
+  user: state.auth.user,
+  notif: state.notif.notif
 });
 
 export default connect(mapStateToProps, {

@@ -427,6 +427,7 @@ export class adminIndex extends Component {
       downloadTableList,
       downloadTableLoading
     } = this.state;
+    console.log(userDetailsList);
 
     let RoleRadio =
       Object.entries(userDetailsList).length > 0 ? (

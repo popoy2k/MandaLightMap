@@ -132,7 +132,7 @@ export class userIndex extends Component {
     auth: PropTypes.object.isRequired,
     home: PropTypes.object.isRequired,
     downloadUrl: PropTypes.node,
-    user: PropTypes.oneOfType([PropTypes.instanceOf(null), PropTypes.object])
+    user: PropTypes.oneOfType([PropTypes.object, PropTypes.instanceOf(null)])
   };
 
   showLipoDrawer = e => {
@@ -287,6 +287,12 @@ export class userIndex extends Component {
       type: finalType
     });
     this.setState({ singleDownload: true, downloading: true });
+  };
+  userClick = e => {
+    const { key } = e;
+    if (key === "1") {
+      this.logout();
+    }
   };
 
   render() {
@@ -591,16 +597,18 @@ export class userIndex extends Component {
                 type={this.state.collapsed ? "menu-unfold" : "menu-fold"}
                 onClick={this.toggle}
               />
-              <Tooltip placement="left" title="Logout">
-                <Dropdown>
-                  {user.lastName}, {user.firstName}
-                </Dropdown>
-                {/* <Icon
-                  type="close-circle"
-                  className="user-cogs"
-                  onClick={this.logout} */}
-                />
-              </Tooltip>
+              <Dropdown
+                className="nav-name"
+                overlay={
+                  <Menu onClick={this.userClick}>
+                    <Menu.Item key="1">Logout</Menu.Item>
+                  </Menu>
+                }
+              >
+                <p>
+                  {`${user.lastName}, ${user.firstName}`} <Icon type="down" />
+                </p>
+              </Dropdown>
             </Header>
             <Content className="user-content-main">
               {content}

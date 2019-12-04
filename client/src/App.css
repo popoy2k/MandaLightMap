@@ -888,7 +888,6 @@ hr {
 }
 
 .login-container {
-  min-height: 450px !important;
   width: 250px !important;
 }
 
@@ -1543,17 +1542,16 @@ svg {
 .article-image {
   width: 100%;
   height: auto;
-  /* max-height: 500px;
-  max-width: 250px; */
   margin: 0 auto;
   padding: 15px;
   border-bottom: 1.5px solid rgba(91, 52, 231, 0.9);
   box-shadow: 2px 1px 3px 1px #888;
+  text-align: center;
 }
 
 .article-image img {
-  width: auto;
-  height: auto;
+  max-height: 800px;
+  max-width: 600px;
 }
 
 .article-img {

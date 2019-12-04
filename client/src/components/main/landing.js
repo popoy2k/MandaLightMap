@@ -282,7 +282,10 @@ export class landing extends Component {
                     Sea Turtles, Migratory bird and Nocturnal Creatures are the
                     most affected with Light Pollution
                   </p>
-                  <Link className="third-btn" to="/related/introduction">
+                  <Link
+                    className="third-btn"
+                    to="/related/animal/migratorybirds/21"
+                  >
                     Learn more.
                   </Link>
                 </div>
@@ -295,7 +298,10 @@ export class landing extends Component {
                     Circadian Rhythm distruption, Breast cancer and many more
                     that Light Pollution can be a factor.
                   </p>
-                  <Link className="third-btn" to="/related/introduction">
+                  <Link
+                    className="third-btn"
+                    to="/related/health/melatoninproduction/31"
+                  >
                     Learn more.
                   </Link>
                 </div>
@@ -308,7 +314,10 @@ export class landing extends Component {
                     Glare, Light Trespass, Unwanted and Unshielded Lighting are
                     some of the result of Light Pollution.
                   </p>
-                  <Link className="third-btn" to="/related/introduction">
+                  <Link
+                    className="third-btn"
+                    to="/related/energy/lighttrespass/41"
+                  >
                     Learn more.
                   </Link>
                 </div>
@@ -322,7 +331,10 @@ export class landing extends Component {
                     lighting can cause security integrity.
                   </p>
 
-                  <Link className="third-btn" to="/related/introduction">
+                  <Link
+                    className="third-btn"
+                    to="/related/safety/unproperlighting/51"
+                  >
                     Learn more.
                   </Link>
                 </div>

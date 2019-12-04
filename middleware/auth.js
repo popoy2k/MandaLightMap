@@ -164,7 +164,7 @@ passport.use(
 
                   return done(null, {
                     status: "success",
-                    msg: {
+                    data: {
                       token: encoded,
                       user: { email, firstName, lastName, role }
                     }

@@ -85,6 +85,7 @@ export class MandaMap extends Component {
     if (!initData || !initData.length || !state) {
       this.setState({ scaleLegend: "" });
       this.geoVectorChange(currMainData);
+
       return;
     }
 
@@ -121,9 +122,11 @@ export class MandaMap extends Component {
       let div = L.DomUtil.create("div", "info legend"),
         range = [80, 70, 60, 50, 40, 30, 20, 10];
       div.innerHTML += `<strong>Radiance Scale</strong> <br />`;
-
+      div.style.minHeight = "auto";
       range.forEach(feVal => {
-        let temp = `<i style="background: ${self.getScaleColor(feVal)}"></i> ${
+        let temp = `<i style="background: ${self.getScaleColor(
+          feVal
+        )}; padding: 1px; max-width: 15px; max-height:15px"></i> ${
           feVal === 80 ? "80+" : feVal === 10 ? "10-" : feVal
         } <br />`;
         div.innerHTML += temp;
@@ -494,17 +497,17 @@ export class MandaMap extends Component {
           }
         );
 
-        let tfSpinal = L.tileLayer(
-          "https://{s}.tile.thunderforest.com/spinal-map/{z}/{x}/{y}.png?apikey=336a2deec6504dfda79e31f016f4aae9",
-          {
-            id: "MapID",
-            attribution:
-              '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            apikey: "336a2deec6504dfda79e31f016f4aae9",
-            maxZoom: 20,
-            maxNativeZoom: 17
-          }
-        );
+        // let tfSpinal = L.tileLayer(
+        //   "https://{s}.tile.thunderforest.com/spinal-map/{z}/{x}/{y}.png?apikey=336a2deec6504dfda79e31f016f4aae9",
+        //   {
+        //     id: "MapID",
+        //     attribution:
+        //       '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        //     apikey: "336a2deec6504dfda79e31f016f4aae9",
+        //     maxZoom: 20,
+        //     maxNativeZoom: 17
+        //   }
+        // );
 
         if (!leafletMap) {
           leafletMap = L.map("leaflet-map", {
@@ -514,8 +517,7 @@ export class MandaMap extends Component {
             "OpenStreet - France": osFrance,
             Transport: tfTransport,
             "Transport Dark": tfTransportDark,
-            "Open Cycle": tfOpenCycle,
-            Hell: tfSpinal
+            "Open Cycle": tfOpenCycle
           };
           L.control
             .layers(baseLayers)
@@ -802,8 +804,26 @@ export class MandaMap extends Component {
   };
 
   brgyChange = value => {
+    const { vectorRadScale } = this.state;
     this.setNewData(value);
     this.setNewBrgy(value);
+    if (!value.length) {
+      if (vectorRadScale) {
+        this.geoVectorRadianceScale([]);
+        this.setNewData(value);
+        this.setNewBrgy(value);
+      }
+      this.setState({
+        brgyValue: value,
+        showIntensity: false,
+        intensityDisable: true,
+        colorDisabled: true,
+        vectorIntensityDisable: true,
+        vectorRadScaleDisable: true,
+        vectorRadScale: false
+      });
+      return;
+    }
     if (!value.length || (value[0].indexOf("All") < 0 && value.length === 1)) {
       this.setState({
         brgyValue: value,
@@ -811,10 +831,12 @@ export class MandaMap extends Component {
         intensityDisable: true,
         colorDisabled: true,
         vectorIntensityDisable: true,
-        vectorRadScaleDisable: true
+        vectorRadScaleDisable: true,
+        vectorRadScale: false
       });
       return;
     }
+
     this.setState({
       brgyValue: value,
       showIntensity: false,
@@ -833,7 +855,8 @@ export class MandaMap extends Component {
       lipoMaxMapData,
       mainMapData,
       textureVal,
-      vectorIntensity
+      vectorIntensity,
+      vectorRadScale
     } = this.state;
 
     let initValue = value.map(val => val.split("-"));
@@ -962,6 +985,10 @@ export class MandaMap extends Component {
       lipoMinMapData.set(feVal.id, feVal.min);
       lipoMaxMapData.set(feVal.id, feVal.max);
     });
+
+    if (vectorRadScale) {
+      this.geoVectorRadianceScale(finalData, true);
+    }
   };
 
   fadeElement = (self, opacity, interval = 300) => {
@@ -1382,8 +1409,8 @@ export class MandaMap extends Component {
           .select("div.main-map-svg")
           .append("svg")
           .attr("id", "main-mapped")
-          .style("width", "100%")
-          .style("height", "100%");
+          .style("width", "1000px")
+          .style("height", "750px");
     let scale = d3.select("svg#main-mapped>g#map-scale").node()
       ? d3.select("svg#main-mapped>g#map-scale")
       : svg.append("g").attr("id", "map-scale");
@@ -1669,87 +1696,92 @@ export class MandaMap extends Component {
           </p>
         </section>
         <section className="main-map">
-        <div className="map-container">
-          <div className="main-map-div">
-            <div className="scoreboard-panel">
-              <h2>Statistic</h2>
-              <div className="main">
-                <ul>
-                  <li title="Area Location">
-                    <Icon type="environment" className="sk-icon-color" />{" "}
-                    {currLoc}
-                  </li>
-                  <li title="Land Area">
-                    <Icon type="area-chart" className="sk-icon-color" />{" "}
-                    {currLA} ha
-                  </li>
-                  <li title="Population">
-                    <Icon type="team" className="sk-icon-color" /> {currPop}
-                  </li>
-                  <li title="Light Intensity">
-                    <Icon type="heat-map" className="sk-icon-color" /> Radiance
-                    - W/cm2*sr
-                    <ul>
-                      <li></li>
-                      <li>
-                        {radMean} <small className="secondary">Mean</small>
-                      </li>
-                      <li>
-                        {radMax} <small className="secondary">Max</small>
-                      </li>
-                      <li>
-                        {radMin} <small className="secondary">Min</small>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
+          <div className="map-container">
+            <div className="main-map-div">
+              <div className="scoreboard-panel">
+                <h2>Statistic</h2>
+                <div className="main">
+                  <ul>
+                    <li title="Area Location">
+                      <Icon type="environment" className="sk-icon-color" />{" "}
+                      {currLoc}
+                    </li>
+                    <li title="Land Area">
+                      <Icon type="area-chart" className="sk-icon-color" />{" "}
+                      {currLA} ha
+                    </li>
+                    <li title="Population">
+                      <Icon type="team" className="sk-icon-color" /> {currPop}
+                    </li>
+                    <li title="Light Intensity">
+                      <Icon type="heat-map" className="sk-icon-color" />{" "}
+                      Radiance - W/cm2*sr
+                      <ul>
+                        <li></li>
+                        <li>
+                          {radMean} <small className="secondary">Mean</small>
+                        </li>
+                        <li>
+                          {radMax} <small className="secondary">Max</small>
+                        </li>
+                        <li>
+                          {radMin} <small className="secondary">Min</small>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
               </div>
-            </div>
-            <div className="map-setting-panel">
-              <h2>Settings</h2>
-              <div className="main">
-                <div className="form-group">
-                  <h4>VIIRS Layers</h4>
-                  <TreeSelect {...tProps} />
-                </div>
-
-                <div className="form-group">
-                  <h4>Area Coverage</h4>
-                  <TreeSelect {...bProps} />
-                </div>
-                <div className="form-group">
-                  <h4>Area Texture</h4>
-                  <div style={{ width: "100%", margin: "10px 0" }}>
-                    <Radio.Group
-                      onChange={this.textureRadioChange}
-                      size="small"
-                      defaultValue="choropleth"
-                      value={textureVal}
-                      style={{ width: "100%" }}
-                    >
-                      <Radio.Button value="choropleth">Choropleth</Radio.Button>
-                      <Radio.Button value="natural">
-                        Interactive Map
-                      </Radio.Button>
-                    </Radio.Group>
+              <div className="map-setting-panel">
+                <h2>Settings</h2>
+                <div className="main">
+                  <div className="form-group">
+                    <h4>VIIRS Layers</h4>
+                    <TreeSelect {...tProps} />
                   </div>
+
+                  <div className="form-group">
+                    <h4>Area Coverage</h4>
+                    <TreeSelect {...bProps} />
+                  </div>
+                  <div className="form-group">
+                    <h4>Area Texture</h4>
+                    <div style={{ width: "100%", margin: "10px 0" }}>
+                      <Radio.Group
+                        onChange={this.textureRadioChange}
+                        size="small"
+                        defaultValue="choropleth"
+                        value={textureVal}
+                        style={{ width: "100%" }}
+                      >
+                        <Radio.Button value="choropleth">
+                          Choropleth
+                        </Radio.Button>
+                        <Radio.Button value="natural">
+                          Interactive Map
+                        </Radio.Button>
+                      </Radio.Group>
+                    </div>
+                  </div>
+                  {isColored}
                 </div>
-                {isColored}
               </div>
             </div>
-          </div>
-          <div className="main-map-svg" id="main-map-svg">
-            <svg id="main-mapped" style={{ width: "1000px", height: "750px" }}>
-              <g id="map-scale" className="map-scale"></g>
-            </svg>
-            {niceMap}
-          </div>
+            <div className="main-map-svg" id="main-map-svg">
+              <svg
+                id="main-mapped"
+                style={{ width: "1000px", height: "750px" }}
+              >
+                <g id="map-scale" className="map-scale"></g>
+              </svg>
+              {niceMap}
+            </div>
 
-          <div
-            className="leaflet-map"
-            id="leaflet-map"
-            style={{ display: "none" }}
-          ></div>
+            <div
+              className="leaflet-map"
+              id="leaflet-map"
+              style={{ display: "none" }}
+            ></div>
           </div>
         </section>
       </Fragment>

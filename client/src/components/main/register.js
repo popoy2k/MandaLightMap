@@ -19,7 +19,6 @@ export class register extends Component {
   componentDidUpdate(prevProps) {
     const { notif } = this.props;
     if (prevProps.notif !== notif) {
-      console.log(notif);
       const { status } = notif;
       const initNotif = (
         <Alert

@@ -55,7 +55,6 @@ export const signupUser = newUser => (dispatch, getState) => {
       });
     })
     .catch(errData => {
-      console.log(errData.response);
       dispatch({
         type: SIGNUP_ERROR,
         paylaod: errData.response.data
@@ -69,13 +68,13 @@ export const signinUser = oldUser => (dispatch, getState) => {
     .then(resData => {
       dispatch({
         type: SIGNIN_SUCCESS,
-        payload: resData
+        payload: resData.data.data
       });
     })
     .catch(errData => {
       dispatch({
         type: SIGNIN_ERROR,
-        paylaod: errData.response.data
+        payload: errData.response.data
       });
     });
 };

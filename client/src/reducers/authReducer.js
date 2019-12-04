@@ -1,6 +1,5 @@
 import {
   SIGNUP_ERROR,
-  SIGNUP_SUCCESS,
   SIGNIN_SUCCESS,
   SIGNIN_ERROR,
   GOOGLE_LOGIN_SUCCESS,
@@ -20,9 +19,7 @@ const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case SIGNUP_SUCCESS:
     case SIGNIN_SUCCESS:
-      return state;
     case GOOGLE_LOGIN_SUCCESS:
     case VERIFY_TOKEN_SUCCESS:
       localStorage.setItem("token", action.payload.token);
