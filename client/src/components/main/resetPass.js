@@ -42,7 +42,7 @@ export class resetPass extends Component {
     return (
       <div className="d-flex align-items-center" style={{ height: "100vh" }}>
         <div className="container">
-          <div className="sk-container">
+          <div className="sk-container reset-container">
             <h1>Reset Password</h1>
             <p>
               Hi There, You are now able to change your password. Please
@@ -81,7 +81,4 @@ export class resetPass extends Component {
 const mapStateToProps = state => ({
   reset: state.reset
 });
-export default connect(
-  mapStateToProps,
-  { resetPassFinal }
-)(resetPass);
+export default connect(mapStateToProps, { resetPassFinal })(resetPass);

@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from "react";
-import { Link } from "react-router-dom";
 import SidePanel from "./SidePanel";
 import NavBar from "../main/NavBar";
 import PanelHeader from "./header";
@@ -15,9 +14,14 @@ export class introTopo extends Component {
           <div className="article-panel">
             <span className="article-title">Introduction to TopoJSON</span>
             <p>
-              <Link to="/" className="sk-custom-link">
+              <a
+                href="https://github.com/topojson/topojson"
+                className="sk-custom-link"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
                 TopoJSON
-              </Link>{" "}
+              </a>{" "}
               is an extension of GeoJSON that encodes topology. Rather than
               representing geometries discretely, geometries in TopoJSON files
               are stitched together from shared line segments called arcs. This

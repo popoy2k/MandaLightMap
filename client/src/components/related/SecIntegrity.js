@@ -4,8 +4,9 @@ import SidePanel from "./SidePanel";
 import NavBar from "../main/NavBar";
 import PanelHeader from "./header";
 
-import Sec1 from "./SecImg1.png";
-import Sec2 from "./SecImg2.png";
+import SEC1 from "./SEC1.png";
+import SEC2 from "./SEC2.png";
+import SEC3 from "./SEC3.png";
 
 export class SecIntegrity extends Component {
   render() {
@@ -20,32 +21,47 @@ export class SecIntegrity extends Component {
               Excessive Light can Cause Security Integrity
             </span>
             <p>
-              Light excessive in our living spaces , we are wasting energy and
-              consequently paying more of our electrical bills. Light pollution
-              is accountable for releasing of millions of tons of Carbon dioxide
-              and waste millions of dollars in the earth.
+              In fact, most property crime occurs in the light of the day. And
+              some crimes like vandalism and graffiti actually thrive on night
+              lighting. <br />
+              <br />
+              A dark sky does not necessarily mean a dark ground. Smart lighting
+              that directs light where it is needed creates a balance between
+              safety and starlight. <br />
+              <br /> Outdoor lighting is intended to enhance safety and security
+              at night, but too much lighting can actually have the opposite
+              effect. Visibility should always be the goal. Glare from bright,
+              unshielded lights actually decreases safety because it shines into
+              our eyes and constricts our pupils. This can not only be blinding,
+              it also makes it more difficult for our eyes to adjust to
+              low-light conditions.
             </p>
             <div className="article-image">
-              <img src={Sec1} alt="Security 1" />
+              <img src={SEC1} alt="Sec1" />
+            </div>
+            <div className="article-image">
+              <img src={SEC2} alt="Sec2" />
+            </div>
+            <div className="article-image">
+              <img src={SEC3} alt="Sec3" />
             </div>
             <p>
-              And in the field of astronomy is also affected because of light
-              pollution.
-              <ul>
-                <li>
-                  Skyglow, caused by light scattering in the atmosphere, tends
-                  to reduce the contrast of the night sky which makes it harder
-                  for astronomers to view the heavenly bodies.
-                </li>
-                <li>
-                  Light trespass may create disturbance in observations when it
-                  enters the telescope.
-                </li>
-              </ul>
+              <h4>Explanation:</h4>
+              In unshielded light my not appreciate the glare from floodlights ,
+              Aim them down to at least 45 degrees and shield them , and my not
+              be happier and so will the environment and night sky. Unshielded
+              light my waste of energy , waste of money , annoying to the people
+              crosses by. <br />
+              <br />
+              And another way around , Full Cutoff Sports Lighting increases the
+              level of useable light on the playing area while addressing light
+              impact concerns such as glare reduction, light spillage and sky
+              glow. Full cutoff lighting systems utilize a recessed lamp in a
+              fixture housing that is parallel with the playing surface. This
+              design increases playing area illumination, reduces glare and
+              light spillage in surrounding areas and eliminates upward light
+              and sky glow.
             </p>
-            <div className="article-image">
-              <img src={Sec2} alt="Security 2" />
-            </div>
           </div>
         </div>
       </Fragment>

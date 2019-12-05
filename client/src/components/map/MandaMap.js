@@ -23,6 +23,37 @@ L.Icon.Default.mergeOptions({
 const { SHOW_PARENT } = TreeSelect;
 const { Option, OptGroup } = Select;
 
+const getMonth = num => {
+  switch(parseInt(num)){
+    case 1:
+    return "Jan";
+    case 2:
+    return "Feb";
+    case 3:
+    return "Mar";
+    case 4:
+    return "Apr";
+    case 5:
+    return "May";
+    case 6:
+    return "Jun";
+    case 7:
+    return "Jul";
+    case 8:
+    return "Aug";
+    case 9:
+    return "Sep";
+    case 10:
+    return "Oct";
+    case 11:
+    return "Nov";      
+    case 12:
+    return "Dec";       
+    default:
+      return "Date";
+  }
+}
+
 export class MandaMap extends Component {
   state = {
     treeValue: ["2019-All"],
@@ -1248,7 +1279,9 @@ export class MandaMap extends Component {
           .tickFormat(d => {
             let name = finalData.map(m => m.month || m.year)[d];
             if (name < 13) {
-              return new Date(name).toDateString().split(" ")[1];
+              console.log(name);
+              // return new Date(name).toDateString().split(" ")[1];
+              return getMonth(name);
             }
             return name;
           });

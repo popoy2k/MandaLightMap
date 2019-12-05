@@ -180,6 +180,13 @@ nav ul li a {
   }
 }
 
+@media (max-width: 1000px) {
+  .mobile-side-panel {
+    position: absolute;
+    width: 0;
+  }
+}
+
 @media (max-width: 850px) {
   section.bg-frst {
     min-height: 400px !important;
@@ -776,6 +783,11 @@ hr {
   height: 300px !important;
 }
 
+.reset-container {
+  padding: 20px !important;
+  width: 400px !important;
+}
+
 .sk-container {
   min-width: 30%;
   min-height: 100px;
@@ -801,7 +813,7 @@ hr {
   margin: 0 auto;
   text-align: center;
   font-size: 16px;
-  padding: 10% 0;
+  padding: 10px 0;
 }
 
 .sk-custom-btn {
@@ -1025,7 +1037,8 @@ hr {
 /* Forget pass */
 
 .forget-pass-container {
-  height: 50vh !important;
+  max-width: 400px !important;
+  padding: 20px 10px !important;
 }
 
 /* Enf of forget pass */
@@ -1494,6 +1507,10 @@ svg {
   margin: 50px;
 }
 
+.mobile-side-panel-div {
+  padding-top: 20px;
+  margin-top: 50px;
+}
 /* End of Side Panel */
 
 .panel-header {
@@ -1539,6 +1556,44 @@ svg {
   color: rgba(91, 52, 231, 0.9);
 }
 
+.article-panel h6 {
+  color: rgba(91, 52, 231, 0.9);
+}
+
+/* .article-panel ol {
+  list-style: none;
+  counter-reset: li;
+}
+
+.article-panel ol li {
+  counter-increment: li;
+}
+
+.article-panel ol li::before {
+  content: "." counter(li);
+  display: inline-block;
+  width: 1em;
+  margin-left: -1.5em;
+  margin-right: 0.5em;
+  text-align: right;
+  direction: rtl;
+  color: rgba(91, 52, 231, 0.9);
+} */
+
+.article-mobile-btn {
+  font-size: 16px;
+  border-radius: 0 5px 5px 0;
+  box-shadow: 1px 1px 2px 1px #aaa;
+  padding: 10px;
+  border: none;
+  background-color: #fff;
+  margin: -1px;
+}
+
+.article-mobile-btn:focus {
+  outline: none;
+}
+
 .article-image {
   width: 100%;
   height: auto;
@@ -1573,7 +1628,6 @@ u {
 .sk-strong {
   color: rgba(91, 52, 231, 0.9);
   font-size: 15px;
-  font-weight: bold;
 }
 
 .article-title {
