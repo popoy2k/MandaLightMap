@@ -89,6 +89,7 @@ passport.use(
                   });
                 })
                 .catch(reas => {
+                  console.log(reas);
                   return cb(null, {
                     status: "error",
                     msg: "There's a error on creating your account"
