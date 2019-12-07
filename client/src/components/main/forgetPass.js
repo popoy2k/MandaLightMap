@@ -3,20 +3,34 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { requestReset } from "../../actions/auth";
 import { Link } from "react-router-dom";
+import { Alert } from "antd";
 
 export class forgetPass extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      email: ""
-    };
+  state = {
+    email: "",
+    disabled: "",
+    notif: ""
+  };
+  componentDidMount() {
     document.title = "Skótos - Forget Password";
   }
 
   componentDidUpdate(prevProps) {
     const { reset } = this.props;
     if (prevProps.reset !== reset) {
-      console.log(reset);
+      const initNotif = (
+        <Alert
+          type={reset.status}
+          message={reset.status === "success" ? "Successful" : "Error"}
+          description={
+            reset.status === "success"
+              ? `An reset password link is sent to ${reset.data.email}`
+              : reset.msg
+          }
+          showIcon
+        />
+      );
+      this.setState({ notif: initNotif, disabled: "" });
     }
   }
 
@@ -31,14 +45,15 @@ export class forgetPass extends Component {
     const { email } = this.state;
     if (email) {
       this.props.requestReset({ email });
-      this.setState({ email: "" });
+      this.setState({ email: "", disabled: "disabled" });
     }
   };
   render() {
-    const { email } = this.state;
+    const { email, disabled, notif } = this.state;
     return (
       <div className="d-flex align-items-center" style={{ height: "100vh" }}>
         <div className="container">
+          <div className="sk-alert forget-pass-container">{notif}</div>
           <div className="forget-pass-container sk-container">
             <p>
               Forgotten your password? <br /> Please enter the email address
@@ -51,9 +66,10 @@ export class forgetPass extends Component {
                 placeholder="Enter email here."
                 onChange={this.onChange}
                 name="email"
+                disabled={disabled}
                 value={email}
               />
-              <button type="submit" className="sk-btn-main">
+              <button type="submit" className="sk-btn-main" disabled={disabled}>
                 Reset Password
               </button>
               <br />
@@ -69,10 +85,7 @@ export class forgetPass extends Component {
 }
 
 const mapStateToProps = state => ({
-  reset: state.reset
+  reset: state.reset.data
 });
 
-export default connect(
-  mapStateToProps,
-  { requestReset }
-)(forgetPass);
+export default connect(mapStateToProps, { requestReset })(forgetPass);

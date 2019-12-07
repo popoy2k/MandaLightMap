@@ -89,7 +89,7 @@ passport.use(
                   });
                 })
                 .catch(reas => {
-                  console.log(reas);
+                  newUser.remove();
                   return cb(null, {
                     status: "error",
                     msg: "There's a error on creating your account"
@@ -131,6 +131,13 @@ passport.use(
             });
           }
 
+          if (!resData) {
+            return done(null, {
+              status: "error",
+              msg: "Account can't be found."
+            });
+          }
+
           resData
             .comparePass(password)
             .then(isMatch => {
@@ -138,6 +145,15 @@ passport.use(
                 return done(null, {
                   status: "error",
                   msg: "Email/Password is incorrect."
+                });
+              }
+
+              const { isActivated } = resData.acctInfo.activationInfo;
+
+              if (!isActivated) {
+                return done(null, {
+                  status: "error",
+                  msg: "Account isn't verified"
                 });
               }
 
@@ -248,9 +264,9 @@ passport.use(
               html: `You've successfully requested for your password to be reset. 
               Here's a link for you to be able to reset your password. 
               Bare in mind that after <strong><i>2 hours</i></strong> this link will expired. <br /> 
-              <a href="http://localhost:3000/auth/ures/${randBuff.toString(
-                "hex"
-              )}">Click me </a>`
+              <a href="${req.protocol}://${
+                req.hostname
+              }/auth/ures/${randBuff.toString("hex")}">Click me </a>`
             })
               .then(res => {
                 result.acctInfo.resetPass.resetToken = randBuff.toString("hex");

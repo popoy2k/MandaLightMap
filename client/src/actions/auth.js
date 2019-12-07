@@ -112,7 +112,7 @@ export const resetPassFinal = newPass => (dispatch, getState) => {
     .catch(resErr => {
       dispatch({
         type: RESET_PASS,
-        payload: resErr.response.data
+        payload: resErr.response
       });
     });
 };
@@ -275,7 +275,6 @@ export const getUserTableData = () => (dispatch, getState) => {
       });
     })
     .catch(resErr => {
-      console.log(resErr.response);
       dispatch({
         type: USER_DATA_TABLE_ERROR
       });
