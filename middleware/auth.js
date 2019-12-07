@@ -220,7 +220,7 @@ passport.use(
           if (error) {
             return done(null, {
               status: "error",
-              msg: "Something went wrong."
+              msg: "Something went fetching your data."
             });
           }
           if (!result) {
@@ -254,7 +254,7 @@ passport.use(
             if (randErr) {
               return done(null, {
                 status: "error",
-                msg: "Something went wrong."
+                msg: "Something went wrong (RG01)."
               });
             }
             Mailer.sender({
@@ -278,16 +278,20 @@ passport.use(
                   if (err) {
                     return done(null, {
                       status: "error",
-                      msg: "Something went wrong"
+                      msg: "Something went requesting for reset password."
                     });
                   }
 
                   return done(null, { status: "success", data: { email } });
                 });
               })
-              .catch(err =>
-                done(null, { status: "error", msg: "Something went wrong" })
-              );
+              .catch(err => {
+                console.log(err);
+                done(null, {
+                  status: "error",
+                  msg: "Something went sending an email."
+                });
+              });
           });
         });
     }
