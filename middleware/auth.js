@@ -286,7 +286,6 @@ passport.use(
                 });
               })
               .catch(err => {
-                console.log(err);
                 done(null, {
                   status: "error",
                   msg: "Something went sending an email."

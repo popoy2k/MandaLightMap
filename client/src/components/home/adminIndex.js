@@ -34,7 +34,8 @@ import {
   uploadValidate,
   getUserTableData,
   getDownloadTableData,
-  getUserDetails
+  getUserDetails,
+  changeUserRole
 } from "../../actions/auth";
 
 import { Redirect } from "react-router-dom";
@@ -145,7 +146,8 @@ export class adminIndex extends Component {
     userDetailsList: [],
     userDetailLoading: true,
     downloadTableList: [],
-    downloadtableLoading: true
+    downloadtableLoading: true,
+    changingRole: false
   };
 
   static propTypes = {
@@ -158,6 +160,7 @@ export class adminIndex extends Component {
     getUserTableData: PropTypes.func.isRequired,
     getDownloadTableData: PropTypes.func.isRequired,
     getUserDetails: PropTypes.func.isRequired,
+    changeUserRole: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
     home: PropTypes.object.isRequired,
     downloadUrl: PropTypes.node,
@@ -169,7 +172,8 @@ export class adminIndex extends Component {
       PropTypes.array,
       PropTypes.instanceOf(null)
     ]),
-    user: PropTypes.oneOfType([PropTypes.object, PropTypes.instanceOf(null)])
+    user: PropTypes.oneOfType([PropTypes.object, PropTypes.instanceOf(null)]),
+    notif: PropTypes.oneOfType([PropTypes.object, PropTypes.instanceOf(null)])
   };
 
   showLipoDrawer = e => {
@@ -238,9 +242,15 @@ export class adminIndex extends Component {
       uploadStat,
       userTable,
       downloadTable,
-      userDetails
+      userDetails,
+      notif
     } = this.props;
     const { uploadFileList } = this.state;
+
+    if (notif !== prevProps.notif) {
+      message[notif.status](notif.msg || notif.data);
+      this.setState({ changingRole: false });
+    }
 
     if (prevProps.userDetails !== userDetails) {
       this.setState({ userDetailsList: userDetails, userDetailLoading: false });
@@ -395,6 +405,15 @@ export class adminIndex extends Component {
     }
   };
 
+  roleChange = e => {
+    const { value: role, name: _id } = e.target;
+    this.props.changeUserRole({ role, _id });
+    this.setState({ changingRole: true });
+    // Show notif for return status
+    // Add disabled in radio button while processing
+    // Tagal matapos ng taon na to tang ina!!
+  };
+
   render() {
     const { isAuthenticated, token } = this.props.auth;
     const { user } = this.props;
@@ -425,18 +444,21 @@ export class adminIndex extends Component {
       userDrawer,
       userDetailsList,
       downloadTableList,
-      downloadTableLoading
+      downloadTableLoading,
+      changingRole
     } = this.state;
-    console.log(userDetailsList);
 
     let RoleRadio =
       Object.entries(userDetailsList).length > 0 ? (
         <div>
           <Radio.Group
             defaultValue={userDetailsList ? userDetailsList.role : "Admin"}
+            onChange={this.roleChange}
+            name={userDetailsList._id}
+            disabled={changingRole ? true : false}
           >
-            <Radio.Button value="Admin">Admin</Radio.Button>
-            <Radio.Button value="User">User</Radio.Button>
+            <Radio value="Admin">Admin</Radio>
+            <Radio value="User">User</Radio>
           </Radio.Group>
         </div>
       ) : (
@@ -891,10 +913,6 @@ export class adminIndex extends Component {
                 <Icon type="bulb" />
                 <span>Light Pollution Data</span>
               </Menu.Item>
-              <Menu.Item key="2">
-                <Icon type="reconciliation" />
-                <span>Health Records</span>
-              </Menu.Item>
             </Menu>
           </Sider>
           <Layout>
@@ -971,7 +989,7 @@ export class adminIndex extends Component {
                 />
               </Drawer>
               <Drawer
-                width={640}
+                width={500}
                 placement="right"
                 visible={userDrawer}
                 closable={false}
@@ -980,7 +998,7 @@ export class adminIndex extends Component {
                 <div>
                   <Spin spinning={userDetailLoading} tip="Fetching data...">
                     <h2>{userDetailsList ? userDetailsList.fullName : ""}</h2>
-                    <Descriptions size="small" col="2">
+                    <Descriptions size="small" column={1}>
                       <Descriptions.Item label="First Name">
                         {userDetailsList ? userDetailsList.firstName : ""}
                       </Descriptions.Item>
@@ -991,9 +1009,18 @@ export class adminIndex extends Component {
                         {userDetailsList ? userDetailsList.email : ""}
                       </Descriptions.Item>
                       <Descriptions.Item label="Date Created">
-                        {userDetailsList
-                          ? moment(userDetailsList.dateCreated).format("L")
-                          : ""}
+                        {userDetailsList ? (
+                          <Tooltip
+                            placement="top"
+                            title={moment(
+                              userDetailsList.dateCreated
+                            ).fromNow()}
+                          >
+                            {moment(userDetailsList.dateCreated).format("L")}
+                          </Tooltip>
+                        ) : (
+                          ""
+                        )}
                       </Descriptions.Item>
                       <Descriptions.Item label="Account Type">
                         {userDetailsList ? userDetailsList.creationType : ""}
@@ -1040,7 +1067,8 @@ const mapStateToProps = state => ({
   userTable: state.home.userTable,
   downloadTable: state.home.downloadTable,
   userDetails: state.home.userDetails,
-  user: state.auth.user
+  user: state.auth.user,
+  notif: state.notif.notif
 });
 
 export default connect(mapStateToProps, {
@@ -1052,5 +1080,6 @@ export default connect(mapStateToProps, {
   uploadValidate,
   getUserTableData,
   getDownloadTableData,
-  getUserDetails
+  getUserDetails,
+  changeUserRole
 })(adminIndex);

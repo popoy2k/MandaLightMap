@@ -317,6 +317,10 @@ export class userIndex extends Component {
       return <Redirect to="/auth/login" />;
     }
 
+    if (!user) {
+      return <div></div>;
+    }
+
     const lipoColumn = [
       {
         title: "Year",
@@ -583,10 +587,6 @@ export class userIndex extends Component {
               <Menu.Item key="1">
                 <Icon type="bulb" />
                 <span>Light Pollution Data</span>
-              </Menu.Item>
-              <Menu.Item key="2">
-                <Icon type="reconciliation" />
-                <span>Health Records</span>
               </Menu.Item>
             </Menu>
           </Sider>

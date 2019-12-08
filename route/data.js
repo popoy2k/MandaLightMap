@@ -10,7 +10,8 @@ const {
   handleFile,
   userTable,
   userDetails,
-  downloadTable
+  downloadTable,
+  userRoleChange
 } = require("../middleware/custom");
 
 const multer = require("multer");
@@ -92,5 +93,9 @@ router
   .post(verifyRequest, downloadTable, (req, res) => {
     // to be handled
   });
+
+router.route("/user/role").post(verifyRequest, userRoleChange, (req, res) => {
+  // to be handled
+});
 
 module.exports = router;

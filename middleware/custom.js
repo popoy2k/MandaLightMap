@@ -115,12 +115,10 @@ const verifyToken = (req, res, next) => {
             return next("router");
           }
 
-          res
-            .status(200)
-            .json({
-              token: encoded,
-              user: { email, firstName, lastName, role }
-            });
+          res.status(200).json({
+            token: encoded,
+            user: { email, firstName, lastName, role }
+          });
           return next();
         }
       );
@@ -332,7 +330,6 @@ const userTable = (req, res, next) => {
     if (!resData) {
       res.status(200).json({ status: "success", data: null });
     }
-
     let dataSource = resData
       .map((mVal, index) => ({
         key: index,
@@ -407,14 +404,14 @@ const userDetails = (req, res, next) => {
   const { id } = req.body;
   User.findOne({ _id: id })
     .select(
-      "acctInfo.activationInfo.isActivated acctInfo.creationType acctInfo.role acctInfo.firstName acctInfo.lastName acctInfo.email acctInfo.dateCreated"
+      "_id acctInfo.activationInfo.isActivated acctInfo.creationType acctInfo.role acctInfo.firstName acctInfo.lastName acctInfo.email acctInfo.dateCreated"
     )
     .exec((err, data) => {
       if (err || !data) {
         res.status(400).json({ status: "error", msg: "Something went wrong" });
         return next("router");
       }
-
+      const { _id } = data;
       let finalData = [data.acctInfo].map(mVal => {
         const {
           firstName,
@@ -426,6 +423,7 @@ const userDetails = (req, res, next) => {
           role
         } = mVal;
         return {
+          _id,
           firstName,
           lastName,
           fullName: `${lastName}, ${firstName}`,
@@ -442,6 +440,25 @@ const userDetails = (req, res, next) => {
     });
 };
 
+const userRoleChange = (req, res, next) => {
+  const { _id, role } = req.body;
+  User.findOneAndUpdate(
+    { _id },
+    { "acctInfo.role": `${role}`.toLowerCase() }
+  ).exec((err, data) => {
+    if (err || !data) {
+      res
+        .status(400)
+        .json({ status: 400, msg: "Something went wrong in your action." });
+      next("router");
+    }
+    res
+      .status(200)
+      .json({ status: "success", msg: "Role changed successfully." });
+    next();
+  });
+};
+
 module.exports = {
   customActivate,
   verifyToken,
@@ -453,5 +470,6 @@ module.exports = {
   handleFile,
   userTable,
   downloadTable,
-  userDetails
+  userDetails,
+  userRoleChange
 };

@@ -29,7 +29,9 @@ import {
   DOWNLOAD_DATA_TABLE_ERROR,
   SIGN_OUT,
   USER_DETAILS_SUCCESS,
-  USER_DETAILS_ERROR
+  USER_DETAILS_ERROR,
+  CHANGE_ROLE_SUCCESS,
+  CHANGE_ROLE_ERROR
 } from "./types";
 import axios from "axios";
 
@@ -309,6 +311,23 @@ export const getUserDetails = id => (dispatch, getState) => {
     .catch(resErr => {
       dispatch({
         type: USER_DETAILS_ERROR
+      });
+    });
+};
+
+export const changeUserRole = userObj => (dispatch, getState) => {
+  axios
+    .post("/data/user/role", JSON.stringify(userObj), getConfig(getState))
+    .then(resData => {
+      dispatch({
+        type: CHANGE_ROLE_SUCCESS,
+        payload: resData.data
+      });
+    })
+    .catch(resErr => {
+      dispatch({
+        type: CHANGE_ROLE_ERROR,
+        payload: resErr.response.data
       });
     });
 };
