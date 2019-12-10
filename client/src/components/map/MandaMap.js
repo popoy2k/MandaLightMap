@@ -385,7 +385,7 @@ export class MandaMap extends Component {
       .tickFormat(function(d) {
         let name = finalData.map(m => m.month || m.year)[d];
         if (name < 13) {
-          return new Date(name).toDateString().split(" ")[1];
+          return getMonth(parseInt(name));
         }
         return name;
       });
