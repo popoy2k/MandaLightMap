@@ -183,7 +183,7 @@ passport.use(
                     status: "success",
                     data: {
                       token: encoded,
-                      user: { email, firstName, lastName, role }
+                      user: { _id, email, firstName, lastName, role }
                     }
                   });
                 }
@@ -400,7 +400,7 @@ passport.use(
                 status: "success",
                 msg: {
                   token: encoded,
-                  user: { email, firstName, lastName, role }
+                  user: { _id, email, firstName, lastName, role }
                 }
               });
             }
@@ -445,7 +445,7 @@ passport.use(
                   status: "success",
                   msg: {
                     token: encoded,
-                    user: { email, firstName, lastName, role }
+                    user: { _id, email, firstName, lastName, role }
                   }
                 });
               }

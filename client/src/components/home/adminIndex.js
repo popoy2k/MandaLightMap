@@ -250,6 +250,9 @@ export class adminIndex extends Component {
     if (notif !== prevProps.notif) {
       message[notif.status](notif.msg || notif.data);
       this.setState({ changingRole: false });
+      if (notif.status === "success") {
+        this.props.getUserTableData();
+      }
     }
 
     if (prevProps.userDetails !== userDetails) {
@@ -1026,7 +1029,23 @@ export class adminIndex extends Component {
                         {userDetailsList ? userDetailsList.creationType : ""}
                       </Descriptions.Item>
                       <Descriptions.Item label="Role">
-                        {userDetailsList ? RoleRadio : ""}
+                        {userDetailsList ? (
+                          userDetailsList._id === user._id ? (
+                            <Tag
+                              color={
+                                userDetailsList.role === "Admin"
+                                  ? "green"
+                                  : "cyan"
+                              }
+                            >
+                              {userDetailsList.role}
+                            </Tag>
+                          ) : (
+                            RoleRadio
+                          )
+                        ) : (
+                          ""
+                        )}
                       </Descriptions.Item>
                       <Descriptions.Item label="Status">
                         <Badge

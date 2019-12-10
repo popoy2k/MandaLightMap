@@ -117,7 +117,7 @@ const verifyToken = (req, res, next) => {
 
           res.status(200).json({
             token: encoded,
-            user: { email, firstName, lastName, role }
+            user: { _id, email, firstName, lastName, role }
           });
           return next();
         }
