@@ -528,17 +528,17 @@ export class MandaMap extends Component {
           }
         );
 
-        // let tfSpinal = L.tileLayer(
-        //   "https://{s}.tile.thunderforest.com/spinal-map/{z}/{x}/{y}.png?apikey=336a2deec6504dfda79e31f016f4aae9",
-        //   {
-        //     id: "MapID",
-        //     attribution:
-        //       '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        //     apikey: "336a2deec6504dfda79e31f016f4aae9",
-        //     maxZoom: 20,
-        //     maxNativeZoom: 17
-        //   }
-        // );
+        let tfSpinal = L.tileLayer(
+          "https://{s}.tile.thunderforest.com/spinal-map/{z}/{x}/{y}.png?apikey=336a2deec6504dfda79e31f016f4aae9",
+          {
+            id: "MapID",
+            attribution:
+              '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            apikey: "336a2deec6504dfda79e31f016f4aae9",
+            maxZoom: 20,
+            maxNativeZoom: 17
+          }
+        );
 
         if (!leafletMap) {
           leafletMap = L.map("leaflet-map", {
@@ -548,7 +548,8 @@ export class MandaMap extends Component {
             "OpenStreet - France": osFrance,
             Transport: tfTransport,
             "Transport Dark": tfTransportDark,
-            "Open Cycle": tfOpenCycle
+            "Open Cycle": tfOpenCycle,
+            "Spinal" : tfSpinal
           };
           L.control
             .layers(baseLayers)
