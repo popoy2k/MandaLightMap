@@ -102,7 +102,9 @@ router.route("/google/signin").post(
 );
 
 router.route("/verify/token").post(verifyToken, (req, res) => {
-  console.log("Shit you looking for ===> ", req.ip, req.ips);
+  const some = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+  console.log("Shit you looking for ===> ", req.ip, req.ips, some);
+
   // To be handled
 });
 
