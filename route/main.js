@@ -102,6 +102,7 @@ router.route("/google/signin").post(
 );
 
 router.route("/verify/token").post(verifyToken, (req, res) => {
+  console.log("Shit you looking for ===> ", req.ip, req.ips);
   // To be handled
 });
 
